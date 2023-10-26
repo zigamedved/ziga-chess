@@ -185,3 +185,6 @@ PGN: 1. c4 c6 2. d4 d5 3. Nf3 Nf6 4. e3 a6 5. b3 Bg4 6. Nbd2 e6 7. Be2 Bd6 8. Bb
 PV1: [FEN "r4rk1/1p3ppp/p1p5/8/2P5/1P6/PR3PPP/R5K1 b - - 0 19"][SetUp "1"]19... Rfd8 20. Re2 Rd7 21. Rae1 f6 22. h4 *
 PV2: [FEN "r4rk1/1p3ppp/p1p5/8/2P5/1P6/PR3PPP/R5K1 b - - 0 19"][SetUp "1"]19... Rfe8 20. Kf1 Rad8 21. Re1 Kf8 22. Rxe8+ *
 score: 56.89363098144531`
+
+# Sources
+- https://stockfishchess.org
