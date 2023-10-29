@@ -294,3 +294,102 @@
 [SourceVersionDate "2023.10.29"]
 
 {[#]} 44... Ke5 (44... Rc6+ 45. Kd3 Ke5 46. Rh4 Rb6 47. Kc4 * $19) 45. Rh4 Rc6+ 46. Kd3 Rb6 47. Kc4 * $19 *
+
+
+[Event "?"]
+[Site "?"]
+[Date "????.??.??"]
+[Round "?"]
+[White "QUERY 4"]
+[Black "?"]
+[Result "*"]
+[SetUp "1"]
+[FEN "7K/6R1/1k6/p7/8/8/8/8 b - - 0 1"]
+[PlyCount "8"]
+[SourceVersionDate "2023.10.29"]
+
+{[#]} 1... Kb5  (1... Kc5 2. Rg4 Kb5 3. Rg1 Kb4 4. Rb1+ Kc5 5. Kh7 * $11) 2. Rg5+ Ka4 3. Kg7 Kb4 4. Rg4+ Kb3 5. Kf7 * $11 *
+
+[Event "?"]
+[Site "?"]
+[Date "????.??.??"]
+[Round "?"]
+[White "SIMILAR 4.1"]
+[Black "50.12"]
+[Result "*"]
+[SetUp "1"]
+[FEN "7K/6R1/1k6/p7/8/8/8/8 b - - 0 1"]
+[PlyCount "6"]
+[SourceVersionDate "2023.10.29"]
+
+{[#]} 1... Kb5 (1... Kc5 2. Rg4 Kb5 3. Kg8 a4 4. Kf7 * $11) 2. Kh7 a4 3. Ra7 Kb4 4. Kg6 * $11 *
+
+[Event "?"]
+[Site "?"]
+[Date "????.??.??"]
+[Round "?"]
+[White "SIMILAR 4.2"]
+[Black "36.87"]
+[Result "*"]
+[SetUp "1"]
+[FEN "7K/6R1/1k6/p7/8/8/8/8 w - - 0 1"]
+[PlyCount "6"]
+[SourceVersionDate "2023.10.29"]
+
+{[#]} 1. Rg5 (1. Kh7 Kb5 2. Kg6 a4 3. Kf5 Kc4 * $11) 1... a4 2. Re5 a3 3. Re3 Kb5 * $18 *
+
+[Event "?"]
+[Site "?"]
+[Date "????.??.??"]
+[Round "?"]
+[White "SIMILAR 4.3"]
+[Black "27.74"]
+[Result "*"]
+[SetUp "1"]
+[FEN "7K/7P/1k6/8/6P1/8/8/8 b - - 0 67"]
+[PlyCount "6"]
+[SourceVersionDate "2023.10.29"]
+
+{[#]} 67... Kc6 (67... Kb5 68. Kg7 Kc4 69. Kf7 Kb4 70. g5 * $18) 68. Kg8 Kc5 69. g5 Kd4 70. Kg7 * $18 *
+
+[Event "?"]
+[Site "?"]
+[Date "????.??.??"]
+[Round "?"]
+[White "SIMILAR 4.4"]
+[Black "26.52"]
+[Result "*"]
+[SetUp "1"]
+[FEN "8/6R1/1kp5/8/p6P/1p6/1P5r/2K5 w - - 0 45"]
+[PlyCount "6"]
+[SourceVersionDate "2023.10.29"]
+
+{[#]} 45. Rg4 (45. Rg8 Rxh4 46. Rf8 Kb5 47. Rc8 Rh1+ * $19) 45... Kb5 46. Rg5+ Kb4 47. Rg4+ Ka5 * $19 *
+
+[Event "?"]
+[Site "?"]
+[Date "????.??.??"]
+[Round "?"]
+[White "SIMILAR 4.5"]
+[Black "19.26"]
+[Result "*"]
+[SetUp "1"]
+[FEN "8/8/k2K2pR/p7/3P4/r7/8/8 w - - 0 52"]
+[PlyCount "6"]
+[SourceVersionDate "2023.10.29"]
+
+{[#]} 52. d5 (52. Rxg6 Kb5 53. Rg5+ Kb4 54. d5 a4 * $11) 52... Rg3 53. Rh2 a4 54. Rd2 a3 * $11 *
+
+[Event "?"]
+[Site "?"]
+[Date "????.??.??"]
+[Round "?"]
+[White "SIMILAR 4.6"]
+[Black "14.60"]
+[Result "*"]
+[SetUp "1"]
+[FEN "8/6R1/1p6/p2k4/6P1/P1P5/K1P5/6r1 b - - 0 46"]
+[PlyCount "6"]
+[SourceVersionDate "2023.10.29"]
+
+{[#]} 46... Kc4 (46... Rf1 47. a4 Kc6 48. g5 Rc1 49. Kb3 * $18) 47. Kb2 Kb5 48. Rg5+ Ka4 49. Rd5 * $18 *
