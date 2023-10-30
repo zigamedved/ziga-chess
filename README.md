@@ -13,7 +13,7 @@
 - `docker run --rm -p 8081:8081 your-image-name` // endpoint available at http://0.0.0.0:8081+prefix/analyse
 
 # R&D
-- improve game attributes in main.py, build index and update the indexedFiles directory in chess-maven project
+- improve game attributes in main.py, build index and update the indexedFiles directory in java-server project
 
 # Request example
 - method `POST`
