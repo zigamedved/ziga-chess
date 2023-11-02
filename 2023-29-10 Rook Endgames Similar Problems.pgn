@@ -10,7 +10,7 @@
 [PlyCount "8"]
 [SourceVersionDate "2023.10.29"]
 
-{[#]} 1. Ra5 (1. Ra6 Rc7 2. Rb6 Ra7 3. Rd6 Rb7 4. Ra6 Rb5+ * $18) 1... Rc7 2. Rb5 Rc4 3. Rb7+ Kf8 4. Ra7 Rd4 * $18 *
+{[#]} 1. Ra5 (1. Ra6 Rc7 2. Rb6 Ra7 3. Rd6 Rb7 4. Ra6 Rb5+ $18) 1... Rc7 2. Rb5 Rc4 3. Rb7+ Kf8 4. Ra7 Rd4 $18 *
 
 [Event "?"]
 [Site "?"]
@@ -24,7 +24,7 @@
 [PlyCount "6"]
 [SourceVersionDate "2023.10.29"]
 
-{[#]} 1. Ra5 (1. e5 fxe5 2. fxe5 Rb6 3. Ra5 Ke7 * $18) 1... Rc7 2. Ra6 Rb7 3. Ra1 Rc7 * $18 *
+{[#]} 1. Ra5 (1. e5 fxe5 2. fxe5 Rb6 3. Ra5 Ke7 $18) 1... Rc7 2. Ra6 Rb7 3. Ra1 Rc7 $18 *
 
 [Event "?"]
 [Site "?"]
@@ -38,7 +38,7 @@
 [PlyCount "6"]
 [SourceVersionDate "2023.10.29"]
 
-{[#]} 50... Rb2 (50... Re7 51. Ra6 Rd7 52. Ra5 Rb7 53. Ra1 * $18) 51. g3 Rb7 52. f4 exf4 53. gxf4 * $18 *
+{[#]} 50... Rb2 (50... Re7 51. Ra6 Rd7 52. Ra5 Rb7 53. Ra1 $18) 51. g3 Rb7 52. f4 exf4 53. gxf4 $18 *
 
 [Event "?"]
 [Site "?"]
@@ -52,7 +52,7 @@
 [PlyCount "6"]
 [SourceVersionDate "2023.10.29"]
 
-{[#]} 56... Kg7 (56... Rc7 57. Kg6 Rg7+ 58. Kxh6 Rh7+ 59. Kg6 * $18) 57. Ra7+ Kf8 58. Ra6 Kg7 59. Ra7+ * $18 *
+{[#]} 56... Kg7 (56... Rc7 57. Kg6 Rg7+ 58. Kxh6 Rh7+ 59. Kg6 $18) 57. Ra7+ Kf8 58. Ra6 Kg7 59. Ra7+ $18 *
 
 [Event "?"]
 [Site "?"]
@@ -66,7 +66,7 @@
 [PlyCount "6"]
 [SourceVersionDate "2023.10.29"]
 
-{[#]} 50. b4 (50. Rb5 b6 51. b4 Rd7 52. Rxb6 Rd5+ * $18) 50... Kg7 51. Rd1 Re7 52. Rd5 Rc7 * $18 *
+{[#]} 50. b4 (50. Rb5 b6 51. b4 Rd7 52. Rxb6 Rd5+ $18) 50... Kg7 51. Rd1 Re7 52. Rd5 Rc7 $18 *
 
 
 [Event "?"]
@@ -81,7 +81,7 @@
 [PlyCount "6"]
 [SourceVersionDate "2023.10.29"]
 
-{[#]} 50... Rd1 (50... Rd3 51. Ra7+ Kf6 52. Kf2 Rd2+ 53. Kg3 * $18) 51. Ra7+ Kf8 52. f5 Rh1 53. Kg2 * $18 *
+{[#]} 50... Rd1 (50... Rd3 51. Ra7+ Kf6 52. Kf2 Rd2+ 53. Kg3 $18) 51. Ra7+ Kf8 52. f5 Rh1 53. Kg2 $18 *
 
 [Event "?"]
 [Site "?"]
@@ -95,7 +95,7 @@
 [PlyCount "6"]
 [SourceVersionDate "2023.10.29"]
 
-{[#]} 63... Ra7 (63... Rd7+ 64. Kc4 h5 65. Rd5 Rc7+ 66. Rc5 * $18) 64. Kc4 Ke6 65. Ra5 Rc7+ 66. Rc5 * $18 *
+{[#]} 63... Ra7 (63... Rd7+ 64. Kc4 h5 65. Rd5 Rc7+ 66. Rc5 $18) 64. Kc4 Ke6 65. Ra5 Rc7+ 66. Rc5 $18 *
 
 
 [Event "?"]
@@ -110,7 +110,7 @@
 [PlyCount "8"]
 [SourceVersionDate "2023.10.29"]
 
-{[#]} 1... Ke4 (1... Rc8+ 2. Kd6 Rd8+ 3. Kc7 Rf8 4. Kd6 Rd8+ 5. Ke7 * $18) 2. Rb4+ Ke3 3. Kc7 Rf8 4. Rb3+ Ke4 5. b7 * $11 *
+{[#]} 1... Ke4 (1... Rc8+ 2. Kd6 Rd8+ 3. Kc7 Rf8 4. Kd6 Rd8+ 5. Ke7 $18) 2. Rb4+ Ke3 3. Kc7 Rf8 4. Rb3+ Ke4 5. b7 $11 *
 
 [Event "?"]
 [Site "?"]
@@ -124,7 +124,7 @@
 [PlyCount "6"]
 [SourceVersionDate "2023.10.29"]
 
-{[#]} 1... Ke4 (1... Rc8+ 2. Kd6 Ke4 3. b7 Rb8 4. Rb4+ * $18) 2. b7 f5 3. Re1+ Kf3 4. Rf1+ * $11 *
+{[#]} 1... Ke4 (1... Rc8+ 2. Kd6 Ke4 3. b7 Rb8 4. Rb4+ $18) 2. b7 f5 3. Re1+ Kf3 4. Rf1+ $11 *
 
 [Event "?"]
 [Site "?"]
@@ -138,7 +138,7 @@
 [PlyCount "6"]
 [SourceVersionDate "2023.10.29"]
 
-{[#]} 48... Rb8 (48... Rg8 49. Kd6 Rd8+ 50. Kc7 Re8 51. b7 * $18) 49. Rh6 f5 50. Rxh5 f4 51. Kc6 * $18 *
+{[#]} 48... Rb8 (48... Rg8 49. Kd6 Rd8+ 50. Kc7 Re8 51. b7 $18) 49. Rh6 f5 50. Rxh5 f4 51. Kc6 $18 *
 
 [Event "?"]
 [Site "?"]
@@ -152,7 +152,7 @@
 [PlyCount "6"]
 [SourceVersionDate "2023.10.29"]
 
-{[#]} 47... Rd3 (47... Rc3+ 48. Kd7 Ra3 49. b7 Ra7 50. Kd6 * $18) 48. Kc7 Ra3 49. b7 Ra7 50. Kd6 * $18 *
+{[#]} 47... Rd3 (47... Rc3+ 48. Kd7 Ra3 49. b7 Ra7 50. Kd6 $18) 48. Kc7 Ra3 49. b7 Ra7 50. Kd6 $18 *
 
 
 [Event "?"]
@@ -167,7 +167,7 @@
 [PlyCount "6"]
 [SourceVersionDate "2023.10.29"]
 
-{[#]} 58. b7 (58. Kb5 Ke4 59. Kc6 Rh6+ 60. Kc7 Kd5 * $11) 58... Ke3 59. Kd6 Kd2 60. Kc7 Rg8 * $11 *
+{[#]} 58. b7 (58. Kb5 Ke4 59. Kc6 Rh6+ 60. Kc7 Kd5 $11) 58... Ke3 59. Kd6 Kd2 60. Kc7 Rg8 $11 *
 
 [Event "?"]
 [Site "?"]
@@ -181,7 +181,7 @@
 [PlyCount "6"]
 [SourceVersionDate "2023.10.29"]
 
-{[#]} 62... d2 (62... Kxf6 63. b7 d2 64. b8=Q d1=Q 65. Qb2+ * $19) 63. b7 Kxf6 64. b8=Q d1=Q 65. Qb2+ * $19 *
+{[#]} 62... d2 (62... Kxf6 63. b7 d2 64. b8=Q d1=Q 65. Qb2+ $19) 63. b7 Kxf6 64. b8=Q d1=Q 65. Qb2+ $19 *
 
 [Event "?"]
 [Site "?"]
@@ -195,7 +195,7 @@
 [PlyCount "6"]
 [SourceVersionDate "2023.10.29"]
 
-{[#]} 69... Ke3 (69... Ke2 70. Kc7 Kf1 71. Kd8 Kg2 72. Ke7 * $19) 70. Kd7 h5 71. Kd6 Kf2 72. Ke5 * $19 *
+{[#]} 69... Ke3 (69... Ke2 70. Kc7 Kf1 71. Kd8 Kg2 72. Ke7 $19) 70. Kd7 h5 71. Kd6 Kf2 72. Ke5 $19 *
 
 [Event "?"]
 [Site "?"]
@@ -209,7 +209,7 @@
 [PlyCount "8"]
 [SourceVersionDate "2023.10.29"]
 
-{[#]} 1. Re4 (1. Rd4 Rc6 2. Ra4 Rb6 3. Re4 Rc6 4. Ra4 Rb6 * $18) 1... Rc6 2. Ra4 Rb6 3. Re4 Rc6 4. Ra4 Rb6 * $18 *
+{[#]} 1. Re4 (1. Rd4 Rc6 2. Ra4 Rb6 3. Re4 Rc6 4. Ra4 Rb6 $18) 1... Rc6 2. Ra4 Rb6 3. Re4 Rc6 4. Ra4 Rb6 $18 *
 
 [Event "?"]
 [Site "?"]
@@ -223,7 +223,7 @@
 [PlyCount "6"]
 [SourceVersionDate "2023.10.29"]
 
-{[#]} 1. Rd4 (1. Rc4 Rb6 2. Ra4 Rc6 3. Re4 Ra6 * $18) 1... Rc6 2. Ra4 Rb6 3. Re4 Rc6 * $18 *
+{[#]} 1. Rd4 (1. Rc4 Rb6 2. Ra4 Rc6 3. Re4 Ra6 $18) 1... Rc6 2. Ra4 Rb6 3. Re4 Rc6 $18 *
 
 [Event "?"]
 [Site "?"]
@@ -237,7 +237,7 @@
 [PlyCount "6"]
 [SourceVersionDate "2023.10.29"]
 
-{[#]} 54... Rf6 (54... Rb6 55. Re4 Rc6 56. Re5 Rc4+ 57. Kh3 * $11) 55. f3 Ra6 56. Rb4 Rc6 57. Ra4 * $11 *
+{[#]} 54... Rf6 (54... Rb6 55. Re4 Rc6 56. Re5 Rc4+ 57. Kh3 $11) 55. f3 Ra6 56. Rb4 Rc6 57. Ra4 $11 *
 
 [Event "?"]
 [Site "?"]
@@ -251,7 +251,7 @@
 [PlyCount "6"]
 [SourceVersionDate "2023.10.29"]
 
-{[#]} 65... Rc6 (65... Rb6 66. Ra4 Kh5 67. Ra5+ Kh6 68. Ra3 * $18) 66. Ra4 Kh5 67. Kg3 Rg6+ 68. Kf4 * $18 *
+{[#]} 65... Rc6 (65... Rb6 66. Ra4 Kh5 67. Ra5+ Kh6 68. Ra3 $18) 66. Ra4 Kh5 67. Kg3 Rg6+ 68. Kf4 $18 *
 
 [Event "?"]
 [Site "?"]
@@ -265,7 +265,7 @@
 [PlyCount "6"]
 [SourceVersionDate "2023.10.29"]
 
-{[#]} 33. Kf2 (33. Re4 Rc6 34. Ra4 Rb6 35. Ke1 Kd6 * $18) 33... Rc6 34. Ra4 Rd6 35. Ra5 Rb6 * $18 *
+{[#]} 33. Kf2 (33. Re4 Rc6 34. Ra4 Rb6 35. Ke1 Kd6 $18) 33... Rc6 34. Ra4 Rd6 35. Ra5 Rb6 $18 *
 
 [Event "?"]
 [Site "?"]
@@ -279,7 +279,7 @@
 [PlyCount "6"]
 [SourceVersionDate "2023.10.29"]
 
-{[#]} 47. h5 (47. Ra4 Rc8 48. h5 Rg8+ 49. Kh4 Rh8 * $18) 47... Rc6 48. Kg5 Rc5+ 49. Kg4 Rc6 * $18 *
+{[#]} 47. h5 (47. Ra4 Rc8 48. h5 Rg8+ 49. Kh4 Rh8 $18) 47... Rc6 48. Kg5 Rc5+ 49. Kg4 Rc6 $18 *
 
 [Event "?"]
 [Site "?"]
@@ -293,7 +293,7 @@
 [PlyCount "6"]
 [SourceVersionDate "2023.10.29"]
 
-{[#]} 44... Ke5 (44... Rc6+ 45. Kd3 Ke5 46. Rh4 Rb6 47. Kc4 * $19) 45. Rh4 Rc6+ 46. Kd3 Rb6 47. Kc4 * $19 *
+{[#]} 44... Ke5 (44... Rc6+ 45. Kd3 Ke5 46. Rh4 Rb6 47. Kc4 $19) 45. Rh4 Rc6+ 46. Kd3 Rb6 47. Kc4 $19 *
 
 
 [Event "?"]
@@ -308,7 +308,7 @@
 [PlyCount "8"]
 [SourceVersionDate "2023.10.29"]
 
-{[#]} 1... Kb5  (1... Kc5 2. Rg4 Kb5 3. Rg1 Kb4 4. Rb1+ Kc5 5. Kh7 * $11) 2. Rg5+ Ka4 3. Kg7 Kb4 4. Rg4+ Kb3 5. Kf7 * $11 *
+{[#]} 1... Kb5  (1... Kc5 2. Rg4 Kb5 3. Rg1 Kb4 4. Rb1+ Kc5 5. Kh7 $11) 2. Rg5+ Ka4 3. Kg7 Kb4 4. Rg4+ Kb3 5. Kf7 $11 *
 
 [Event "?"]
 [Site "?"]
@@ -322,7 +322,7 @@
 [PlyCount "6"]
 [SourceVersionDate "2023.10.29"]
 
-{[#]} 1... Kb5 (1... Kc5 2. Rg4 Kb5 3. Kg8 a4 4. Kf7 * $11) 2. Kh7 a4 3. Ra7 Kb4 4. Kg6 * $11 *
+{[#]} 1... Kb5 (1... Kc5 2. Rg4 Kb5 3. Kg8 a4 4. Kf7 $11) 2. Kh7 a4 3. Ra7 Kb4 4. Kg6 $11 *
 
 [Event "?"]
 [Site "?"]
@@ -336,7 +336,7 @@
 [PlyCount "6"]
 [SourceVersionDate "2023.10.29"]
 
-{[#]} 1. Rg5 (1. Kh7 Kb5 2. Kg6 a4 3. Kf5 Kc4 * $11) 1... a4 2. Re5 a3 3. Re3 Kb5 * $18 *
+{[#]} 1. Rg5 (1. Kh7 Kb5 2. Kg6 a4 3. Kf5 Kc4 $11) 1... a4 2. Re5 a3 3. Re3 Kb5 $18 *
 
 [Event "?"]
 [Site "?"]
@@ -350,7 +350,7 @@
 [PlyCount "6"]
 [SourceVersionDate "2023.10.29"]
 
-{[#]} 67... Kc6 (67... Kb5 68. Kg7 Kc4 69. Kf7 Kb4 70. g5 * $18) 68. Kg8 Kc5 69. g5 Kd4 70. Kg7 * $18 *
+{[#]} 67... Kc6 (67... Kb5 68. Kg7 Kc4 69. Kf7 Kb4 70. g5 $18) 68. Kg8 Kc5 69. g5 Kd4 70. Kg7 $18 *
 
 [Event "?"]
 [Site "?"]
@@ -364,7 +364,7 @@
 [PlyCount "6"]
 [SourceVersionDate "2023.10.29"]
 
-{[#]} 45. Rg4 (45. Rg8 Rxh4 46. Rf8 Kb5 47. Rc8 Rh1+ * $19) 45... Kb5 46. Rg5+ Kb4 47. Rg4+ Ka5 * $19 *
+{[#]} 45. Rg4 (45. Rg8 Rxh4 46. Rf8 Kb5 47. Rc8 Rh1+ $19) 45... Kb5 46. Rg5+ Kb4 47. Rg4+ Ka5 $19 *
 
 [Event "?"]
 [Site "?"]
@@ -378,7 +378,7 @@
 [PlyCount "6"]
 [SourceVersionDate "2023.10.29"]
 
-{[#]} 52. d5 (52. Rxg6 Kb5 53. Rg5+ Kb4 54. d5 a4 * $11) 52... Rg3 53. Rh2 a4 54. Rd2 a3 * $11 *
+{[#]} 52. d5 (52. Rxg6 Kb5 53. Rg5+ Kb4 54. d5 a4 $11) 52... Rg3 53. Rh2 a4 54. Rd2 a3 $11 *
 
 [Event "?"]
 [Site "?"]
@@ -392,7 +392,7 @@
 [PlyCount "6"]
 [SourceVersionDate "2023.10.29"]
 
-{[#]} 46... Kc4 (46... Rf1 47. a4 Kc6 48. g5 Rc1 49. Kb3 * $18) 47. Kb2 Kb5 48. Rg5+ Ka4 49. Rd5 * $18 *
+{[#]} 46... Kc4 (46... Rf1 47. a4 Kc6 48. g5 Rc1 49. Kb3 $18) 47. Kb2 Kb5 48. Rg5+ Ka4 49. Rd5 $18 *
 
 
 [Event "?"]
@@ -407,7 +407,7 @@
 [PlyCount "8"]
 [SourceVersionDate "2023.10.29"]
 
-{[#]} 1. Kf5 (1. Ke6 Kg5 2. Kd6 Kg4 3. Kd5 Kh5 4. Kc4 a2 * $19) 1... Kh4 2. Kf4 Kh5 3. Kf5 Kh6 4. Kf6 Kh5 * $11 *
+{[#]} 1. Kf5 (1. Ke6 Kg5 2. Kd6 Kg4 3. Kd5 Kh5 4. Kc4 a2 $19) 1... Kh4 2. Kf4 Kh5 3. Kf5 Kh6 4. Kf6 Kh5 $11 *
 
 [Event "?"]
 [Site "?"]
@@ -421,7 +421,7 @@
 [PlyCount "6"]
 [SourceVersionDate "2023.10.29"]
 
-{[#]} 1. Kf5 (1. Ke6 Kg5 2. Kd5 Kf6 3. Kc5 Ke5 * $19) 1... Kh4 2. Kf4 Kh3 3. Kf3 Kh4 * $11 *
+{[#]} 1. Kf5 (1. Ke6 Kg5 2. Kd5 Kf6 3. Kc5 Ke5 $19) 1... Kh4 2. Kf4 Kh3 3. Kf3 Kh4 $11 *
 
 [Event "?"]
 [Site "?"]
@@ -435,7 +435,7 @@
 [PlyCount "6"]
 [SourceVersionDate "2023.10.29"]
 
-{[#]} 70... b4 (70... a2 71. Ke6 b4 72. Kf5 Kh4 73. Kf4 * $11) 71. Ke6 a2 72. Kf5 Kh4 73. Kf4 * $11 *
+{[#]} 70... b4 (70... a2 71. Ke6 b4 72. Kf5 Kh4 73. Kf4 $11) 71. Ke6 a2 72. Kf5 Kh4 73. Kf4 $11 *
 
 [Event "?"]
 [Site "?"]
@@ -449,7 +449,7 @@
 [PlyCount "6"]
 [SourceVersionDate "2023.10.29"]
 
-{[#]} 52. Kxf5 (52. Ke6 Rf2 53. g6 hxg6 54. Ke5 Kxh4 * $19) 52... a5 53. Kf6 Kg4 54. h5 Kxh5 * $19 *
+{[#]} 52. Kxf5 (52. Ke6 Rf2 53. g6 hxg6 54. Ke5 Kxh4 $19) 52... a5 53. Kf6 Kg4 54. h5 Kxh5 $19 *
 
 [Event "?"]
 [Site "?"]
@@ -463,7 +463,7 @@
 [PlyCount "6"]
 [SourceVersionDate "2023.10.29"]
 
-{[#]} 52... Rxb1 (52... Kxh6 53. e7 Rxb1 54. e8=Q Ra1 55. Qe3+ * $11) 53. Ke7 a2 54. d6 Rd1 55. Kf6 * $19 *
+{[#]} 52... Rxb1 (52... Kxh6 53. e7 Rxb1 54. e8=Q Ra1 55. Qe3+ $11) 53. Ke7 a2 54. d6 Rd1 55. Kf6 $19 *
 
 [Event "?"]
 [Site "?"]
@@ -477,7 +477,7 @@
 [PlyCount "6"]
 [SourceVersionDate "2023.10.29"]
 
-{[#]} 78. Kb1 (78. Kd2 a2 79. Kd3 a1=Q 80. Ke3 b1=Q * $19) 78... Kc3 79. Ka2 Kc2 80. Kxa3 b1=Q * $19 *
+{[#]} 78. Kb1 (78. Kd2 a2 79. Kd3 a1=Q 80. Ke3 b1=Q $19) 78... Kc3 79. Ka2 Kc2 80. Kxa3 b1=Q $19 *
 
 [Event "?"]
 [Site "?"]
@@ -491,7 +491,7 @@
 [PlyCount "6"]
 [SourceVersionDate "2023.10.29"]
 
-{[#]} 49... g3 (49... a5 50. Kxg4 a4 51. Kf3 a2 52. Kf4 * $19) 50. Ke5 a2 51. Kd5 Kf7 52. Kc6 * $19 *
+{[#]} 49... g3 (49... a5 50. Kxg4 a4 51. Kf3 a2 52. Kf4 $19) 50. Ke5 a2 51. Kd5 Kf7 52. Kc6 $19 *
 
 
 [Event "?"]
@@ -506,7 +506,7 @@
 [PlyCount "8"]
 [SourceVersionDate "2023.10.29"]
 
-{[#]} 1. Rg1+ (1. Rd1 Ra8+ 2. Kd7 Ra7+ 3. Ke6 Ra6+ 4. Rd6 Ra8 * $18) 1... Kh7 2. Rd1 Kg6 3. Kf8 Rf2+ 4. Ke8 Ra2 * $18 *
+{[#]} 1. Rg1+ (1. Rd1 Ra8+ 2. Kd7 Ra7+ 3. Ke6 Ra6+ 4. Rd6 Ra8 $18) 1... Kh7 2. Rd1 Kg6 3. Kf8 Rf2+ 4. Ke8 Ra2 $18 *
 
 [Event "?"]
 [Site "?"]
@@ -520,7 +520,7 @@
 [PlyCount "6"]
 [SourceVersionDate "2023.10.29"]
 
-{[#]} 1. Re1 (1. Rf7+ Kh6 2. Kf8 Ra8+ 3. e8=Q Rxe8+ * $18) 1... Kg6 2. Kd8 Ra8+ 3. Kd7 Ra7+ * $18 *
+{[#]} 1. Re1 (1. Rf7+ Kh6 2. Kf8 Ra8+ 3. e8=Q Rxe8+ $18) 1... Kg6 2. Kd8 Ra8+ 3. Kd7 Ra7+ $18 *
 
 [Event "?"]
 [Site "?"]
@@ -534,7 +534,7 @@
 [PlyCount "6"]
 [SourceVersionDate "2023.10.29"]
 
-{[#]} 1... Ra8+ (1... Ra4 2. Rf7+ Kh6 3. Rf3 Kg5 4. Kf7 * $18) 2. Kd7 Ra7+ 3. Kd6 Ra6+ 4. Kd5 * $11 *
+{[#]} 1... Ra8+ (1... Ra4 2. Rf7+ Kh6 3. Rf3 Kg5 4. Kf7 $18) 2. Kd7 Ra7+ 3. Kd6 Ra6+ 4. Kd5 $11 *
 
 [Event "?"]
 [Site "?"]
@@ -548,7 +548,7 @@
 [PlyCount "6"]
 [SourceVersionDate "2023.10.29"]
 
-{[#]} 1... Rb8+ (1... Re2 2. Rd1 Ra2 3. Kd7 Ra8 4. Ke6 * $18) 2. Kd7 Rb7+ 3. Ke6 Rb6+ 4. Kd5 * $18 *
+{[#]} 1... Rb8+ (1... Re2 2. Rd1 Ra2 3. Kd7 Ra8 4. Ke6 $18) 2. Kd7 Rb7+ 3. Ke6 Rb6+ 4. Kd5 $18 *
 
 [Event "?"]
 [Site "?"]
@@ -562,7 +562,7 @@
 [PlyCount "6"]
 [SourceVersionDate "2023.10.29"]
 
-{[#]} 96... Rxa7 (96... Kg7 97. Rg2+ Kf6 98. Kf8 Rxa7 99. Rf2+ * $18) 97. Re2 Ra8+ 98. Kd7 Kg5 99. e8=Q * $18 *
+{[#]} 96... Rxa7 (96... Kg7 97. Rg2+ Kf6 98. Kf8 Rxa7 99. Rf2+ $18) 97. Re2 Ra8+ 98. Kd7 Kg5 99. e8=Q $18 *
 
 [Event "?"]
 [Site "?"]
@@ -576,7 +576,7 @@
 [PlyCount "6"]
 [SourceVersionDate "2023.10.29"]
 
-{[#]} 55. e8=R+ (55. e8=Q+ Rxe8 56. Kxc6 Ra8 57. Kd6 Ra6+ * $19) 55... Rxe8 56. Kxc6 Ra8 57. Kd6 Ra6+ * $19 *
+{[#]} 55. e8=R+ (55. e8=Q+ Rxe8 56. Kxc6 Ra8 57. Kd6 Ra6+ $19) 55... Rxe8 56. Kxc6 Ra8 57. Kd6 Ra6+ $19 *
 
 [Event "?"]
 [Site "?"]
@@ -590,7 +590,7 @@
 [PlyCount "6"]
 [SourceVersionDate "2023.10.29"]
 
-{[#]} 74... Rxf7+ (74... Rg3+ 75. Kf8 Ka3 76. Ke8 a4 77. Rb7 * $18) 75. Kxf7 Kb4 76. Ke6 Kc4 77. Kd6 * $18 *
+{[#]} 74... Rxf7+ (74... Rg3+ 75. Kf8 Ka3 76. Ke8 a4 77. Rb7 $18) 75. Kxf7 Kb4 76. Ke6 Kc4 77. Kd6 $18 *
 
 
 [Event "?"]
@@ -605,7 +605,7 @@
 [PlyCount "8"]
 [SourceVersionDate "2023.10.29"]
 
-{[#]} 1. c7 (1. Ka6 Rc5 2. Kb6 Rc3 3. Kb7 Rxc6 4. Kxc6 Kb1 * $11) 1... Kb2 2. c8=Q Rd3 3. Qc4 Rc3 4. Qe4 Kb3 * $18 *
+{[#]} 1. c7 (1. Ka6 Rc5 2. Kb6 Rc3 3. Kb7 Rxc6 4. Kxc6 Kb1 $11) 1... Kb2 2. c8=Q Rd3 3. Qc4 Rc3 4. Qe4 Kb3 $18 *
 
 [Event "?"]
 [Site "?"]
@@ -619,7 +619,7 @@
 [PlyCount "6"]
 [SourceVersionDate "2023.10.29"]
 
-{[#]} 1. c7 (1. Ka6 Rc5 2. Kb7 Rc4 3. c7 Kb2 * $11) 1... Rd2 2. c8=Q Kb2 3. Kb5 Rd3 * $18 *
+{[#]} 1. c7 (1. Ka6 Rc5 2. Kb7 Rc4 3. c7 Kb2 $11) 1... Rd2 2. c8=Q Kb2 3. Kb5 Rd3 $18 *
 
 [Event "?"]
 [Site "?"]
@@ -633,7 +633,7 @@
 [PlyCount "6"]
 [SourceVersionDate "2023.10.29"]
 
-{[#]} 64. Rh7 (64. Rd7 Rxc6+ 65. Kxc6 Kc4 66. Kb6 Kb4 * $18) 64... Kc4 65. Kb7 Rxc6 66. Kxc6 Kd4 * $18 *
+{[#]} 64. Rh7 (64. Rd7 Rxc6+ 65. Kxc6 Kc4 66. Kb6 Kb4 $18) 64... Kc4 65. Kb7 Rxc6 66. Kxc6 Kd4 $18 *
 
 [Event "?"]
 [Site "?"]
@@ -647,7 +647,7 @@
 [PlyCount "6"]
 [SourceVersionDate "2023.10.29"]
 
-{[#]} 52. Ka6 (52. c7 Rc3 53. Kb6 Rxc7 54. Kxc7 Ke3 * $11) 52... Ra3+ 53. Kb6 Rf3 54. Kb7 Rb3+ * $11 *
+{[#]} 52. Ka6 (52. c7 Rc3 53. Kb6 Rxc7 54. Kxc7 Ke3 $11) 52... Ra3+ 53. Kb6 Rf3 54. Kb7 Rb3+ $11 *
 
 [Event "?"]
 [Site "?"]
@@ -661,7 +661,7 @@
 [PlyCount "6"]
 [SourceVersionDate "2023.10.29"]
 
-{[#]} 81... g5 (81... g6 82. Kb7 Ke7 83. c7 g5 84. c8=Q * $18) 82. Kb7 Ke7 83. Kxa6 g4 84. c7 * $18 *
+{[#]} 81... g5 (81... g6 82. Kb7 Ke7 83. c7 g5 84. c8=Q $18) 82. Kb7 Ke7 83. Kxa6 g4 84. c7 $18 *
 
 [Event "?"]
 [Site "?"]
@@ -675,7 +675,7 @@
 [PlyCount "6"]
 [SourceVersionDate "2023.10.29"]
 
-{[#]} 62... Kc5 (62... Kb4 63. Kb6 Kxb3 64. Kxa5 Kc4 65. Ka6 * $18) 63. Kb7 Kb5 64. c7 Kb4 65. Kb6 * $18 *
+{[#]} 62... Kc5 (62... Kb4 63. Kb6 Kxb3 64. Kxa5 Kc4 65. Ka6 $18) 63. Kb7 Kb5 64. c7 Kb4 65. Kb6 $18 *
 
 [Event "?"]
 [Site "?"]
@@ -689,7 +689,7 @@
 [PlyCount "6"]
 [SourceVersionDate "2023.10.29"]
 
-{[#]} 55. c7 (55. b7 Rd3+ 56. Ke2 Rb3 57. c7 a2 * $11) 55... Rd3+ 56. Ke2 Rc3 57. b7 a2 * $11 *
+{[#]} 55. c7 (55. b7 Rd3+ 56. Ke2 Rb3 57. c7 a2 $11) 55... Rd3+ 56. Ke2 Rc3 57. b7 a2 $11 *
 
 
 [Event "?"]
@@ -704,7 +704,7 @@
 [PlyCount "8"]
 [SourceVersionDate "2023.10.29"]
 
-{[#]} 1. Rd2  (1. Rd3 d4 2. Rd1 Kd5 3. Kd7 Kc4 4. Ke6 d3 * $18) 1... d4 2. Rd1 Kd5 3. Kd7 Kc4 4. Ke6 d3 * $18 *
+{[#]} 1. Rd2  (1. Rd3 d4 2. Rd1 Kd5 3. Kd7 Kc4 4. Ke6 d3 $18) 1... d4 2. Rd1 Kd5 3. Kd7 Kc4 4. Ke6 d3 $18 *
 
 [Event "?"]
 [Site "?"]
@@ -718,7 +718,7 @@
 [PlyCount "6"]
 [SourceVersionDate "2023.10.29"]
 
-{[#]} 1. Rd2 (1. Rd3 d4 2. Rd1 Ke4 3. Kd6 d3 * $18) 1... d4 2. Rd1 Ke4 3. Kd6 d3 * $18 *
+{[#]} 1. Rd2 (1. Rd3 d4 2. Rd1 Ke4 3. Kd6 d3 $18) 1... d4 2. Rd1 Ke4 3. Kd6 d3 $18 *
 
 [Event "?"]
 [Site "?"]
@@ -732,7 +732,7 @@
 [PlyCount "6"]
 [SourceVersionDate "2023.10.29"]
 
-{[#]} 51. Kg5 (51. Ke6 Kc4 52. f5 d4 53. f6 d3 * $18) 51... Kc4 52. f5 d4 53. f6 d3 * $18 *
+{[#]} 51. Kg5 (51. Ke6 Kc4 52. f5 d4 53. f6 d3 $18) 51... Kc4 52. f5 d4 53. f6 d3 $18 *
 
 [Event "?"]
 [Site "?"]
@@ -746,7 +746,7 @@
 [PlyCount "6"]
 [SourceVersionDate "2023.10.29"]
 
-{[#]} 84... Kc5 (84... Ke5 85. Rd1 d4 86. Kc7 Ke4 87. Kb6 * $18) 85. Rd1 d4 86. Kc7 Kc4 87. Kd6 * $18 *
+{[#]} 84... Kc5 (84... Ke5 85. Rd1 d4 86. Kc7 Ke4 87. Kb6 $18) 85. Rd1 d4 86. Kc7 Kc4 87. Kd6 $18 *
 
 [Event "?"]
 [Site "?"]
@@ -760,7 +760,7 @@
 [PlyCount "6"]
 [SourceVersionDate "2023.10.29"]
 
-{[#]} 57. Kf2 (57. Rb2 Kd4 58. Rxb3 Kc4 59. Rb5 d4 * $18) 57... d4 58. Rb2 Kd5 59. Rxb3 Kc4 * $18 *
+{[#]} 57. Kf2 (57. Rb2 Kd4 58. Rxb3 Kc4 59. Rb5 d4 $18) 57... d4 58. Rb2 Kd5 59. Rxb3 Kc4 $18 *
 
 [Event "?"]
 [Site "?"]
@@ -774,7 +774,7 @@
 [PlyCount "6"]
 [SourceVersionDate "2023.10.29"]
 
-{[#]} 46. Kxf4 (46. Kh4 Kc4 47. Kg5 d4 48. Kxf4 d3 * $19) 46... Kc4 47. Ke3 Kc3 48. Ke2 d4 * $19 *
+{[#]} 46. Kxf4 (46. Kh4 Kc4 47. Kg5 d4 48. Kxf4 d3 $19) 46... Kc4 47. Ke3 Kc3 48. Ke2 d4 $19 *
 
 [Event "?"]
 [Site "?"]
@@ -788,7 +788,7 @@
 [PlyCount "6"]
 [SourceVersionDate "2023.10.29"]
 
-{[#]} 80... Kc6 (80... Kd4 81. Kg8 Kd5 82. h7 Kc4 83. h8=Q * $19) 81. Kf7 Kb5 82. Ke6 Kb6 83. g7 * $19 *
+{[#]} 80... Kc6 (80... Kd4 81. Kg8 Kd5 82. h7 Kc4 83. h8=Q $19) 81. Kf7 Kb5 82. Ke6 Kb6 83. g7 $19 *
 
 
 [Event "?"]
@@ -803,7 +803,7 @@
 [PlyCount "8"]
 [SourceVersionDate "2023.10.29"]
 
-{[#]} 1. Rb7 (1. Rb3 Rc8 2. Rb5 Kf8 3. Rh5 Ke8 4. Rh8+ Kd7 * $18) 1... Rc8 2. Rg7+ Kf8 3. Rh7 Ke8 4. Rh8+ Kd7 * $18 *
+{[#]} 1. Rb7 (1. Rb3 Rc8 2. Rb5 Kf8 3. Rh5 Ke8 4. Rh8+ Kd7 $18) 1... Rc8 2. Rg7+ Kf8 3. Rh7 Ke8 4. Rh8+ Kd7 $18 *
 
 [Event "?"]
 [Site "?"]
@@ -817,7 +817,7 @@
 [PlyCount "6"]
 [SourceVersionDate "2023.10.29"]
 
-{[#]} 1. Rb3 (1. Rb7 Rd8 2. Rc7 Kh8 3. Rh7+ Kg8 * $18) 1... Kf8 2. Rh3 Ke8 3. Rh8+ Kd7 * $18 *
+{[#]} 1. Rb3 (1. Rb7 Rd8 2. Rc7 Kh8 3. Rh7+ Kg8 $18) 1... Kf8 2. Rh3 Ke8 3. Rh8+ Kd7 $18 *
 
 [Event "?"]
 [Site "?"]
@@ -831,7 +831,7 @@
 [PlyCount "6"]
 [SourceVersionDate "2023.10.29"]
 
-{[#]} 1. Rg7+ (1. Rd7 Rc8 2. Rg7+ Kf8 3. Rh7 Ke8 * $18) 1... Kf8 2. Rh7 Ke8 3. Rh8+ Kd7 * $18 *
+{[#]} 1. Rg7+ (1. Rd7 Rc8 2. Rg7+ Kf8 3. Rh7 Ke8 $18) 1... Kf8 2. Rh7 Ke8 3. Rh8+ Kd7 $18 *
 
 [Event "?"]
 [Site "?"]
@@ -845,7 +845,7 @@
 [PlyCount "6"]
 [SourceVersionDate "2023.10.29"]
 
-{[#]} 59... Rd8 (59... Kf8 60. Rh7 Ke8 61. Rh8+ Kd7 62. Rxc8 * $18) 60. Rh7 Rd6 61. Rb7 Rd8 62. Rh7 * $18 *
+{[#]} 59... Rd8 (59... Kf8 60. Rh7 Ke8 61. Rh8+ Kd7 62. Rxc8 $18) 60. Rh7 Rd6 61. Rb7 Rd8 62. Rh7 $18 *
 
 [Event "?"]
 [Site "?"]
@@ -859,7 +859,7 @@
 [PlyCount "6"]
 [SourceVersionDate "2023.10.29"]
 
-{[#]} 77... Rc8 (77... Rxf6+ 78. Kxf6 Kh8 79. Kg6 Kg8 80. Ra8# * $18) 78. Rg7+ Kf8 79. Rh7 Ke8 80. Rh8+ * $18 *
+{[#]} 77... Rc8 (77... Rxf6+ 78. Kxf6 Kh8 79. Kg6 Kg8 80. Ra8# $18) 78. Rg7+ Kf8 79. Rh7 Ke8 80. Rh8+ $18 *
 
 [Event "?"]
 [Site "?"]
@@ -873,7 +873,7 @@
 [PlyCount "6"]
 [SourceVersionDate "2023.10.29"]
 
-{[#]} 58... Kg8 (58... Ke8 59. Kg7 Kd7 60. Kg6 Ke6 61. Kg7 * $18) 59. Kh5 Kf8 60. Kg5 Kf7 61. Kf5 * $11 *
+{[#]} 58... Kg8 (58... Ke8 59. Kg7 Kd7 60. Kg6 Ke6 61. Kg7 $18) 59. Kh5 Kf8 60. Kg5 Kf7 61. Kf5 $11 *
 
 [Event "?"]
 [Site "?"]
@@ -887,7 +887,7 @@
 [PlyCount "6"]
 [SourceVersionDate "2023.10.29"]
 
-{[#]} 38. Ke3 (38. Rh1 Rd7 39. Rh8+ Ke7 40. Rg8 Ke6 * $18) 38... Rc6 39. Rh1 Rc7 40. Rh7 Ke8 * $11 *
+{[#]} 38. Ke3 (38. Rh1 Rd7 39. Rh8+ Ke7 40. Rg8 Ke6 $18) 38... Rc6 39. Rh1 Rc7 40. Rh7 Ke8 $11 *
 
 [Event "?"]
 [Site "?"]
@@ -901,7 +901,7 @@
 [PlyCount "8"]
 [SourceVersionDate "2023.10.29"]
 
-{[#]} 1. Rb6 (1. Rb7 Rd8 2. Rc7 Re8 3. Ra7 Rd8 4. Ra6 Re8 * $11) 1... Rc8 2. g7 Ra8 3. Rd6 Re8 4. Ra6 Rb8 * $11 *
+{[#]} 1. Rb6 (1. Rb7 Rd8 2. Rc7 Re8 3. Ra7 Rd8 4. Ra6 Re8 $11) 1... Rc8 2. g7 Ra8 3. Rd6 Re8 4. Ra6 Rb8 $11 *
 
 [Event "?"]
 [Site "?"]
@@ -915,7 +915,7 @@
 [PlyCount "6"]
 [SourceVersionDate "2023.10.29"]
 
-{[#]} 1. Rb7 (1. Rb5 Re8 2. Rb7 Rd8 3. Ra7 Rc8 * $18) 1... Rd8 2. Ra7 Kh8 3. Ra6 Rb8 * $11 *
+{[#]} 1. Rb7 (1. Rb5 Re8 2. Rb7 Rd8 3. Ra7 Rc8 $18) 1... Rd8 2. Ra7 Kh8 3. Ra6 Rb8 $11 *
 
 [Event "?"]
 [Site "?"]
@@ -929,7 +929,7 @@
 [PlyCount "6"]
 [SourceVersionDate "2023.10.29"]
 
-{[#]} 1. g5 (1. Rb6 Re8 2. g5 Ra8 3. Rc6 Re8 * $18) 1... Rc8 2. Rb6 Ra8 3. Re6 Kf8 * $18 *
+{[#]} 1. g5 (1. Rb6 Re8 2. g5 Ra8 3. Rc6 Re8 $18) 1... Rc8 2. Rb6 Ra8 3. Re6 Kf8 $18 *
 
 [Event "?"]
 [Site "?"]
@@ -943,7 +943,7 @@
 [PlyCount "6"]
 [SourceVersionDate "2023.10.29"]
 
-{[#]} 1. Rg7+ (1. Ra2 Rd8 2. Ra4 Rc8 3. Ra6 Rb8 * $18) 1... Kh8 2. Rh7+ Kg8 3. Rb7 Re8 * $18 *
+{[#]} 1. Rg7+ (1. Ra2 Rd8 2. Ra4 Rc8 3. Ra6 Rb8 $18) 1... Kh8 2. Rh7+ Kg8 3. Rb7 Re8 $18 *
 
 [Event "?"]
 [Site "?"]
@@ -957,7 +957,7 @@
 [PlyCount "6"]
 [SourceVersionDate "2023.10.29"]
 
-{[#]} 71... Rb8 (71... Ra8 72. Rb5 Re8 73. Rb7 Kh8 74. Rxb4 * $11) 72. Rd7 b3 73. Rg7+ Kh8 74. Rh7+ * $11 *
+{[#]} 71... Rb8 (71... Ra8 72. Rb5 Re8 73. Rb7 Kh8 74. Rxb4 $11) 72. Rd7 b3 73. Rg7+ Kh8 74. Rh7+ $11 *
 
 [Event "?"]
 [Site "?"]
@@ -971,7 +971,7 @@
 [PlyCount "6"]
 [SourceVersionDate "2023.10.29"]
 
-{[#]} 39. Rdd7 (39. Kg2 Reb8 40. Re7 Re8 41. Rc7 Red8 * $19) 39... Rf8 40. Ra7 Rad8 41. Rdc7 Rd2 * $11 *
+{[#]} 39. Rdd7 (39. Kg2 Reb8 40. Re7 Re8 41. Rc7 Red8 $19) 39... Rf8 40. Ra7 Rad8 41. Rdc7 Rd2 $11 *
 
 [Event "?"]
 [Site "?"]
@@ -985,7 +985,7 @@
 [PlyCount "6"]
 [SourceVersionDate "2023.10.29"]
 
-{[#]} 24... Rc2 (24... Rfe8 25. Rd2 Rcd8 26. Rc2 Rc8 27. Rd2 * $18) 25. Rc4 Rd2 26. Rcc1 Re8 27. Rd1 * $11 *
+{[#]} 24... Rc2 (24... Rfe8 25. Rd2 Rcd8 26. Rc2 Rc8 27. Rd2 $18) 25. Rc4 Rd2 26. Rcc1 Re8 27. Rd1 $11 *
 
 [Event "?"]
 [Site "?"]
@@ -999,7 +999,7 @@
 [PlyCount "8"]
 [SourceVersionDate "2023.10.29"]
 
-{[#]} 1. Kd6+ (1. Rd7 Ra8 2. Rd6 Kg6 3. Rd1 Ra7+ 4. Rd7 Ra2 * $11) 1... Kf8 2. Kd7 Re8 3. Ra5 Re7+ 4. Kd6 Re8 * $18 *
+{[#]} 1. Kd6+ (1. Rd7 Ra8 2. Rd6 Kg6 3. Rd1 Ra7+ 4. Rd7 Ra2 $11) 1... Kf8 2. Kd7 Re8 3. Ra5 Re7+ 4. Kd6 Re8 $18 *
 
 [Event "?"]
 [Site "?"]
@@ -1013,7 +1013,7 @@
 [PlyCount "6"]
 [SourceVersionDate "2023.10.29"]
 
-{[#]} 1. Kd6+ (1. Rd7 Ra8 2. Rd2 Ra7+ 3. Rd7 Ra4 * $11) 1... Kf8 2. Kd7 Re8 3. Ra1 Re7+ * $18 *
+{[#]} 1. Kd6+ (1. Rd7 Ra8 2. Rd2 Ra7+ 3. Rd7 Ra4 $11) 1... Kf8 2. Kd7 Re8 3. Ra1 Re7+ $18 *
 
 [Event "?"]
 [Site "?"]
@@ -1027,7 +1027,7 @@
 [PlyCount "6"]
 [SourceVersionDate "2023.10.29"]
 
-{[#]} 1... Ra7+ (1... Rg2 2. Kd7 Ra2 3. e7 Re2 4. Rg1+ * $18) 2. Rd7 Ra8 3. Rd6 Kg6 4. Rd1 * $11 *
+{[#]} 1... Ra7+ (1... Rg2 2. Kd7 Ra2 3. e7 Re2 4. Rg1+ $18) 2. Rd7 Ra8 3. Rd6 Kg6 4. Rd1 $11 *
 
 [Event "?"]
 [Site "?"]
@@ -1041,7 +1041,7 @@
 [PlyCount "6"]
 [SourceVersionDate "2023.10.29"]
 
-{[#]} 1... Kg6 (1... Rb1 2. Kd7 Rb8 3. Ke7 Kg6 4. Ra3 * $18) 2. Ra2 Rb7+ 3. Kd8 Kf6 4. e7 * $18 *
+{[#]} 1... Kg6 (1... Rb1 2. Kd7 Rb8 3. Ke7 Kg6 4. Ra3 $18) 2. Ra2 Rb7+ 3. Kd8 Kf6 4. e7 $18 *
 
 [Event "?"]
 [Site "?"]
@@ -1055,7 +1055,7 @@
 [PlyCount "6"]
 [SourceVersionDate "2023.10.29"]
 
-{[#]} 65... Kf8 (65... Ra6+ 66. Kd7 Ra7+ 67. Kd6 f5 68. Ke5 * $11) 66. Rg3 Ra6+ 67. Kd7 Ra7+ 68. Kd6 * $11 *
+{[#]} 65... Kf8 (65... Ra6+ 66. Kd7 Ra7+ 67. Kd6 f5 68. Ke5 $11) 66. Rg3 Ra6+ 67. Kd7 Ra7+ 68. Kd6 $11 *
 
 [Event "?"]
 [Site "?"]
@@ -1069,7 +1069,7 @@
 [PlyCount "6"]
 [SourceVersionDate "2023.10.29"]
 
-{[#]} 51... axb3 (51... a3 52. Kd6 Ke8 53. e7 Kf7 54. Kc7 * $18) 52. Kd6 Ke8 53. f7+ Kf8 54. Kd7 * $18 *
+{[#]} 51... axb3 (51... a3 52. Kd6 Ke8 53. e7 Kf7 54. Kc7 $18) 52. Kd6 Ke8 53. f7+ Kf8 54. Kd7 $18 *
 
 [Event "?"]
 [Site "?"]
@@ -1083,7 +1083,7 @@
 [PlyCount "6"]
 [SourceVersionDate "2023.10.29"]
 
-{[#]} 32... Kc8 (32... Re8 33. Rd7 Rxe5 34. Rxg7 Re1+ 35. Kb2 * $11) 33. e6 Re8 34. Re1 Kd8 35. Rd1+ * $11 *
+{[#]} 32... Kc8 (32... Re8 33. Rd7 Rxe5 34. Rxg7 Re1+ 35. Kb2 $11) 33. e6 Re8 34. Re1 Kd8 35. Rd1+ $11 *
 
 [Event "?"]
 [Site "?"]
@@ -1097,7 +1097,7 @@
 [PlyCount "8"]
 [SourceVersionDate "2023.10.29"]
 
-{[#]} 1. Rh2+ (1. Kc4 b1=Q 2. Rh2+ Kc1 3. Rh1+ Kb2 4. Rxb1+ Kxb1 * $11) 1... Kb1 2. Rh7 Kc2 3. Rh2+ Kb1 4. Rh8 Kc2 * $11 *
+{[#]} 1. Rh2+ (1. Kc4 b1=Q 2. Rh2+ Kc1 3. Rh1+ Kb2 4. Rxb1+ Kxb1 $11) 1... Kb1 2. Rh7 Kc2 3. Rh2+ Kb1 4. Rh8 Kc2 $11 *
 
 [Event "?"]
 [Site "?"]
@@ -1111,7 +1111,7 @@
 [PlyCount "6"]
 [SourceVersionDate "2023.10.29"]
 
-{[#]} 1. Rh2+ (1. Kc4 b1=Q 2. Rh2+ Kc1 3. Rh1+ Kc2 * $11) 1... Kb1 2. Rh7 Kc2 3. Rh2+ Kb1 * $11 *
+{[#]} 1. Rh2+ (1. Kc4 b1=Q 2. Rh2+ Kc1 3. Rh1+ Kc2 $11) 1... Kb1 2. Rh7 Kc2 3. Rh2+ Kb1 $11 *
 
 [Event "?"]
 [Site "?"]
@@ -1125,7 +1125,7 @@
 [PlyCount "6"]
 [SourceVersionDate "2023.10.29"]
 
-{[#]} 71. Rh2+ (71. Rh1 b1=R 72. Rxb1 Kxb1 73. Kxb3 Kc1 * $11) 71... Kb1 72. Rh1+ Kc2 73. Rh2+ Kb1 * $11 *
+{[#]} 71. Rh2+ (71. Rh1 b1=R 72. Rxb1 Kxb1 73. Kxb3 Kc1 $11) 71... Kb1 72. Rh1+ Kc2 73. Rh2+ Kb1 $11 *
 
 [Event "?"]
 [Site "?"]
@@ -1139,7 +1139,7 @@
 [PlyCount "6"]
 [SourceVersionDate "2023.10.29"]
 
-{[#]} 62. Kxe4 (62. Kd5 Rb4 63. Rh2+ Kb1 64. Rh1+ Ka2 * $11) 62... b2 63. Rh2+ Kc3 64. Rh1 Kc2 * $19 *
+{[#]} 62. Kxe4 (62. Kd5 Rb4 63. Rh2+ Kb1 64. Rh1+ Ka2 $11) 62... b2 63. Rh2+ Kc3 64. Rh1 Kc2 $19 *
 
 [Event "?"]
 [Site "?"]
@@ -1153,7 +1153,7 @@
 [PlyCount "6"]
 [SourceVersionDate "2023.10.29"]
 
-{[#]} 65. Kf5 (65. Kg5 Kc1 66. Kh6 b1=Q 67. Rxb1+ Kxb1 * $18) 65... Ka2 66. Ke5 Kb1 67. Kf4 Kc2 * $18 *
+{[#]} 65. Kf5 (65. Kg5 Kc1 66. Kh6 b1=Q 67. Rxb1+ Kxb1 $18) 65... Ka2 66. Ke5 Kb1 67. Kf4 Kc2 $18 *
 
 [Event "?"]
 [Site "?"]
@@ -1167,7 +1167,7 @@
 [PlyCount "6"]
 [SourceVersionDate "2023.10.29"]
 
-{[#]} 80. Rh2+ (80. d6 Rd1 81. Rd3+ Ke2 82. Rxd1 a2 * $19) 80... Ke1 81. Ke3 Kf1 82. Rh1+ Kg2 * $11 *
+{[#]} 80. Rh2+ (80. d6 Rd1 81. Rd3+ Ke2 82. Rxd1 a2 $19) 80... Ke1 81. Ke3 Kf1 82. Rh1+ Kg2 $11 *
 
 [Event "?"]
 [Site "?"]
@@ -1181,7 +1181,7 @@
 [PlyCount "6"]
 [SourceVersionDate "2023.10.29"]
 
-{[#]} 78. Kb1 (78. Kd2 a2 79. Kd3 a1=Q 80. Ke3 b1=Q * $19) 78... Kc3 79. Ka2 Kc2 80. Kxa3 b1=Q * $19 *
+{[#]} 78. Kb1 (78. Kd2 a2 79. Kd3 a1=Q 80. Ke3 b1=Q $19) 78... Kc3 79. Ka2 Kc2 80. Kxa3 b1=Q $19 *
 
 [Event "?"]
 [Site "?"]
@@ -1195,7 +1195,7 @@
 [PlyCount "8"]
 [SourceVersionDate "2023.10.29"]
 
-{[#]} 1... Rh1 (1... Rb6 2. Ra1 Kf8 3. e6 Rb2 4. Kf6 Rf2+ 5. Ke5 * $11) 2. Kg6 Kd8 3. e6 Ke8 4. Kg5 Rc1 5. Rh7 * $11 *
+{[#]} 1... Rh1 (1... Rb6 2. Ra1 Kf8 3. e6 Rb2 4. Kf6 Rf2+ 5. Ke5 $11) 2. Kg6 Kd8 3. e6 Ke8 4. Kg5 Rc1 5. Rh7 $11 *
 
 [Event "?"]
 [Site "?"]
@@ -1209,7 +1209,7 @@
 [PlyCount "6"]
 [SourceVersionDate "2023.10.29"]
 
-{[#]} 68... Kxd7 (68... Kf8 69. Ra7 Ke8 70. e6 Kf8 71. Kf6 * $18) 69. Kf6 Kc7 70. Ke6 Kd8 71. Kf6 * $18 *
+{[#]} 68... Kxd7 (68... Kf8 69. Ra7 Ke8 70. e6 Kf8 71. Kf6 $18) 69. Kf6 Kc7 70. Ke6 Kd8 71. Kf6 $18 *
 
 [Event "?"]
 [Site "?"]
@@ -1223,7 +1223,7 @@
 [PlyCount "6"]
 [SourceVersionDate "2023.10.29"]
 
-{[#]} 79... Kxd7 (79... Ke8 80. e6 Kf8 81. Kg6 Ke8 82. Kf6 * $18) 80. Kf6 Kc7 81. Ke6 Kd8 82. Kf6 * $18 *
+{[#]} 79... Kxd7 (79... Ke8 80. e6 Kf8 81. Kg6 Ke8 82. Kf6 $18) 80. Kf6 Kc7 81. Ke6 Kd8 82. Kf6 $18 *
 
 [Event "?"]
 [Site "?"]
@@ -1237,7 +1237,7 @@
 [PlyCount "6"]
 [SourceVersionDate "2023.10.29"]
 
-{[#]} 1... Rb6 (1... Rh1 2. Ra8+ Kd7 3. Ra7+ Ke8 4. Ke6 * $11) 2. Ra8+ Kf7 3. Ra7+ Ke8 4. Rg7 * $11 *
+{[#]} 1... Rb6 (1... Rh1 2. Ra8+ Kd7 3. Ra7+ Ke8 4. Ke6 $11) 2. Ra8+ Kf7 3. Ra7+ Ke8 4. Rg7 $11 *
 
 [Event "?"]
 [Site "?"]
@@ -1251,7 +1251,7 @@
 [PlyCount "6"]
 [SourceVersionDate "2023.10.29"]
 
-{[#]} 1. Kf6 (1. Ra8+ Ke7 2. Ra7+ Kf8 3. Ra8+ Kf7 * $18) 1... Re1 2. Ra2 Re3 3. Rb2 Re1 * $18 *
+{[#]} 1. Kf6 (1. Ra8+ Ke7 2. Ra7+ Kf8 3. Ra8+ Kf7 $18) 1... Re1 2. Ra2 Re3 3. Rb2 Re1 $18 *
 
 [Event "?"]
 [Site "?"]
@@ -1265,7 +1265,7 @@
 [PlyCount "6"]
 [SourceVersionDate "2023.10.29"]
 
-{[#]} 59. Kf7 (59. Kf5 h3 60. Kf6 Ke8 61. e6 Kf8 * $19) 59... Kc7 60. e6 h3 61. e7 h2 * $11 *
+{[#]} 59. Kf7 (59. Kf5 h3 60. Kf6 Ke8 61. e6 Kf8 $19) 59... Kc7 60. e6 h3 61. e7 h2 $11 *
 
 [Event "?"]
 [Site "?"]
@@ -1279,7 +1279,7 @@
 [PlyCount "6"]
 [SourceVersionDate "2023.10.29"]
 
-{[#]} 48. e6 (48. exd6 Kd7 49. h4 h5 50. Kg6 a5 * $19) 48... Kc7 49. e7 Rd7 50. Kf6 Rxe7 * $19 *
+{[#]} 48. e6 (48. exd6 Kd7 49. h4 h5 50. Kg6 a5 $19) 48... Kc7 49. e7 Rd7 50. Kf6 Rxe7 $19 *
 
 [Event "?"]
 [Site "?"]
@@ -1293,7 +1293,7 @@
 [PlyCount "8"]
 [SourceVersionDate "2023.10.29"]
 
-{[#]} 1. Kf6 (1. Ra8+ Kd7 2. Ra7+ Ke8 3. Kf6 Re1 4. Ke6 Kf8 * $18) 1... Re1 2. Ra8+ Kd7 3. Ra7+ Ke8 4. Ke6 Kf8 * $18 *
+{[#]} 1. Kf6 (1. Ra8+ Kd7 2. Ra7+ Ke8 3. Kf6 Re1 4. Ke6 Kf8 $18) 1... Re1 2. Ra8+ Kd7 3. Ra7+ Ke8 4. Ke6 Kf8 $18 *
 
 [Event "?"]
 [Site "?"]
@@ -1307,7 +1307,7 @@
 [PlyCount "6"]
 [SourceVersionDate "2023.10.29"]
 
-{[#]} 1... Rb6 (1... Rh1 2. Ra8+ Kd7 3. Ra7+ Ke8 4. Ke6 * $11) 2. Ra8+ Kf7 3. Ra7+ Ke8 4. Rg7 * $11 *
+{[#]} 1... Rb6 (1... Rh1 2. Ra8+ Kd7 3. Ra7+ Ke8 4. Ke6 $11) 2. Ra8+ Kf7 3. Ra7+ Ke8 4. Rg7 $11 *
 
 [Event "?"]
 [Site "?"]
@@ -1321,7 +1321,7 @@
 [PlyCount "6"]
 [SourceVersionDate "2023.10.29"]
 
-{[#]} 1. Kf6 (1. Ra8+ Ke7 2. Ra7+ Kf8 3. Ra8+ Kf7 * $18) 1... Re1 2. Ra2 Re3 3. Rb2 Re1 * $18 *
+{[#]} 1. Kf6 (1. Ra8+ Ke7 2. Ra7+ Kf8 3. Ra8+ Kf7 $18) 1... Re1 2. Ra2 Re3 3. Rb2 Re1 $18 *
 
 [Event "?"]
 [Site "?"]
@@ -1335,7 +1335,7 @@
 [PlyCount "6"]
 [SourceVersionDate "2023.10.29"]
 
-{[#]} 54... Re4 (54... Rf4+ 55. Ke6 Kf8 56. Ra8+ Kg7 57. Kd7 * $18) 55. Ra8+ Kd7 56. Ra7+ Ke8 57. Ra8+ * $18 *
+{[#]} 54... Re4 (54... Rf4+ 55. Ke6 Kf8 56. Ra8+ Kg7 57. Kd7 $18) 55. Ra8+ Kd7 56. Ra7+ Ke8 57. Ra8+ $18 *
 
 [Event "?"]
 [Site "?"]
@@ -1349,7 +1349,7 @@
 [PlyCount "6"]
 [SourceVersionDate "2023.10.29"]
 
-{[#]} 68... Kxd7 (68... Kf8 69. Ra7 Ke8 70. e6 Kf8 71. Kf6 * $18) 69. Kf6 Kc7 70. Ke6 Kd8 71. Kf6 * $18 *
+{[#]} 68... Kxd7 (68... Kf8 69. Ra7 Ke8 70. e6 Kf8 71. Kf6 $18) 69. Kf6 Kc7 70. Ke6 Kd8 71. Kf6 $18 *
 
 [Event "?"]
 [Site "?"]
@@ -1363,7 +1363,7 @@
 [PlyCount "6"]
 [SourceVersionDate "2023.10.29"]
 
-{[#]} 52... Rxc4 (52... Rg4 53. Ra8+ Ke7 54. Ra7+ Ke8 55. Kc3 * $18) 53. Ra8+ Ke7 54. Ra7+ Ke8 55. Kd3 * $18 *
+{[#]} 52... Rxc4 (52... Rg4 53. Ra8+ Ke7 54. Ra7+ Ke8 55. Kc3 $18) 53. Ra8+ Ke7 54. Ra7+ Ke8 55. Kd3 $18 *
 
 [Event "?"]
 [Site "?"]
@@ -1377,7 +1377,7 @@
 [PlyCount "6"]
 [SourceVersionDate "2023.10.29"]
 
-{[#]} 46... Re1+ (46... Kd6 47. Rd8+ Kxe7 48. Rxd1 b5 49. Kd5 * $18) 47. Kd5 Rxe7 48. Ra7+ Kd8 49. Ra8+ * $11 *
+{[#]} 46... Re1+ (46... Kd6 47. Rd8+ Kxe7 48. Rxd1 b5 49. Kd5 $18) 47. Kd5 Rxe7 48. Ra7+ Kd8 49. Ra8+ $11 *
 
 [Event "?"]
 [Site "?"]
@@ -1391,7 +1391,7 @@
 [PlyCount "8"]
 [SourceVersionDate "2023.10.29"]
 
-{[#]} 1... Rd4 (1... Rb2+ 2. Ke1 Rd2 3. Ra4+ Rd4 4. Ra8 Kf3 5. Ra5 * $19) 2. Ke1 Rd5 3. Ra3 Kf3 4. Ra1 Rb5 5. Kd1 * $19 *
+{[#]} 1... Rd4 (1... Rb2+ 2. Ke1 Rd2 3. Ra4+ Rd4 4. Ra8 Kf3 5. Ra5 $19) 2. Ke1 Rd5 3. Ra3 Kf3 4. Ra1 Rb5 5. Kd1 $19 *
 
 [Event "?"]
 [Site "?"]
@@ -1405,7 +1405,7 @@
 [PlyCount "6"]
 [SourceVersionDate "2023.10.29"]
 
-{[#]} 1... Rd4 (1... Rb2+ 2. Kf1 Rd2 3. Kg1 Rd5 4. Ra4+ * $19) 2. Ra1 Rd2+ 3. Ke1 Kf3 4. Ra5 * $19 *
+{[#]} 1... Rd4 (1... Rb2+ 2. Kf1 Rd2 3. Kg1 Rd5 4. Ra4+ $19) 2. Ra1 Rd2+ 3. Ke1 Kf3 4. Ra5 $19 *
 
 [Event "?"]
 [Site "?"]
@@ -1419,7 +1419,7 @@
 [PlyCount "6"]
 [SourceVersionDate "2023.10.29"]
 
-{[#]} 55. g4 (55. h5 gxh5 56. g4 Rc2+ 57. Ke1 Kf3 * $19) 55... Rc4 56. h5 Rd4 57. hxg6 Rd2+ * $19 *
+{[#]} 55. g4 (55. h5 gxh5 56. g4 Rc2+ 57. Ke1 Kf3 $19) 55... Rc4 56. h5 Rd4 57. hxg6 Rd2+ $19 *
 
 [Event "?"]
 [Site "?"]
@@ -1433,7 +1433,7 @@
 [PlyCount "6"]
 [SourceVersionDate "2023.10.29"]
 
-{[#]} 46... Rd2+ (46... Rd5 47. Ke1 Rd2 48. a6 Kf3 49. h7 * $18) 47. Ke1 Kf3 48. Re6 Ra2 49. Kd1 * $19 *
+{[#]} 46... Rd2+ (46... Rd5 47. Ke1 Rd2 48. a6 Kf3 49. h7 $18) 47. Ke1 Kf3 48. Re6 Ra2 49. Kd1 $19 *
 
 [Event "?"]
 [Site "?"]
@@ -1447,7 +1447,7 @@
 [PlyCount "6"]
 [SourceVersionDate "2023.10.29"]
 
-{[#]} 47. Rh2 (47. Rg1 Rd4 48. Rf1 Rd2+ 49. Ke1 Rxc2 * $19) 47... Ra3 48. Rh4+ Kd5 49. Rg4 g5 * $11 *
+{[#]} 47. Rh2 (47. Rg1 Rd4 48. Rf1 Rd2+ 49. Ke1 Rxc2 $19) 47... Ra3 48. Rh4+ Kd5 49. Rg4 g5 $11 *
 
 [Event "?"]
 [Site "?"]
@@ -1461,7 +1461,7 @@
 [PlyCount "6"]
 [SourceVersionDate "2023.10.29"]
 
-{[#]} 73... f2 (73... Ke3 74. Rc3+ Kf2 75. Kc2 Kg2 76. Rdd3 * $19) 74. Re6+ Kf3 75. Rd1 Re4 76. Rf6 * $11 *
+{[#]} 73... f2 (73... Ke3 74. Rc3+ Kf2 75. Kc2 Kg2 76. Rdd3 $19) 74. Re6+ Kf3 75. Rd1 Re4 76. Rf6 $11 *
 
 [Event "?"]
 [Site "?"]
@@ -1475,7 +1475,7 @@
 [PlyCount "6"]
 [SourceVersionDate "2023.10.29"]
 
-{[#]} 38. Ra8 (38. g4 Kf3 39. Rd8 Re7+ 40. Kd1 Kxg4 * $19) 38... Kf3 39. Rxa5 Kxg3 40. Rd5 g4 * $19 *
+{[#]} 38. Ra8 (38. g4 Kf3 39. Rd8 Re7+ 40. Kd1 Kxg4 $19) 38... Kf3 39. Rxa5 Kxg3 40. Rd5 g4 $19 *
 
 [Event "?"]
 [Site "?"]
@@ -1489,7 +1489,7 @@
 [PlyCount "8"]
 [SourceVersionDate "2023.10.29"]
 
-{[#]} 1... Kc5 (1... Kb5 2. Kf7 Kc4 3. Ra8 Kb4 4. Rxa6 Kb3 5. Rc6 * $18) 2. Kg7 a5 3. Kf6 a4 4. Ke5 Kc4 5. Rc8+ * $11 *
+{[#]} 1... Kc5 (1... Kb5 2. Kf7 Kc4 3. Ra8 Kb4 4. Rxa6 Kb3 5. Rc6 $18) 2. Kg7 a5 3. Kf6 a4 4. Ke5 Kc4 5. Rc8+ $11 *
 
 [Event "?"]
 [Site "?"]
@@ -1503,7 +1503,7 @@
 [PlyCount "6"]
 [SourceVersionDate "2023.10.29"]
 
-{[#]} 1... Kc5 (1... a5 2. Rh5 Ka6 3. Kh7 Kb7 4. Rxa5 * $18) 2. Kg7 a5 3. Kf6 a4 4. Kf5 * $11 *
+{[#]} 1... Kc5 (1... a5 2. Rh5 Ka6 3. Kh7 Kb7 4. Rxa5 $18) 2. Kg7 a5 3. Kf6 a4 4. Kf5 $11 *
 
 [Event "?"]
 [Site "?"]
@@ -1517,7 +1517,7 @@
 [PlyCount "6"]
 [SourceVersionDate "2023.10.29"]
 
-{[#]} 68... Kc4 (68... Kc5 69. Kf6 a4 70. Kf5 a3 71. Ra8 * $11) 69. Ra8 Kb4 70. Rb8+ Kc4 71. Ra8 * $11 *
+{[#]} 68... Kc4 (68... Kc5 69. Kf6 a4 70. Kf5 a3 71. Ra8 $11) 69. Ra8 Kb4 70. Rb8+ Kc4 71. Ra8 $11 *
 
 [Event "?"]
 [Site "?"]
@@ -1531,7 +1531,7 @@
 [PlyCount "6"]
 [SourceVersionDate "2023.10.29"]
 
-{[#]} 79... b3 (79... Kc4 80. Ra8 Kb5 81. Kf6 b3 82. Ke5 * $18) 80. Rb8 Kc4 81. Rc8+ Kb5 82. Ra8 * $11 *
+{[#]} 79... b3 (79... Kc4 80. Ra8 Kb5 81. Kf6 b3 82. Ke5 $18) 80. Rb8 Kc4 81. Rc8+ Kb5 82. Ra8 $11 *
 
 [Event "?"]
 [Site "?"]
@@ -1545,7 +1545,7 @@
 [PlyCount "6"]
 [SourceVersionDate "2023.10.29"]
 
-{[#]} 8... Kb5 (8... a3 9. Ra8+ Kb5 10. Kf6 Kc4 11. Ke5 * $11) 9. Kf6 b3 10. Ke5 a3 11. Kd5 * $19 *
+{[#]} 8... Kb5 (8... a3 9. Ra8+ Kb5 10. Kf6 Kc4 11. Ke5 $11) 9. Kf6 b3 10. Ke5 a3 11. Kd5 $19 *
 
 [Event "?"]
 [Site "?"]
@@ -1559,7 +1559,7 @@
 [PlyCount "6"]
 [SourceVersionDate "2023.10.29"]
 
-{[#]} 62... Kb4 (62... Kd4 63. Kg7 Kxc4 64. Kf7 Kd4 65. Kg6 * $19) 63. Kg7 Kxc4 64. Kf7 Kd4 65. Kg6 * $19 *
+{[#]} 62... Kb4 (62... Kd4 63. Kg7 Kxc4 64. Kf7 Kd4 65. Kg6 $19) 63. Kg7 Kxc4 64. Kf7 Kd4 65. Kg6 $19 *
 
 [Event "?"]
 [Site "?"]
@@ -1573,7 +1573,7 @@
 [PlyCount "6"]
 [SourceVersionDate "2023.10.29"]
 
-{[#]} 52... a2 (52... g3 53. Kxe5 Kb5 54. Rc3 g2 55. Rb3+ * $18) 53. Ra4 Kb5 54. Rxa2 Kc4 55. Kxe5 * $18 *
+{[#]} 52... a2 (52... g3 53. Kxe5 Kb5 54. Rc3 g2 55. Rb3+ $18) 53. Ra4 Kb5 54. Rxa2 Kc4 55. Kxe5 $18 *
 
 [Event "?"]
 [Site "?"]
@@ -1587,7 +1587,7 @@
 [PlyCount "8"]
 [SourceVersionDate "2023.10.29"]
 
-{[#]} 1. Rb8 (1. Rb7 f4+ 2. Kg2 Rc2+ 3. Kf3 Rh2 4. Rh7+ Kg6 * $19) 1... f4+ 2. Kf3 Rc3+ 3. Kg2 Rc2+ 4. Kf3 Rc3+ * $19 *
+{[#]} 1. Rb8 (1. Rb7 f4+ 2. Kg2 Rc2+ 3. Kf3 Rh2 4. Rh7+ Kg6 $19) 1... f4+ 2. Kf3 Rc3+ 3. Kg2 Rc2+ 4. Kf3 Rc3+ $19 *
 
 [Event "?"]
 [Site "?"]
@@ -1601,7 +1601,7 @@
 [PlyCount "6"]
 [SourceVersionDate "2023.10.29"]
 
-{[#]} 1. Rb7 (1. Rb8 f4+ 2. Kg2 Rc2+ 3. Kf3 Rh2 * $19) 1... f4+ 2. Kg2 Rc2+ 3. Kf3 Rd2 * $19 *
+{[#]} 1. Rb7 (1. Rb8 f4+ 2. Kg2 Rc2+ 3. Kf3 Rh2 $19) 1... f4+ 2. Kg2 Rc2+ 3. Kf3 Rd2 $19 *
 
 [Event "?"]
 [Site "?"]
@@ -1615,7 +1615,7 @@
 [PlyCount "6"]
 [SourceVersionDate "2023.10.29"]
 
-{[#]} 71... f5 (71... Ra4 72. Rb6 Kf7 73. Rb5 Ra8 74. Kh2 * $19) 72. Rb6+ Kh5 73. Rb7 f4+ 74. Kf3 * $19 *
+{[#]} 71... f5 (71... Ra4 72. Rb6 Kf7 73. Rb5 Ra8 74. Kh2 $19) 72. Rb6+ Kh5 73. Rb7 f4+ 74. Kf3 $19 *
 
 [Event "?"]
 [Site "?"]
@@ -1629,7 +1629,7 @@
 [PlyCount "6"]
 [SourceVersionDate "2023.10.29"]
 
-{[#]} 45. a5 (45. Kf2 Rc2+ 46. Ke1 Ra2 47. a5 Kd4 * $18) 45... Rc3+ 46. Kg2 Rc2+ 47. Kf3 Rc3+ * $18 *
+{[#]} 45. a5 (45. Kf2 Rc2+ 46. Ke1 Ra2 47. a5 Kd4 $18) 45... Rc3+ 46. Kg2 Rc2+ 47. Kf3 Rc3+ $18 *
 
 [Event "?"]
 [Site "?"]
@@ -1643,7 +1643,7 @@
 [PlyCount "6"]
 [SourceVersionDate "2023.10.29"]
 
-{[#]} 50. Ra1 (50. Rg1 Rc2+ 51. Kf3 Rc3+ 52. Ke2 Rxh3 * $19) 50... Rc2+ 51. Kf3 Rc3+ 52. Kg2 f4 * $19 *
+{[#]} 50. Ra1 (50. Rg1 Rc2+ 51. Kf3 Rc3+ 52. Ke2 Rxh3 $19) 50... Rc2+ 51. Kf3 Rc3+ 52. Kg2 f4 $19 *
 
 [Event "?"]
 [Site "?"]
@@ -1657,7 +1657,7 @@
 [PlyCount "6"]
 [SourceVersionDate "2023.10.29"]
 
-{[#]} 45. Kxf3 (45. g4 Rcc3 46. Kd5 Rf4 47. Rg1 Kf6 * $19) 45... Rc3+ 46. Kg2 Rc2+ 47. Kf3 h5 * $19 *
+{[#]} 45. Kxf3 (45. g4 Rcc3 46. Kd5 Rf4 47. Rg1 Kf6 $19) 45... Rc3+ 46. Kg2 Rc2+ 47. Kf3 h5 $19 *
 
 [Event "?"]
 [Site "?"]
@@ -1671,7 +1671,7 @@
 [PlyCount "6"]
 [SourceVersionDate "2023.10.29"]
 
-{[#]} 45. Kg3 (45. Ra5+ Ke4 46. Kg3 f4+ 47. Kg2 Rh1 * $19) 45... Ke5 46. Kg2 Rh1 47. Kxf2 Rxh2+ * $11 *
+{[#]} 45. Kg3 (45. Ra5+ Ke4 46. Kg3 f4+ 47. Kg2 Rh1 $19) 45... Ke5 46. Kg2 Rh1 47. Kxf2 Rxh2+ $11 *
 
 [Event "?"]
 [Site "?"]
@@ -1685,7 +1685,7 @@
 [PlyCount "8"]
 [SourceVersionDate "2023.10.25"]
 
-{[#]} 25... Rfe8 (25... f6 26. Rb7 Rfb8 27. Rb6 Kf7 28. b3 Rxb6 29. axb6 * $18) 26. Rae1 Kf8 27. Rxe8+ Rxe8 28. Rxe8+ Kxe8 29. Kg2 * $18 *
+{[#]} 25... Rfe8 (25... f6 26. Rb7 Rfb8 27. Rb6 Kf7 28. b3 Rxb6 29. axb6 $18) 26. Rae1 Kf8 27. Rxe8+ Rxe8 28. Rxe8+ Kxe8 29. Kg2 $18 *
 
 [Event "?"]
 [Site "?"]
@@ -1699,7 +1699,7 @@
 [PlyCount "6"]
 [SourceVersionDate "2023.10.25"]
 
-{[#]} 25... Rfe8 (25... f6 26. Rae1 Rf7 27. Re8+ Rf8 28. R8e4 * $18) 26. Rae1 Kf8 27. Rxe8+ Rxe8 28. Rxe8+ * $18 *
+{[#]} 25... Rfe8 (25... f6 26. Rae1 Rf7 27. Re8+ Rf8 28. R8e4 $18) 26. Rae1 Kf8 27. Rxe8+ Rxe8 28. Rxe8+ $18 *
 
 [Event "?"]
 [Site "?"]
@@ -1713,7 +1713,7 @@
 [PlyCount "6"]
 [SourceVersionDate "2023.10.25"]
 
-{[#]} 24... f6 (24... Rfe8 25. Rae1 Kf8 26. Rxe8+ Rxe8 27. Rc1 * $11) 25. Rd1 Rae8 26. Rc4 Re7 27. h4 * $18 *
+{[#]} 24... f6 (24... Rfe8 25. Rae1 Kf8 26. Rxe8+ Rxe8 27. Rc1 $11) 25. Rd1 Rae8 26. Rc4 Re7 27. h4 $18 *
 
 [Event "?"]
 [Site "?"]
@@ -1727,7 +1727,7 @@
 [PlyCount "6"]
 [SourceVersionDate "2023.10.25"]
 
-{[#]} 21. Rxe8+ (21. Kf1 Kf8 22. b3 Rab8 23. Rxe8+ Rxe8 * $18) 21... Rxe8 22. Kf1 Rb8 23. Re1 f6 * $11 *
+{[#]} 21. Rxe8+ (21. Kf1 Kf8 22. b3 Rab8 23. Rxe8+ Rxe8 $18) 21... Rxe8 22. Kf1 Rb8 23. Re1 f6 $11 *
 
 [Event "?"]
 [Site "?"]
@@ -1741,7 +1741,7 @@
 [PlyCount "6"]
 [SourceVersionDate "2023.10.25"]
 
-{[#]} 22... Rae8 (22... Rfe8 23. Rxe8+ Rxe8 24. Kf1 Rb8 25. b3 * $18) 23. Rxe8 Rxe8 24. Kf1 Rb8 25. b3 * $18 *
+{[#]} 22... Rae8 (22... Rfe8 23. Rxe8+ Rxe8 24. Kf1 Rb8 25. b3 $18) 23. Rxe8 Rxe8 24. Kf1 Rb8 25. b3 $18 *
 
 [Event "?"]
 [Site "?"]
@@ -1755,7 +1755,7 @@
 [PlyCount "6"]
 [SourceVersionDate "2023.10.25"]
 
-{[#]} 18. Rfe1 (18. b3 Rfe8 19. Rfe1 a5 20. Kf1 Kf8 * $11) 18... Rfe8 19. Rxe8+ Rxe8 20. Kf1 Kf8 * $11 *
+{[#]} 18. Rfe1 (18. b3 Rfe8 19. Rfe1 a5 20. Kf1 Kf8 $11) 18... Rfe8 19. Rxe8+ Rxe8 20. Kf1 Kf8 $11 *
 
 [Event "?"]
 [Site "?"]
@@ -1769,7 +1769,7 @@
 [PlyCount "6"]
 [SourceVersionDate "2023.10.25"]
 
-{[#]} 18... Rfe8 (18... Rae8 19. Rae1 Rxe4 20. Rxe4 f6 21. Re7 * $18) 19. Re3 Kf8 20. Rxe8+ Rxe8 21. Kf1 * $11 *
+{[#]} 18... Rfe8 (18... Rae8 19. Rae1 Rxe4 20. Rxe4 f6 21. Re7 $18) 19. Re3 Kf8 20. Rxe8+ Rxe8 21. Kf1 $11 *
 
 
 [Event "?"]
@@ -1784,7 +1784,7 @@
 [PlyCount "8"]
 [SourceVersionDate "2023.10.25"]
 
-{[#]} 33... c4 (33... a5 34. Rd3 a4 35. bxa4 Ra8 36. Ra3 Ra5 37. f4 * $18) 34. bxc4 Rxc4 35. Rd8+ Kh7 36. Rd7 Rxe4 37. Rxa7 * $18 *
+{[#]} 33... c4 (33... a5 34. Rd3 a4 35. bxa4 Ra8 36. Ra3 Ra5 37. f4 $18) 34. bxc4 Rxc4 35. Rd8+ Kh7 36. Rd7 Rxe4 37. Rxa7 $18 *
 
 [Event "?"]
 [Site "?"]
@@ -1798,7 +1798,7 @@
 [PlyCount "6"]
 [SourceVersionDate "2023.10.25"]
 
-{[#]} 33... c4 (33... a5 34. Rd3 a4 35. bxa4 Kf8 36. Rc3 * $11) 34. h4 a5 35. bxc4 Rxc4 36. e5 * $18 *
+{[#]} 33... c4 (33... a5 34. Rd3 a4 35. bxa4 Kf8 36. Rc3 $11) 34. h4 a5 35. bxc4 Rxc4 36. e5 $18 *
 
 [Event "?"]
 [Site "?"]
@@ -1812,7 +1812,7 @@
 [PlyCount "6"]
 [SourceVersionDate "2023.10.25"]
 
-{[#]} 26... c4 (26... a5 27. Rc4 a4 28. Rxa4 c4 29. bxc4 * $18) 27. Rxc4 Rxc4 28. bxc4 Rxc4 29. Rd8+ * $18 *
+{[#]} 26... c4 (26... a5 27. Rc4 a4 28. Rxa4 c4 29. bxc4 $18) 27. Rxc4 Rxc4 28. bxc4 Rxc4 29. Rd8+ $18 *
 
 
 [Event "?"]
@@ -1827,7 +1827,7 @@
 [PlyCount "6"]
 [SourceVersionDate "2023.10.25"]
 
-{[#]} 23... Rxc4 (23... g5 24. Rd4 a5 25. Kf3 axb4 26. axb4 * $18) 24. Rd8+ Kh7 25. Rd7 Kg6 26. Rxa7 * $18 *
+{[#]} 23... Rxc4 (23... g5 24. Rd4 a5 25. Kf3 axb4 26. axb4 $18) 24. Rd8+ Kh7 25. Rd7 Kg6 26. Rxa7 $18 *
 
 [Event "?"]
 [Site "?"]
@@ -1841,7 +1841,7 @@
 [PlyCount "6"]
 [SourceVersionDate "2023.10.25"]
 
-{[#]} 42... Ra8 (42... Rb4 43. Rd5 f6 44. Rd8+ Kf7 45. Rd7+ * $11) 43. Kg2 Ra5 44. Rd8+ Kh7 45. h5 * $11 *
+{[#]} 42... Ra8 (42... Rb4 43. Rd5 f6 44. Rd8+ Kf7 45. Rd7+ $11) 43. Kg2 Ra5 44. Rd8+ Kh7 45. h5 $11 *
 
 [Event "?"]
 [Site "?"]
@@ -1855,7 +1855,7 @@
 [PlyCount "6"]
 [SourceVersionDate "2023.10.25"]
 
-{[#]} 35... Kf8 (35... h5 36. Kg2 c4 37. bxc4 Rxc4 38. Ra5 * $11) 36. Rd7 a5 37. Ra7 c4 38. bxc4 * $11 *
+{[#]} 35... Kf8 (35... h5 36. Kg2 c4 37. bxc4 Rxc4 38. Ra5 $11) 36. Rd7 a5 37. Ra7 c4 38. bxc4 $11 *
 
 [Event "?"]
 [Site "?"]
@@ -1869,7 +1869,7 @@
 [PlyCount "6"]
 [SourceVersionDate "2023.10.25"]
 
-{[#]} 27... Rxc4 (27... e5 28. Rd5 Rxc4 29. Rxe5 g6 30. h3 * $11) 28. Rd8+ Kh7 29. Ra8 g5 30. Ra7 * $11 *
+{[#]} 27... Rxc4 (27... e5 28. Rd5 Rxc4 29. Rxe5 g6 30. h3 $11) 28. Rd8+ Kh7 29. Ra8 g5 30. Ra7 $11 *
 
 
 [Event "?"]
@@ -1884,7 +1884,7 @@
 [PlyCount "8"]
 [SourceVersionDate "2023.10.25"]
 
-{[#]} 28. Kf1 (28. Kg2 Kg7 29. Rac1 Rff7 30. Kh3 Rfe7 31. Kh4 Re8 * $18) 28... Kg7 29. Kg2 Rf6 30. Rc2 Re6 31. Rg1 Kf6 * $18 *
+{[#]} 28. Kf1 (28. Kg2 Kg7 29. Rac1 Rff7 30. Kh3 Rfe7 31. Kh4 Re8 $18) 28... Kg7 29. Kg2 Rf6 30. Rc2 Re6 31. Rg1 Kf6 $18 *
 
 [Event "?"]
 [Site "?"]
@@ -1898,7 +1898,7 @@
 [PlyCount "6"]
 [SourceVersionDate "2023.10.25"]
 
-{[#]} 28. Kg2 (28. Kf1 Kg7 29. Rc2 h6 30. Ke2 Kf7 * $18) 28... h6 29. Rac1 Kg7 30. Re6 Rf6 * $18 *
+{[#]} 28. Kg2 (28. Kf1 Kg7 29. Rc2 h6 30. Ke2 Kf7 $18) 28... h6 29. Rac1 Kg7 30. Re6 Rf6 $18 *
 
 [Event "?"]
 [Site "?"]
@@ -1912,7 +1912,7 @@
 [PlyCount "6"]
 [SourceVersionDate "2023.10.25"]
 
-{[#]} 39... Rb7 (39... Rd8 40. Kf1 Ke7 41. Rxb6 Rc8 42. Rxg6 * $18) 40. Kh2 Re7 41. Rxb6 Rc7 42. Rc6 * $18 *
+{[#]} 39... Rb7 (39... Rd8 40. Kf1 Ke7 41. Rxb6 Rc8 42. Rxg6 $18) 40. Kh2 Re7 41. Rxb6 Rc7 42. Rc6 $18 *
 
 [Event "?"]
 [Site "?"]
@@ -1926,7 +1926,7 @@
 [PlyCount "6"]
 [SourceVersionDate "2023.10.25"]
 
-{[#]} 35... Ke7 (35... Kf8 36. b5 Kg7 37. Re6 Kg8 38. Rc6 * $18) 36. a3 Kf7 37. a4 Ke7 38. g4 * $18 *
+{[#]} 35... Ke7 (35... Kf8 36. b5 Kg7 37. Re6 Kg8 38. Rc6 $18) 36. a3 Kf7 37. a4 Ke7 38. g4 $18 *
 
 [Event "?"]
 [Site "?"]
@@ -1940,7 +1940,7 @@
 [PlyCount "6"]
 [SourceVersionDate "2023.10.25"]
 
-{[#]} 29. b4 (29. Kg2 Rf7 30. Rc8+ Rf8 31. Rxf8+ Kxf8 * $18) 29... h5 30. Kg2 Kh7 31. a4 Rf7 * $18 *
+{[#]} 29. b4 (29. Kg2 Rf7 30. Rc8+ Rf8 31. Rxf8+ Kxf8 $18) 29... h5 30. Kg2 Kh7 31. a4 Rf7 $18 *
 
 [Event "?"]
 [Site "?"]
@@ -1954,7 +1954,7 @@
 [PlyCount "6"]
 [SourceVersionDate "2023.10.25"]
 
-{[#]} 36... Rf6 (36... Rdf7 37. a4 Rf6 38. Rc2 g5 39. a5 * $19) 37. Rc2 Rfd6 38. Kh3 Kf6 39. Rc8 * $19 *
+{[#]} 36... Rf6 (36... Rdf7 37. a4 Rf6 38. Rc2 g5 39. a5 $19) 37. Rc2 Rfd6 38. Kh3 Kf6 39. Rc8 $19 *
 
 [Event "?"]
 [Site "?"]
@@ -1968,7 +1968,7 @@
 [PlyCount "6"]
 [SourceVersionDate "2023.10.25"]
 
-{[#]} 33... Rf8 (33... Re8 34. Kf2 Rf8 35. Rxe6 Rf7 36. Ree7 * $18) 34. Rxe6 Rf7 35. Rxf7 Kxf7 36. Rd6 * $18 *
+{[#]} 33... Rf8 (33... Re8 34. Kf2 Rf8 35. Rxe6 Rf7 36. Ree7 $18) 34. Rxe6 Rf7 35. Rxf7 Kxf7 36. Rd6 $18 *
 
 
 [Event "?"]
@@ -1983,7 +1983,7 @@
 [PlyCount "8"]
 [SourceVersionDate "2023.10.25"]
 
-{[#]} 42. e7 (42. h4 Re8 43. e7 Rxe7 44. Rxg6 Rh7 45. Rf6 Rxh4 * $11) 42... Re8 43. Rd7+ Kc6 44. Rxa7 g5 45. Kc2 Kd6 * $11 *
+{[#]} 42. e7 (42. h4 Re8 43. e7 Rxe7 44. Rxg6 Rh7 45. Rf6 Rxh4 $11) 42... Re8 43. Rd7+ Kc6 44. Rxa7 g5 45. Kc2 Kd6 $11 *
 
 [Event "?"]
 [Site "?"]
@@ -1997,7 +1997,7 @@
 [PlyCount "6"]
 [SourceVersionDate "2023.10.25"]
 
-{[#]} 42. e7 (42. h4 Rc7 43. e7 Rxe7 44. Rxg6 Rh7 * $11) 42... Kc7 43. Rxg6 Kd7 44. e8=Q+ Rxe8 * $11 *
+{[#]} 42. e7 (42. h4 Rc7 43. e7 Rxe7 44. Rxg6 Rh7 $11) 42... Kc7 43. Rxg6 Kd7 44. e8=Q+ Rxe8 $11 *
 
 [Event "?"]
 [Site "?"]
@@ -2011,7 +2011,7 @@
 [PlyCount "6"]
 [SourceVersionDate "2023.10.25"]
 
-{[#]} 43... Rxh4 (43... Rh7 44. Rd4 Kb5 45. Re4 Re7 46. Re2 * $11) 44. b4 Re4 45. Ka4 Kb7 46. Rd7+ * $18 *
+{[#]} 43... Rxh4 (43... Rh7 44. Rd4 Kb5 45. Re4 Re7 46. Re2 $11) 44. b4 Re4 45. Ka4 Kb7 46. Rd7+ $18 *
 
 [Event "?"]
 [Site "?"]
@@ -2025,7 +2025,7 @@
 [PlyCount "6"]
 [SourceVersionDate "2023.10.25"]
 
-{[#]} 39... Kxd6 (39... Re4 40. Rd7+ Kc6 41. b4 Rfe1 42. Rh7 * $18) 40. e7+ Kc7 41. h4 Rxe7 42. Rg5 * $19 *
+{[#]} 39... Kxd6 (39... Re4 40. Rd7+ Kc6 41. b4 Rfe1 42. Rh7 $18) 40. e7+ Kc7 41. h4 Rxe7 42. Rg5 $19 *
 
 [Event "?"]
 [Site "?"]
@@ -2039,7 +2039,7 @@
 [PlyCount "6"]
 [SourceVersionDate "2023.10.25"]
 
-{[#]} 31. Rd7 (31. Rd5 Re8 32. h4 Rxe6 33. hxg5 hxg5 * $11) 31... Re8 32. e7 Kc8 33. Rxa7 g4 * $11 *
+{[#]} 31. Rd7 (31. Rd5 Re8 32. h4 Rxe6 33. hxg5 hxg5 $11) 31... Re8 32. e7 Kc8 33. Rxa7 g4 $11 *
 
 [Event "?"]
 [Site "?"]
@@ -2053,7 +2053,7 @@
 [PlyCount "6"]
 [SourceVersionDate "2023.10.25"]
 
-{[#]} 36... Kb8 (36... g4 37. Kc3 Kb8 38. Kd4 Kc7 39. Rd7+ * $11) 37. e7 Rxe7 38. Rxf6 b5 39. Rh6 * $11 *
+{[#]} 36... Kb8 (36... g4 37. Kc3 Kb8 38. Kd4 Kc7 39. Rd7+ $11) 37. e7 Rxe7 38. Rxf6 b5 39. Rh6 $11 *
 
 [Event "?"]
 [Site "?"]
@@ -2067,7 +2067,7 @@
 [PlyCount "6"]
 [SourceVersionDate "2023.10.25"]
 
-{[#]} 40... Rg8 (40... Kb7 41. Rxg6 Re8 42. Rf6 Kc6 43. b3 * $11) 41. e7 Re8 42. b3 Rxe7 43. Rxg6 * $19 *
+{[#]} 40... Rg8 (40... Kb7 41. Rxg6 Re8 42. Rf6 Kc6 43. b3 $11) 41. e7 Re8 42. b3 Rxe7 43. Rxg6 $19 *
 
 [Event "?"]
 [Site "?"]
@@ -2096,7 +2096,7 @@ a5 Rc6 52. g4 Ra6 53. Ra4 Kf6 54. Kg3 $18 *
 [PlyCount "6"]
 [SourceVersionDate "2023.10.25"]
 
-{[#]} 50... Ra6 (50... Kg7 51. a5 Ra6 52. Ra4 Kf6 53. Ra2 * $18) 51. Kf3 g5 52. hxg5 hxg5 53. Ke4 * $18 *
+{[#]} 50... Ra6 (50... Kg7 51. a5 Ra6 52. Ra4 Kf6 53. Ra2 $18) 51. Kf3 g5 52. hxg5 hxg5 53. Ke4 $18 *
 
 [Event "?"]
 [Site "?"]
@@ -2125,7 +2125,7 @@ a5 Rc6 52. g4 Ra6 53. Ra4 Kf6 54. Kg3 $18 *
 [PlyCount "6"]
 [SourceVersionDate "2023.10.25"]
 
-{[#]} 41... Re6 (41... Re5 42. Rc4 Kf6 43. g4 Kg7 44. Kf3 * $11) 42. Kf3 Rf6+ 43. Ke3 Re6+ 44. Re4 * $11 *
+{[#]} 41... Re6 (41... Re5 42. Rc4 Kf6 43. g4 Kg7 44. Kf3 $11) 42. Kf3 Rf6+ 43. Ke3 Re6+ 44. Re4 $11 *
 
 [Event "?"]
 [Site "?"]
@@ -2139,7 +2139,7 @@ a5 Rc6 52. g4 Ra6 53. Ra4 Kf6 54. Kg3 $18 *
 [PlyCount "6"]
 [SourceVersionDate "2023.10.25"]
 
-{[#]} 37... Ra8 (37... Rb8 38. a5 Ra8 39. Ra4 Ra6 40. Kf3 * $18) 38. Kf3 h5 39. Ke4 g5 40. h4 * $18 *
+{[#]} 37... Ra8 (37... Rb8 38. a5 Ra8 39. Ra4 Ra6 40. Kf3 $18) 38. Kf3 h5 39. Ke4 g5 40. h4 $18 *
 
 [Event "?"]
 [Site "?"]
@@ -2153,7 +2153,7 @@ a5 Rc6 52. g4 Ra6 53. Ra4 Kf6 54. Kg3 $18 *
 [PlyCount "6"]
 [SourceVersionDate "2023.10.25"]
 
-{[#]} 35... Ra6 (35... Re6+ 36. Kd3 Kf8 37. Ra4 Ra6 38. Kd4 * $19) 36. Ra4 Kf8 37. Kd1 Ke7 38. g4 * $19 *
+{[#]} 35... Ra6 (35... Re6+ 36. Kd3 Kf8 37. Ra4 Ra6 38. Kd4 $19) 36. Ra4 Kf8 37. Kd1 Ke7 38. g4 $19 *
 
 [Event "?"]
 [Site "?"]
@@ -2167,5 +2167,5 @@ a5 Rc6 52. g4 Ra6 53. Ra4 Kf6 54. Kg3 $18 *
 [PlyCount "6"]
 [SourceVersionDate "2023.10.25"]
 
-{[#]} 38... Kg7 (38... Rc6 39. Rc2 Kg7 40. c4 Kf6 41. h4 * $11) 39. c4 Ra6 40. Rd3 Kf6 41. Kg2 * $11 *
+{[#]} 38... Kg7 (38... Rc6 39. Rc2 Kg7 40. c4 Kf6 41. h4 $11) 39. c4 Ra6 40. Rd3 Kf6 41. Kg2 $11 *
 
