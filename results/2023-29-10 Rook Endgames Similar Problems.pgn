@@ -9,6 +9,7 @@
 [FEN "8/1r3kp1/5p1p/5K1P/4PPP1/8/R7/8 w - - 0 1"]
 [PlyCount "8"]
 [SourceVersionDate "2023.10.29"]
+[PPTExample "1"]
 
 {[#]} 1. Ra5 (1. Ra6 Rc7 2. Rb6 Ra7 3. Rd6 Rb7 4. Ra6 Rb5+ $18) 1... Rc7 2. Rb5 Rc4 3. Rb7+ Kf8 4. Ra7 Rd4 $18 *
 
@@ -37,6 +38,7 @@
 [FEN "R7/1r3kp1/5p1p/4pK1P/4P3/5P2/6P1/8 b - - 0 50"]
 [PlyCount "6"]
 [SourceVersionDate "2023.10.29"]
+[PPTExample "1A"]
 
 {[#]} 50... Rb2 (50... Re7 51. Ra6 Rd7 52. Ra5 Rb7 53. Ra1 $18) 51. g3 Rb7 52. f4 exf4 53. gxf4 $18 *
 
@@ -80,6 +82,7 @@
 [FEN "3r4/5kp1/7p/8/R4PP1/4P1K1/8/8 b - - 0 50"]
 [PlyCount "6"]
 [SourceVersionDate "2023.10.29"]
+[PPTExample "1C"]
 
 {[#]} 50... Rd1 (50... Rd3 51. Ra7+ Kf6 52. Kf2 Rd2+ 53. Kg3 $18) 51. Ra7+ Kf8 52. f5 Rh1 53. Kg2 $18 *
 
@@ -94,6 +97,7 @@
 [FEN "8/2r1k1pp/5p2/2R1p3/1P2P3/3K1P2/6PP/8 b - - 0 63"]
 [PlyCount "6"]
 [SourceVersionDate "2023.10.29"]
+[PPTExample "1B"]
 
 {[#]} 63... Ra7 (63... Rd7+ 64. Kc4 h5 65. Rd5 Rc7+ 66. Rc5 $18) 64. Kc4 Ke6 65. Ra5 Rc7+ 66. Rc5 $18 *
 
@@ -109,6 +113,7 @@
 [FEN "3r4/8/1PK2p2/5k2/8/8/8/1R6 b - - 0 1"]
 [PlyCount "8"]
 [SourceVersionDate "2023.10.29"]
+[PPTExample "2"]
 
 {[#]} 1... Ke4 (1... Rc8+ 2. Kd6 Rd8+ 3. Kc7 Rf8 4. Kd6 Rd8+ 5. Ke7 $18) 2. Rb4+ Ke3 3. Kc7 Rf8 4. Rb3+ Ke4 5. b7 $11 *
 
@@ -137,6 +142,7 @@
 [FEN "2r5/5p2/1PR5/2K4p/8/5k2/7P/8 b - - 0 48"]
 [PlyCount "6"]
 [SourceVersionDate "2023.10.29"]
+[PPTExample "2C"]
 
 {[#]} 48... Rb8 (48... Rg8 49. Kd6 Rd8+ 50. Kc7 Re8 51. b7 $18) 49. Rh6 f5 50. Rxh5 f4 51. Kc6 $18 *
 
@@ -180,6 +186,7 @@
 [FEN "8/5p2/1PK1pP2/4k2p/7P/3p4/8/8 b - - 0 62"]
 [PlyCount "6"]
 [SourceVersionDate "2023.10.29"]
+[PPTExample "2A"]
 
 {[#]} 62... d2 (62... Kxf6 63. b7 d2 64. b8=Q d1=Q 65. Qb2+ $19) 63. b7 Kxf6 64. b8=Q d1=Q 65. Qb2+ $19 *
 
@@ -194,6 +201,7 @@
 [FEN "2K5/8/7p/8/6p1/3k2P1/7P/8 b - - 0 69"]
 [PlyCount "6"]
 [SourceVersionDate "2023.10.29"]
+[PPTExample "2B"]
 
 {[#]} 69... Ke3 (69... Ke2 70. Kc7 Kf1 71. Kd8 Kg2 72. Ke7 $19) 70. Kd7 h5 71. Kd6 Kf2 72. Ke5 $19 *
 
@@ -208,6 +216,7 @@
 [FEN "8/8/r5kP/6P1/1R3K2/8/8/8 w - - 0 1"]
 [PlyCount "8"]
 [SourceVersionDate "2023.10.29"]
+[PPTExample "3"]
 
 {[#]} 1. Re4 (1. Rd4 Rc6 2. Ra4 Rb6 3. Re4 Rc6 4. Ra4 Rb6 $18) 1... Rc6 2. Ra4 Rb6 3. Re4 Rc6 4. Ra4 Rb6 $18 *
 
@@ -236,6 +245,7 @@
 [FEN "8/8/2r3k1/6p1/3R2K1/6P1/5P2/8 b - - 0 54"]
 [PlyCount "6"]
 [SourceVersionDate "2023.10.29"]
+[PPTExample "3C"]
 
 {[#]} 54... Rf6 (54... Rb6 55. Re4 Rc6 56. Re5 Rc4+ 57. Kh3 $11) 55. f3 Ra6 56. Rb4 Rc6 57. Ra4 $11 *
 
@@ -278,6 +288,7 @@
 [FEN "8/8/8/2r5/1R4KP/4k3/8/8 w - - 0 47"]
 [PlyCount "6"]
 [SourceVersionDate "2023.10.29"]
+[PPTExample "3B"]
 
 {[#]} 47. h5 (47. Ra4 Rc8 48. h5 Rg8+ 49. Kh4 Rh8 $18) 47... Rc6 48. Kg5 Rc5+ 49. Kg4 Rc6 $18 *
 
@@ -292,6 +303,7 @@
 [FEN "8/pp5p/1r1k4/5p2/1PK2R2/6P1/7P/8 b - - 0 44"]
 [PlyCount "6"]
 [SourceVersionDate "2023.10.29"]
+[PPTExample "3A"]
 
 {[#]} 44... Ke5 (44... Rc6+ 45. Kd3 Ke5 46. Rh4 Rb6 47. Kc4 $19) 45. Rh4 Rc6+ 46. Kd3 Rb6 47. Kc4 $19 *
 
@@ -307,6 +319,7 @@
 [FEN "7K/6R1/1k6/p7/8/8/8/8 b - - 0 1"]
 [PlyCount "8"]
 [SourceVersionDate "2023.10.29"]
+[PPTExample "4"]
 
 {[#]} 1... Kb5  (1... Kc5 2. Rg4 Kb5 3. Rg1 Kb4 4. Rb1+ Kc5 5. Kh7 $11) 2. Rg5+ Ka4 3. Kg7 Kb4 4. Rg4+ Kb3 5. Kf7 $11 *
 
@@ -335,6 +348,7 @@
 [FEN "7K/6R1/1k6/p7/8/8/8/8 w - - 0 1"]
 [PlyCount "6"]
 [SourceVersionDate "2023.10.29"]
+[PPTExample "4B"]
 
 {[#]} 1. Rg5 (1. Kh7 Kb5 2. Kg6 a4 3. Kf5 Kc4 $11) 1... a4 2. Re5 a3 3. Re3 Kb5 $18 *
 
@@ -377,6 +391,7 @@
 [FEN "8/8/k2K2pR/p7/3P4/r7/8/8 w - - 0 52"]
 [PlyCount "6"]
 [SourceVersionDate "2023.10.29"]
+[PPTExample "4A"]
 
 {[#]} 52. d5 (52. Rxg6 Kb5 53. Rg5+ Kb4 54. d5 a4 $11) 52... Rg3 53. Rh2 a4 54. Rd2 a3 $11 *
 
@@ -391,6 +406,7 @@
 [FEN "8/6R1/1p6/p2k4/6P1/P1P5/K1P5/6r1 b - - 0 46"]
 [PlyCount "6"]
 [SourceVersionDate "2023.10.29"]
+[PPTExample "4C"]
 
 {[#]} 46... Kc4 (46... Rf1 47. a4 Kc6 48. g5 Rc1 49. Kb3 $18) 47. Kb2 Kb5 48. Rg5+ Ka4 49. Rd5 $18 *
 
@@ -406,6 +422,7 @@
 [FEN "8/8/5K2/7k/8/p7/1p6/1R6 w - - 0 1"]
 [PlyCount "8"]
 [SourceVersionDate "2023.10.29"]
+[PPTExample "5"]
 
 {[#]} 1. Kf5 (1. Ke6 Kg5 2. Kd6 Kg4 3. Kd5 Kh5 4. Kc4 a2 $19) 1... Kh4 2. Kf4 Kh5 3. Kf5 Kh6 4. Kf6 Kh5 $11 *
 
@@ -434,6 +451,7 @@
 [FEN "8/2p1K3/8/1p5k/2p5/p7/8/6R1 b - - 0 70"]
 [PlyCount "6"]
 [SourceVersionDate "2023.10.29"]
+[PPTExample "5A"]
 
 {[#]} 70... b4 (70... a2 71. Ke6 b4 72. Kf5 Kh4 73. Kf4 $11) 71. Ke6 a2 72. Kf5 Kh4 73. Kf4 $11 *
 
@@ -476,6 +494,7 @@
 [FEN "8/8/8/8/1k6/p7/1pK5/8 w - - 0 78"]
 [PlyCount "6"]
 [SourceVersionDate "2023.10.29"]
+[PPTExample "5C"]
 
 {[#]} 78. Kb1 (78. Kd2 a2 79. Kd3 a1=Q 80. Ke3 b1=Q $19) 78... Kc3 79. Ka2 Kc2 80. Kxa3 b1=Q $19 *
 
@@ -490,6 +509,7 @@
 [FEN "6k1/p7/8/5K2/6p1/p7/8/8 b - - 0 49"]
 [PlyCount "6"]
 [SourceVersionDate "2023.10.29"]
+[PPTExample "5B"]
 
 {[#]} 49... g3 (49... a5 50. Kxg4 a4 51. Kf3 a2 52. Kf4 $19) 50. Ke5 a2 51. Kd5 Kf7 52. Kc6 $19 *
 
@@ -505,6 +525,7 @@
 [FEN "4K3/4P1k1/8/8/8/8/r7/5R2 w - - 0 1"]
 [PlyCount "8"]
 [SourceVersionDate "2023.10.29"]
+[PPTExample "6"]
 
 {[#]} 1. Rg1+ (1. Rd1 Ra8+ 2. Kd7 Ra7+ 3. Ke6 Ra6+ 4. Rd6 Ra8 $18) 1... Kh7 2. Rd1 Kg6 3. Kf8 Rf2+ 4. Ke8 Ra2 $18 *
 
@@ -533,6 +554,7 @@
 [FEN "4K3/4P1k1/8/8/8/8/r7/5R2 b - - 0 1"]
 [PlyCount "6"]
 [SourceVersionDate "2023.10.29"]
+[PPTExample "6C"]
 
 {[#]} 1... Ra8+ (1... Ra4 2. Rf7+ Kh6 3. Rf3 Kg5 4. Kf7 $18) 2. Kd7 Ra7+ 3. Kd6 Ra6+ 4. Kd5 $11 *
 
@@ -575,6 +597,7 @@
 [FEN "6k1/3KP1p1/2r1r2p/8/7P/6P1/p7/R7 w - - 0 55"]
 [PlyCount "6"]
 [SourceVersionDate "2023.10.29"]
+[PPTExample "6A"]
 
 {[#]} 55. e8=R+ (55. e8=Q+ Rxe8 56. Kxc6 Ra8 57. Kd6 Ra6+ $19) 55... Rxe8 56. Kxc6 Ra8 57. Kd6 Ra6+ $19 *
 
@@ -589,6 +612,7 @@
 [FEN "8/5RK1/8/p7/k7/5r2/8/8 b - - 0 74"]
 [PlyCount "6"]
 [SourceVersionDate "2023.10.29"]
+[PPTExample "6B"]
 
 {[#]} 74... Rxf7+ (74... Rg3+ 75. Kf8 Ka3 76. Ke8 a4 77. Rb7 $18) 75. Kxf7 Kb4 76. Ke6 Kc4 77. Kd6 $18 *
 
@@ -604,6 +628,7 @@
 [FEN "8/8/1KP5/3r4/8/8/8/k7 w - - 0 1"]
 [PlyCount "8"]
 [SourceVersionDate "2023.10.29"]
+[PPTExample "7"]
 
 {[#]} 1. c7 (1. Ka6 Rc5 2. Kb6 Rc3 3. Kb7 Rxc6 4. Kxc6 Kb1 $11) 1... Kb2 2. c8=Q Rd3 3. Qc4 Rc3 4. Qe4 Kb3 $18 *
 
@@ -632,6 +657,7 @@
 [FEN "8/R7/1KPr4/8/1k6/8/8/8 w - - 0 64"]
 [PlyCount "6"]
 [SourceVersionDate "2023.10.29"]
+[PPTExample "7B"]
 
 {[#]} 64. Rh7 (64. Rd7 Rxc6+ 65. Kxc6 Kc4 66. Kb6 Kb4 $18) 64... Kc4 65. Kb7 Rxc6 66. Kxc6 Kd4 $18 *
 
@@ -674,6 +700,7 @@
 [FEN "8/2K5/2P5/pk6/8/1P6/8/8 b - - 0 62"]
 [PlyCount "6"]
 [SourceVersionDate "2023.10.29"]
+[PPTExample "7C"]
 
 {[#]} 62... Kc5 (62... Kb4 63. Kb6 Kxb3 64. Kxa5 Kc4 65. Ka6 $18) 63. Kb7 Kb5 64. c7 Kb4 65. Kb6 $18 *
 
@@ -688,6 +715,7 @@
 [FEN "8/6k1/1PPr1p2/4p3/8/p4K2/7P/8 w - - 0 55"]
 [PlyCount "6"]
 [SourceVersionDate "2023.10.29"]
+[PPTExample "7A"]
 
 {[#]} 55. c7 (55. b7 Rd3+ 56. Ke2 Rb3 57. c7 a2 $11) 55... Rd3+ 56. Ke2 Rc3 57. b7 a2 $11 *
 
@@ -802,6 +830,7 @@
 [FEN "r5k1/8/5PK1/8/8/8/8/1R6 w - - 0 1"]
 [PlyCount "8"]
 [SourceVersionDate "2023.10.29"]
+[PPTExample "8"]
 
 {[#]} 1. Rb7 (1. Rb3 Rc8 2. Rb5 Kf8 3. Rh5 Ke8 4. Rh8+ Kd7 $18) 1... Rc8 2. Rg7+ Kf8 3. Rh7 Ke8 4. Rh8+ Kd7 $18 *
 
@@ -830,6 +859,7 @@
 [FEN "1r4k1/R7/5PK1/8/8/8/8/8 w - - 0 1"]
 [PlyCount "6"]
 [SourceVersionDate "2023.10.29"]
+[PPTExample "8B"]
 
 {[#]} 1. Rg7+ (1. Rd7 Rc8 2. Rg7+ Kf8 3. Rh7 Ke8 $18) 1... Kf8 2. Rh7 Ke8 3. Rh8+ Kd7 $18 *
 
@@ -872,6 +902,7 @@
 [FEN "5k2/8/5PK1/8/8/8/8/8 b - - 0 58"]
 [PlyCount "6"]
 [SourceVersionDate "2023.10.29"]
+[PPTExample "8A"]
 
 {[#]} 58... Kg8 (58... Ke8 59. Kg7 Kd7 60. Kg6 Ke6 61. Kg7 $18) 59. Kh5 Kf8 60. Kg5 Kf7 61. Kf5 $11 *
 
@@ -886,6 +917,7 @@
 [FEN "5k2/p5p1/1p1r1pP1/8/P1P1P3/3P4/4K3/5R2 w - - 0 38"]
 [PlyCount "6"]
 [SourceVersionDate "2023.10.29"]
+[PPTExample "8C"]
 
 {[#]} 38. Ke3 (38. Rh1 Rd7 39. Rh8+ Ke7 40. Rg8 Ke6 $18) 38... Rc6 39. Rh1 Rc7 40. Rh7 Ke8 $11 *
 
@@ -900,6 +932,7 @@
 [FEN "r5k1/8/6PK/8/8/8/8/1R6 w - - 0 1"]
 [PlyCount "8"]
 [SourceVersionDate "2023.10.29"]
+[PPTExample "9"]
 
 {[#]} 1. Rb6 (1. Rb7 Rd8 2. Rc7 Re8 3. Ra7 Rd8 4. Ra6 Re8 $11) 1... Rc8 2. g7 Ra8 3. Rd6 Re8 4. Ra6 Rb8 $11 *
 
@@ -928,6 +961,7 @@
 [FEN "r5k1/1R6/6PK/8/6P1/8/8/8 w - - 0 1"]
 [PlyCount "6"]
 [SourceVersionDate "2023.10.29"]
+[PPTExample "9C"]
 
 {[#]} 1. g5 (1. Rb6 Re8 2. g5 Ra8 3. Rc6 Re8 $18) 1... Rc8 2. Rb6 Ra8 3. Re6 Kf8 $18 *
 
@@ -970,6 +1004,7 @@
 [FEN "r3r1k1/1R3p1p/6p1/p7/8/6PP/5P2/3R2K1 w - - 0 39"]
 [PlyCount "6"]
 [SourceVersionDate "2023.10.29"]
+[PPTExample "9A"]
 
 {[#]} 39. Rdd7 (39. Kg2 Reb8 40. Re7 Re8 41. Rc7 Red8 $19) 39... Rf8 40. Ra7 Rad8 41. Rdc7 Rd2 $11 *
 
@@ -984,6 +1019,7 @@
 [FEN "2r2rk1/5p1p/p5p1/8/3R4/1P3P2/P5PP/R5K1 b - - 0 24"]
 [PlyCount "6"]
 [SourceVersionDate "2023.10.29"]
+[PPTExample "9B"]
 
 {[#]} 24... Rc2 (24... Rfe8 25. Rd2 Rcd8 26. Rc2 Rc8 27. Rd2 $18) 25. Rc4 Rd2 26. Rcc1 Re8 27. Rd1 $11 *
 
@@ -998,6 +1034,7 @@
 [FEN "1r6/R3K1k1/4P3/8/8/8/8/8 w - - 0 1"]
 [PlyCount "8"]
 [SourceVersionDate "2023.10.29"]
+[PPTExample "10"]
 
 {[#]} 1. Kd6+ (1. Rd7 Ra8 2. Rd6 Kg6 3. Rd1 Ra7+ 4. Rd7 Ra2 $11) 1... Kf8 2. Kd7 Re8 3. Ra5 Re7+ 4. Kd6 Re8 $18 *
 
@@ -1026,6 +1063,7 @@
 [FEN "8/4K1k1/4P3/8/8/8/r7/3R4 b - - 0 1"]
 [PlyCount "6"]
 [SourceVersionDate "2023.10.29"]
+[PPTExample "10C"]
 
 {[#]} 1... Ra7+ (1... Rg2 2. Kd7 Ra2 3. e7 Re2 4. Rg1+ $18) 2. Rd7 Ra8 3. Rd6 Kg6 4. Rd1 $11 *
 
@@ -1068,6 +1106,7 @@
 [FEN "3k4/8/4PP2/3K4/p7/1P6/8/8 b - - 0 51"]
 [PlyCount "6"]
 [SourceVersionDate "2023.10.29"]
+[PPTExample "10B"]
 
 {[#]} 51... axb3 (51... a3 52. Kd6 Ke8 53. e7 Kf7 54. Kc7 $18) 52. Kd6 Ke8 53. f7+ Kf8 54. Kd7 $18 *
 
@@ -1082,6 +1121,7 @@
 [FEN "1k3r2/2p3p1/1pp4p/4P3/6P1/1P5P/P7/2KR4 b - - 0 32"]
 [PlyCount "6"]
 [SourceVersionDate "2023.10.29"]
+[PPTExample "10A"]
 
 {[#]} 32... Kc8 (32... Re8 33. Rd7 Rxe5 34. Rxg7 Re1+ 35. Kb2 $11) 33. e6 Re8 34. Re1 Kd8 35. Rd1+ $11 *
 
@@ -1096,6 +1136,7 @@
 [FEN "8/8/8/8/1K6/7R/1pk5/8 w - - 0 1"]
 [PlyCount "8"]
 [SourceVersionDate "2023.10.29"]
+[PPTExample "14"]
 
 {[#]} 1. Rh2+ (1. Kc4 b1=Q 2. Rh2+ Kc1 3. Rh1+ Kb2 4. Rxb1+ Kxb1 $11) 1... Kb1 2. Rh7 Kc2 3. Rh2+ Kb1 4. Rh8 Kc2 $11 *
 
@@ -1124,6 +1165,7 @@
 [FEN "8/8/8/8/7R/Kp6/1pk5/8 w - - 0 71"]
 [PlyCount "6"]
 [SourceVersionDate "2023.10.29"]
+[PPTExample "14A"]
 
 {[#]} 71. Rh2+ (71. Rh1 b1=R 72. Rxb1 Kxb1 73. Kxb3 Kc1 $11) 71... Kb1 72. Rh1+ Kc2 73. Rh2+ Kb1 $11 *
 
@@ -1166,6 +1208,7 @@
 [FEN "8/8/8/3P4/3K4/p6R/1p1k4/1r6 w - - 0 80"]
 [PlyCount "6"]
 [SourceVersionDate "2023.10.29"]
+[PPTExample "14C"]
 
 {[#]} 80. Rh2+ (80. d6 Rd1 81. Rd3+ Ke2 82. Rxd1 a2 $19) 80... Ke1 81. Ke3 Kf1 82. Rh1+ Kg2 $11 *
 
@@ -1180,6 +1223,7 @@
 [FEN "8/8/8/8/1k6/p7/1pK5/8 w - - 0 78"]
 [PlyCount "6"]
 [SourceVersionDate "2023.10.29"]
+[PPTExample "14B"]
 
 {[#]} 78. Kb1 (78. Kd2 a2 79. Kd3 a1=Q 80. Ke3 b1=Q $19) 78... Kc3 79. Ka2 Kc2 80. Kxa3 b1=Q $19 *
 
@@ -1292,6 +1336,7 @@
 [FEN "4k3/R7/8/4PK2/8/8/8/1r6 w - - 0 1"]
 [PlyCount "8"]
 [SourceVersionDate "2023.10.29"]
+[PPTExample "11"]
 
 {[#]} 1. Kf6 (1. Ra8+ Kd7 2. Ra7+ Ke8 3. Kf6 Re1 4. Ke6 Kf8 $18) 1... Re1 2. Ra8+ Kd7 3. Ra7+ Ke8 4. Ke6 Kf8 $18 *
 
@@ -1334,6 +1379,7 @@
 [FEN "4k3/8/5K2/4P3/6r1/8/R7/8 b - - 0 54"]
 [PlyCount "6"]
 [SourceVersionDate "2023.10.29"]
+[PPTExample "11C"]
 
 {[#]} 54... Re4 (54... Rf4+ 55. Ke6 Kf8 56. Ra8+ Kg7 57. Kd7 $18) 55. Ra8+ Kd7 56. Ra7+ Ke8 57. Ra8+ $18 *
 
@@ -1362,6 +1408,7 @@
 [FEN "4k3/R7/1p1pP3/3P1p2/2P2r2/8/P2K4/8 b - - 0 52"]
 [PlyCount "6"]
 [SourceVersionDate "2023.10.29"]
+[PPTExample "11A"]
 
 {[#]} 52... Rxc4 (52... Rg4 53. Ra8+ Ke7 54. Ra7+ Ke8 55. Kc3 $18) 53. Ra8+ Ke7 54. Ra7+ Ke8 55. Kd3 $18 *
 
@@ -1376,6 +1423,7 @@
 [FEN "R7/2k1P3/1p6/p7/4K3/8/8/3r4 b - - 0 46"]
 [PlyCount "6"]
 [SourceVersionDate "2023.10.29"]
+[PPTExample "11B"]
 
 {[#]} 46... Re1+ (46... Kd6 47. Rd8+ Kxe7 48. Rxd1 b5 49. Kd5 $18) 47. Kd5 Rxe7 48. Ra7+ Kd8 49. Ra8+ $11 *
 
@@ -1390,6 +1438,7 @@
 [FEN "8/8/8/R4p2/1r2k3/4p1P1/4K3/8 b - - 0 1"]
 [PlyCount "8"]
 [SourceVersionDate "2023.10.29"]
+[PPTExample "15"]
 
 {[#]} 1... Rd4 (1... Rb2+ 2. Ke1 Rd2 3. Ra4+ Rd4 4. Ra8 Kf3 5. Ra5 $19) 2. Ke1 Rd5 3. Ra3 Kf3 4. Ra1 Rb5 5. Kd1 $19 *
 
@@ -1432,6 +1481,7 @@
 [FEN "3r4/8/6RP/P4p2/1P3k2/2P1p3/4K3/8 b - - 0 46"]
 [PlyCount "6"]
 [SourceVersionDate "2023.10.29"]
+[PPTExample "15A"]
 
 {[#]} 46... Rd2+ (46... Rd5 47. Ke1 Rd2 48. a6 Kf3 49. h7 $18) 47. Ke1 Kf3 48. Re6 Ra2 49. Kd1 $19 *
 
@@ -1460,6 +1510,7 @@
 [FEN "3R4/8/2R5/1p3p2/4kr2/1K3p2/8/8 b - - 0 73"]
 [PlyCount "6"]
 [SourceVersionDate "2023.10.29"]
+[PPTExample "15C"]
 
 {[#]} 73... f2 (73... Ke3 74. Rc3+ Kf2 75. Kc2 Kg2 76. Rdd3 $19) 74. Re6+ Kf3 75. Rd1 Re4 76. Rf6 $11 *
 
@@ -1474,6 +1525,7 @@
 [FEN "7R/1p4r1/8/p5p1/3pk3/6P1/PP6/4K3 w - - 0 38"]
 [PlyCount "6"]
 [SourceVersionDate "2023.10.29"]
+[PPTExample "15B"]
 
 {[#]} 38. Ra8 (38. g4 Kf3 39. Rd8 Re7+ 40. Kd1 Kxg4 $19) 38... Kf3 39. Rxa5 Kxg3 40. Rd5 g4 $19 *
 
@@ -1488,6 +1540,7 @@
 [FEN "6KR/8/pk6/8/8/8/8/8 b - - 0 1"]
 [PlyCount "8"]
 [SourceVersionDate "2023.10.29"]
+[PPTExample "12"]
 
 {[#]} 1... Kc5 (1... Kb5 2. Kf7 Kc4 3. Ra8 Kb4 4. Rxa6 Kb3 5. Rc6 $18) 2. Kg7 a5 3. Kf6 a4 4. Ke5 Kc4 5. Rc8+ $11 *
 
@@ -1516,6 +1569,7 @@
 [FEN "7R/6K1/8/p2k4/8/8/8/8 b - - 0 68"]
 [PlyCount "6"]
 [SourceVersionDate "2023.10.29"]
+[PPTExample "12C"]
 
 {[#]} 68... Kc4 (68... Kc5 69. Kf6 a4 70. Kf5 a3 71. Ra8 $11) 69. Ra8 Kb4 70. Rb8+ Kc4 71. Ra8 $11 *
 
@@ -1558,6 +1612,7 @@
 [FEN "6K1/8/1p6/8/2P5/2k5/8/8 b - - 0 62"]
 [PlyCount "6"]
 [SourceVersionDate "2023.10.29"]
+[PPTExample "12A"]
 
 {[#]} 62... Kb4 (62... Kd4 63. Kg7 Kxc4 64. Kf7 Kd4 65. Kg6 $19) 63. Kg7 Kxc4 64. Kf7 Kd4 65. Kg6 $19 *
 
@@ -1572,6 +1627,7 @@
 [FEN "8/8/1k1K4/4p3/2R1Ppp1/p4P2/8/8 b - - 0 52"]
 [PlyCount "6"]
 [SourceVersionDate "2023.10.29"]
+[PPTExample "12B"]
 
 {[#]} 52... a2 (52... g3 53. Kxe5 Kb5 54. Rc3 g2 55. Rb3+ $18) 53. Ra4 Kb5 54. Rxa2 Kc4 55. Kxe5 $18 *
 
@@ -1586,6 +1642,7 @@
 [FEN "8/8/8/5ppk/2r5/1R4KP/8/8 w - - 0 1"]
 [PlyCount "8"]
 [SourceVersionDate "2023.10.29"]
+[PPTExample "13"]
 
 {[#]} 1. Rb8 (1. Rb7 f4+ 2. Kg2 Rc2+ 3. Kf3 Rh2 4. Rh7+ Kg6 $19) 1... f4+ 2. Kf3 Rc3+ 3. Kg2 Rc2+ 4. Kf3 Rc3+ $19 *
 
@@ -1614,6 +1671,7 @@
 [FEN "8/8/5pk1/6p1/8/1R4KP/r7/8 b - - 0 71"]
 [PlyCount "6"]
 [SourceVersionDate "2023.10.29"]
+[PPTExample "13B"]
 
 {[#]} 71... f5 (71... Ra4 72. Rb6 Kf7 73. Rb5 Ra8 74. Kh2 $19) 72. Rb6+ Kh5 73. Rb7 f4+ 74. Kf3 $19 *
 
@@ -1656,6 +1714,7 @@
 [FEN "2r5/p3p3/6kp/6p1/3PK3/P4rP1/8/7R w - - 0 45"]
 [PlyCount "6"]
 [SourceVersionDate "2023.10.29"]
+[PPTExample "13C"]
 
 {[#]} 45. Kxf3 (45. g4 Rcc3 46. Kd5 Rf4 47. Rg1 Kf6 $19) 45... Rc3+ 46. Kg2 Rc2+ 47. Kf3 h5 $19 *
 
@@ -1670,6 +1729,7 @@
 [FEN "8/7p/R7/3k1p2/7K/8/P4p1P/5r2 w - - 0 45"]
 [PlyCount "6"]
 [SourceVersionDate "2023.10.29"]
+[PPTExample "13A"]
 
 {[#]} 45. Kg3 (45. Ra5+ Ke4 46. Kg3 f4+ 47. Kg2 Rh1 $19) 45... Ke5 46. Kg2 Rh1 47. Kxf2 Rxh2+ $11 *
 
