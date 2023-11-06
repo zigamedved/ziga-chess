@@ -348,7 +348,6 @@
 [FEN "7K/6R1/1k6/p7/8/8/8/8 w - - 0 1"]
 [PlyCount "6"]
 [SourceVersionDate "2023.10.29"]
-[PPTExample "4B"]
 
 {[#]} 1. Rg5 (1. Kh7 Kb5 2. Kg6 a4 3. Kf5 Kc4 $11) 1... a4 2. Re5 a3 3. Re3 Kb5 $18 *
 
@@ -363,6 +362,7 @@
 [FEN "7K/7P/1k6/8/6P1/8/8/8 b - - 0 67"]
 [PlyCount "6"]
 [SourceVersionDate "2023.10.29"]
+[PPTExample "4B"]
 
 {[#]} 67... Kc6 (67... Kb5 68. Kg7 Kc4 69. Kf7 Kb4 70. g5 $18) 68. Kg8 Kc5 69. g5 Kd4 70. Kg7 $18 *
 
@@ -2229,3 +2229,58 @@ a5 Rc6 52. g4 Ra6 53. Ra4 Kf6 54. Kg3 $18 *
 
 {[#]} 38... Kg7 (38... Rc6 39. Rc2 Kg7 40. c4 Kf6 41. h4 $11) 39. c4 Ra6 40. Rd3 Kf6 41. Kg2 $11 *
 
+#### 
+EXAMPLE 4
+
+PV1: 
+[Result "*"]
+[FEN "8/6p1/5p2/3K2p1/k7/8/5P2/8 w - - 0 66"]
+[SetUp "1"]
+
+66. Ke6 Kb5 67. Kd5 Kb4 68. Kd4 g4 69. Kd3 Kb5 *
+
+PV2: 
+[Result "*"]
+[FEN "8/6p1/5p2/3K2p1/k7/8/5P2/8 w - - 0 66"]
+[SetUp "1"]
+
+66. Kc4 g4 67. Kd3 Kb3 68. Ke4 Kc4 69. Ke3 f5 
+
+Game #0
+
+White: Te, Roza
+Black: Okhotnik, Vladimir
+Result: 0-1
+endgameFEN: 8/6p1/5p2/7p/k1K4P/6P1/P7/8 b - - 0 50
+name: Game#479511.txt
+PGN: 1. e4 d6 2. d4 Nf6 3. Nc3 e5 4. dxe5 dxe5 5. Qxd8+ Kxd8 6. Bg5 Be6 7. O-O-O+ Kc8 8. f4 exf4 9. Bxf4 Ng4 10. Nh3 Bc5 11. Nd5 c6 12. Nc7 Be3+ 13. Bxe3 Nxe3 14. Nxa8 Nxd1 15. Kxd1 Bxh3 16. gxh3 Nd7 17. Rg1 g6 18. h4 Kb8 19. h5 Ne5 20. Be2 Kxa8 21. Kd2 Kb8 22. Ke3 Kc7 23. Kf4 f6 24. h4 Kd6 25. Rg3 a5 26. a4 b6 27. Rb3 Kc5 28. Rc3+ Kd6 29. Rb3 Kc7 30. Rh3 Rd8 31. Ke3 g5 32. hxg5 fxg5 33. h6 Rg8 34. Rh1 Rg6 35. Rg1 Kd6 36. c3 g4 37. Kf4 Rf6+ 38. Kg5 Rf2 39. Bxg4 Nf7+ 40. Kh4 Nxh6 41. Bh3 Ke5 42. Rg7 Rf7 43. Rg5+ Kxe4 44. Bg2+ Kf4 45. Bxc6 Rf6 46. Bd7 Nf5+ 47. Bxf5 Rh6+ 48. Rh5 Rxh5+ 49. Kxh5 Kxf5 50. Kh6 Ke4 51. Kxh7 Kd3 52. Kg6 Kc2 0-1
+PV1: [FEN "8/6p1/5p2/7p/k1K4P/6P1/P7/8 b - - 0 50"][SetUp "1"]50... g5 51. Kd3 Kb4 52. Kd4 g4 53. Kd5 *
+PV2: [FEN "8/6p1/5p2/7p/k1K4P/6P1/P7/8 b - - 0 50"][SetUp "1"]50... f5 51. Kd4 Kb4 52. Ke3 Kc3 53. a3 *
+score: 25.445772171020508
+Example 4B
+
+Game #43
+
+White: Zanin,Clement
+Black: Pigeat,B
+Result: 0-1
+endgameFEN: 8/6p1/2p2pk1/1p4p1/6P1/4K3/7P/8 b - - 0 60
+name: Game#253552.txt
+PGN: 1. e4 e6 2. d4 d5 3. exd5 exd5 4. Bd3 Nf6 5. Ne2 Bd6 6. Bf4 O-O 7. O-O c6 8. Nbc3 Bg4 9. f3 Bh5 10. Qe1 Re8 11. Qg3 Bxf4 12. Nxf4 Bg6 13. Nxg6 hxg6 14. Ne2 Nh5 15. Qf2 Qf6 16. c4 dxc4 17. Bxc4 Nd7 18. Rad1 Nb6 19. Bb3 Rad8 20. f4 Qe7 21. Ng3 Nf6 22. f5 g5 23. Qd2 Nfd5 24. Nh5 f6 25. Rfe1 Qd7 26. Qa5 Rxe1+ 27. Rxe1 Re8 28. Rd1 Qxf5 29. Ng3 Qe6 30. Qxa7 Qe3+ 31. Kh1 Qe1+ 32. Nf1 Qe7 33. Qxb6 Kh8 34. Qa5 Nf4 35. Qd2 Qe4 36. Ng3 Qe3 37. Qc2 Qe1+ 38. Nf1 Qh4 39. Ng3 Re3 40. Qf2 Rd3 41. Re1 Qh6 42. Bc2 Kh7 43. Bxd3+ Nxd3 44. Qc2 Qg6 45. Rd1 Nf4 46. Qf2 Ne6 47. Re1 Nf4 48. Nf5 Qxf5 49. g3 Qd5+ 50. Kg1 Nh3+ 51. Kf1 Nxf2 52. Kxf2 Qxd4+ 53. Re3 Qxb2+ 54. Kf3 Qxa2 55. g4 Qd5+ 56. Kf2 b5 57. Rh3+ Kg6 58. Re3 Qd4 59. Kf3 Qxe3+ 60. Kxe3 f5 61. gxf5+ Kxf5 62. Kd4 Kf4 63. Kc5 g4 64. Kxc6 b4 65. Kb5 b3 66. Ka4 b2 67. Ka3 b1=Q 68. h3 g3 69. h4 g2 70. h5 g1=Q 71. h6 Qc5+ 72. Ka4 Qcb4# 0-1
+PV1: [FEN "8/6p1/2p2pk1/1p4p1/6P1/4K3/7P/8 b - - 0 60"][SetUp "1"]60... f5 61. Kd4 fxg4 62. Kc5 Kf5 63. Kd4 *
+PV2: [FEN "8/6p1/2p2pk1/1p4p1/6P1/4K3/7P/8 b - - 0 60"][SetUp "1"]60... c5 61. Ke4 f5+ 62. Kd5 b4 63. gxf5+ *
+score: 18.011629104614258
+Example 4A
+
+Game #999
+
+White: Chen,Ryo
+Black: Eljanov,P
+Result: 0-1
+endgameFEN: 8/6pp/kp3p2/8/3P2P1/7P/1PK2P2/8 w - - 0 34
+name: Game#155927.txt
+PGN: 1. e4 e5 2. Nf3 Nc6 3. Bb5 a6 4. Ba4 Nf6 5. d3 Bc5 6. O-O d6 7. c3 O-O 8. Nbd2 Ba7 9. Re1 Ne7 10. h3 Ng6 11. Nf1 b5 12. Bb3 Bb7 13. Ng3 h6 14. d4 Re8 15. dxe5 dxe5 16. Be3 Bxe3 17. Rxe3 Qe7 18. Nf5 Qc5 19. Qc2 Rad8 20. g3 Ne7 21. Nxe7+ Rxe7 22. Nh4 Red7 23. Qe2 Rd2 24. Qf3 R8d7 25. Nf5 Bxe4 26. Nxh6+ Kf8 27. Rxe4 Nxe4 28. Rf1 Rxf2 29. Rxf2 Qxf2+ 30. Qxf2 Nxf2 31. Nxf7 Rxf7 32. Bxf7 Nxh3+ 33. Kg2 Kxf7 34. Kxh3 Kf6 35. Kg4 g6 36. Kf3 Kf5 37. g4+ Kg5 38. b4 Kh4 39. Ke4 Kxg4 40. Kxe5 g5 41. Kd5 Kf5 42. Kc6 g4 43. Kb7 g3 44. Kxa6 g2 45. Kxb5 g1=Q 46. a4 Qf1+ 47. Ka5 Qc4 48. b5 Ke6 49. Ka6 Kd7 50. a5 c6 51. Ka7 Qxb5 52. a6 Kc7 53. Ka8 Qb8# 0-1
+PV1: [FEN "8/6pp/kp3p2/8/3P2P1/7P/1PK2P2/8 w - - 0 34"][SetUp "1"]34. Kd3 Kb5 35. Ke4 Kc6 36. f4 Kd6 *
+PV2: [FEN "8/6pp/kp3p2/8/3P2P1/7P/1PK2P2/8 w - - 0 34"][SetUp "1"]34. d5 Kb5 35. b4 Ka6 36. Kc3 Kb5 *
+score: 12.843935012817383
+Example 4C
