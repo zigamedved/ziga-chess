@@ -2234,53 +2234,53 @@ EXAMPLE 4
 
 PV1: 
 [Result "*"]
-[FEN "8/6p1/5p2/3K2p1/k7/8/5P2/8 w - - 0 66"]
+[FEN "2R5/5p2/4p1k1/4P3/6K1/8/8/7r w - - 2 72"]
 [SetUp "1"]
 
-66. Ke6 Kb5 67. Kd5 Kb4 68. Kd4 g4 69. Kd3 Kb5 *
+72. Kf4 Rh4+ 73. Ke3 Rh5 74. Ke4 Rh4+ 75. Ke3 Kf5 *
 
 PV2: 
 [Result "*"]
-[FEN "8/6p1/5p2/3K2p1/k7/8/5P2/8 w - - 0 66"]
+[FEN "2R5/5p2/4p1k1/4P3/6K1/8/8/7r w - - 2 72"]
 [SetUp "1"]
 
-66. Kc4 g4 67. Kd3 Kb3 68. Ke4 Kc4 69. Ke3 f5 
+72. Rb8 Rf1 73. Rb3 Kg7 74. Rh3 Rf5 75. Re3 Kf8 *
 
 Game #0
 
-White: Te, Roza
-Black: Okhotnik, Vladimir
-Result: 0-1
-endgameFEN: 8/6p1/5p2/7p/k1K4P/6P1/P7/8 b - - 0 50
-name: Game#479511.txt
-PGN: 1. e4 d6 2. d4 Nf6 3. Nc3 e5 4. dxe5 dxe5 5. Qxd8+ Kxd8 6. Bg5 Be6 7. O-O-O+ Kc8 8. f4 exf4 9. Bxf4 Ng4 10. Nh3 Bc5 11. Nd5 c6 12. Nc7 Be3+ 13. Bxe3 Nxe3 14. Nxa8 Nxd1 15. Kxd1 Bxh3 16. gxh3 Nd7 17. Rg1 g6 18. h4 Kb8 19. h5 Ne5 20. Be2 Kxa8 21. Kd2 Kb8 22. Ke3 Kc7 23. Kf4 f6 24. h4 Kd6 25. Rg3 a5 26. a4 b6 27. Rb3 Kc5 28. Rc3+ Kd6 29. Rb3 Kc7 30. Rh3 Rd8 31. Ke3 g5 32. hxg5 fxg5 33. h6 Rg8 34. Rh1 Rg6 35. Rg1 Kd6 36. c3 g4 37. Kf4 Rf6+ 38. Kg5 Rf2 39. Bxg4 Nf7+ 40. Kh4 Nxh6 41. Bh3 Ke5 42. Rg7 Rf7 43. Rg5+ Kxe4 44. Bg2+ Kf4 45. Bxc6 Rf6 46. Bd7 Nf5+ 47. Bxf5 Rh6+ 48. Rh5 Rxh5+ 49. Kxh5 Kxf5 50. Kh6 Ke4 51. Kxh7 Kd3 52. Kg6 Kc2 0-1
-PV1: [FEN "8/6p1/5p2/7p/k1K4P/6P1/P7/8 b - - 0 50"][SetUp "1"]50... g5 51. Kd3 Kb4 52. Kd4 g4 53. Kd5 *
-PV2: [FEN "8/6p1/5p2/7p/k1K4P/6P1/P7/8 b - - 0 50"][SetUp "1"]50... f5 51. Kd4 Kb4 52. Ke3 Kc3 53. a3 *
-score: 25.445772171020508
+White: Zawadzki,S
+Black: Rasik,V
+Result: 1/2-1/2
+endgameFEN: 8/5p2/4p1kp/4P3/4K3/7r/P7/2R5 b - - 0 47
+name: Game#826992.txt
+PGN: 1. e4 c5 2. Nf3 e6 3. d4 cxd4 4. Nxd4 Nf6 5. Nc3 d6 6. Be2 Be7 7. Be3 a6 8. f4 O-O 9. g4 d5 10. e5 Ne4 11. Nxe4 dxe4 12. g5 b5 13. Qd2 Qd5 14. Nb3 Qxd2+ 15. Nxd2 Bb7 16. O-O-O Nc6 17. Nb3 Rac8 18. Rd7 Ba8 19. c3 Rfe8 20. Kb1 Bf8 21. Rhd1 Ne7 22. Ra7 Nd5 23. Bc1 Rxc3 24. bxc3 Nxc3+ 25. Kb2 Nxe2 26. Be3 b4 27. Rdd7 Nc3 28. Rxa6 Nd5 29. Bc1 Nc3 30. Bd2 Rc8 31. Bxc3 bxc3+ 32. Kc2 e3 33. Kd3 Bc6 34. Rxc6 Rxc6 35. Rd8 c2 36. Nc1 h6 37. gxh6 gxh6 38. Kxe3 Kg7 39. Ra8 Bc5+ 40. Kd3 Bg1 41. h3 Bh2 42. Ra4 Kg6 43. Ke4 Rc3 44. Rb4 Rxh3 45. Rc4 Bxf4 46. Rxc2 Bxc1 47. Rxc1 Rh4+ 48. Ke3 Ra4 49. Rg1+ Kf5 50. Rf1+ Kxe5 51. Rxf7 Ra8 52. Kf2 Rxa2+ 53. Kg3 Ra3+ 54. Kg4 Ra1 55. Rf2 Rg1+ 56. Kf3 h5 57. Ra2 Rd1 58. Rh2 Rf1+ 59. Kg3 Rg1+ 60. Kf3 Rg5 61. Ra2 h4 62. Rh2 Rg3+ 63. Kf2 Rg4 64. Rh3 Kf5 65. Ra3 e5 66. Rb3 Ra4 67. Rc3 Ra2+ 68. Ke3 h3 69. Rc8 Ra3+ 70. Kf2 Kf4 71. Rf8+ Ke4 72. Rh8 Ra2+ 73. Kg1 Rg2+ 74. Kf1 Rg3 75. Kf2 Rf3+ 76. Ke2 Ra3 77. Kf2 Ra2+ 78. Kg1 h2+ 79. Kh1 Ra1+ 80. Kxh2 Ke3 81. Kg2 e4 82. Rc8 Rd1 83. Ra8 Ke2 84. Ra4 e3 85. Ra2+ Rd2 86. Ra1 Rd1 87. Ra2+ Kd3 88. Ra3+ Ke4 89. Ra4+ Rd4 90. Ra8 Rd1 91. Ra4+ Kd3 92. Ra3+ Ke2 93. Ra2+ Rd2 94. Ra1 Rc2 95. Kg3 Rc3 96. Kg2 Rc8 97. Ra2+ Kd3 98. Ra3+ Kd2 99. Ra2+ Rc2 100. Ra1 Kd3+ 101. Kf1 Kd2 102. Kg2 Kd3+ 103. Kf1 Rf2+ 104. Ke1 Re2+ 1/2-1/2
+PV1: [FEN "8/5p2/4p1kp/4P3/4K3/7r/P7/2R5 b - - 0 47"][SetUp "1"]47... Rh4+ 48. Ke3 Ra4 49. Rg1+ Kf5 50. Rf1+ *
+PV2: [FEN "8/5p2/4p1kp/4P3/4K3/7r/P7/2R5 b - - 0 47"][SetUp "1"]47... Ra3 48. Rg1+ Kh7 49. Rg2 Ra4+ 50. Ke3 *
+score: 26.79941177368164
 Example 4B
 
-Game #43
+Game #20
 
-White: Zanin,Clement
-Black: Pigeat,B
+White: Mollov, Elin
+Black: Peev, Peicho Chonev
 Result: 0-1
-endgameFEN: 8/6p1/2p2pk1/1p4p1/6P1/4K3/7P/8 b - - 0 60
-name: Game#253552.txt
-PGN: 1. e4 e6 2. d4 d5 3. exd5 exd5 4. Bd3 Nf6 5. Ne2 Bd6 6. Bf4 O-O 7. O-O c6 8. Nbc3 Bg4 9. f3 Bh5 10. Qe1 Re8 11. Qg3 Bxf4 12. Nxf4 Bg6 13. Nxg6 hxg6 14. Ne2 Nh5 15. Qf2 Qf6 16. c4 dxc4 17. Bxc4 Nd7 18. Rad1 Nb6 19. Bb3 Rad8 20. f4 Qe7 21. Ng3 Nf6 22. f5 g5 23. Qd2 Nfd5 24. Nh5 f6 25. Rfe1 Qd7 26. Qa5 Rxe1+ 27. Rxe1 Re8 28. Rd1 Qxf5 29. Ng3 Qe6 30. Qxa7 Qe3+ 31. Kh1 Qe1+ 32. Nf1 Qe7 33. Qxb6 Kh8 34. Qa5 Nf4 35. Qd2 Qe4 36. Ng3 Qe3 37. Qc2 Qe1+ 38. Nf1 Qh4 39. Ng3 Re3 40. Qf2 Rd3 41. Re1 Qh6 42. Bc2 Kh7 43. Bxd3+ Nxd3 44. Qc2 Qg6 45. Rd1 Nf4 46. Qf2 Ne6 47. Re1 Nf4 48. Nf5 Qxf5 49. g3 Qd5+ 50. Kg1 Nh3+ 51. Kf1 Nxf2 52. Kxf2 Qxd4+ 53. Re3 Qxb2+ 54. Kf3 Qxa2 55. g4 Qd5+ 56. Kf2 b5 57. Rh3+ Kg6 58. Re3 Qd4 59. Kf3 Qxe3+ 60. Kxe3 f5 61. gxf5+ Kxf5 62. Kd4 Kf4 63. Kc5 g4 64. Kxc6 b4 65. Kb5 b3 66. Ka4 b2 67. Ka3 b1=Q 68. h3 g3 69. h4 g2 70. h5 g1=Q 71. h6 Qc5+ 72. Ka4 Qcb4# 0-1
-PV1: [FEN "8/6p1/2p2pk1/1p4p1/6P1/4K3/7P/8 b - - 0 60"][SetUp "1"]60... f5 61. Kd4 fxg4 62. Kc5 Kf5 63. Kd4 *
-PV2: [FEN "8/6p1/2p2pk1/1p4p1/6P1/4K3/7P/8 b - - 0 60"][SetUp "1"]60... c5 61. Ke4 f5+ 62. Kd5 b4 63. gxf5+ *
-score: 18.011629104614258
+endgameFEN: 8/1R6/2P4k/8/Pp4K1/7r/1P6/7r w - - 0 52
+name: Game#397834.txt
+PGN: 1. d4 g6 2. e4 Bg7 3. Nc3 d6 4. Nf3 c6 5. a4 a5 6. Be3 Nd7 7. Qd2 Qc7 8. Bc4 Ngf6 9. O-O O-O 10. Bb3 Nb6 11. h3 d5 12. Bf4 Qd8 13. Rfe1 Ne8 14. Bh6 Nc7 15. Bxg7 Kxg7 16. Re2 h6 17. Rae1 Be6 18. Ne5 Nd7 19. Qf4 dxe4 20. Nxd7 Qxd7 21. Qe5+ Kh7 22. Rxe4 Bxb3 23. cxb3 e6 24. Rh4 f5 25. g4 Qd8 26. gxf5 Qxh4 27. Qxc7+ Kg8 28. Rxe6 Qg5+ 29. Qg3 Qxg3+ 30. fxg3 gxf5 31. Rxh6 Rad8 32. Rh4 Kg7 33. Rf4 Kg6 34. Kf2 Rh8 35. h4 Rhe8 36. g4 fxg4 37. Kg3 Re3+ 38. Kxg4 Rd3 39. h5+ Kh6 40. Ne2 Rg8+ 41. Kh4 Re3 42. Rf6+ Kh7 43. Nf4 Re4 44. h6 Re1 45. b4 Rh1+ 46. Nh3 axb4 47. d5 Rg6 48. Rf7+ Kxh6 49. Rxb7 Rg5 50. dxc6 Rh5+ 51. Kg4 R5xh3 52. c7 Rh4+ 53. Kf3 Rc4 54. Rxb4 Rxc7 55. Rb6+ Kg7 56. b4 Rh4 0-1
+PV1: [FEN "8/1R6/2P4k/8/Pp4K1/7r/1P6/7r w - - 0 52"][SetUp "1"]52. Rb8 Rh4+ 53. Kg3 R1h3+ 54. Kf2 Rh2+ *
+PV2: [FEN "8/1R6/2P4k/8/Pp4K1/7r/1P6/7r w - - 0 52"][SetUp "1"]52. c7 Rh4+ 53. Kf5 Rc1 54. Ke6 Rd4 *
+score: 20.197221755981445
 Example 4A
 
 Game #999
 
-White: Chen,Ryo
-Black: Eljanov,P
-Result: 0-1
-endgameFEN: 8/6pp/kp3p2/8/3P2P1/7P/1PK2P2/8 w - - 0 34
-name: Game#155927.txt
-PGN: 1. e4 e5 2. Nf3 Nc6 3. Bb5 a6 4. Ba4 Nf6 5. d3 Bc5 6. O-O d6 7. c3 O-O 8. Nbd2 Ba7 9. Re1 Ne7 10. h3 Ng6 11. Nf1 b5 12. Bb3 Bb7 13. Ng3 h6 14. d4 Re8 15. dxe5 dxe5 16. Be3 Bxe3 17. Rxe3 Qe7 18. Nf5 Qc5 19. Qc2 Rad8 20. g3 Ne7 21. Nxe7+ Rxe7 22. Nh4 Red7 23. Qe2 Rd2 24. Qf3 R8d7 25. Nf5 Bxe4 26. Nxh6+ Kf8 27. Rxe4 Nxe4 28. Rf1 Rxf2 29. Rxf2 Qxf2+ 30. Qxf2 Nxf2 31. Nxf7 Rxf7 32. Bxf7 Nxh3+ 33. Kg2 Kxf7 34. Kxh3 Kf6 35. Kg4 g6 36. Kf3 Kf5 37. g4+ Kg5 38. b4 Kh4 39. Ke4 Kxg4 40. Kxe5 g5 41. Kd5 Kf5 42. Kc6 g4 43. Kb7 g3 44. Kxa6 g2 45. Kxb5 g1=Q 46. a4 Qf1+ 47. Ka5 Qc4 48. b5 Ke6 49. Ka6 Kd7 50. a5 c6 51. Ka7 Qxb5 52. a6 Kc7 53. Ka8 Qb8# 0-1
-PV1: [FEN "8/6pp/kp3p2/8/3P2P1/7P/1PK2P2/8 w - - 0 34"][SetUp "1"]34. Kd3 Kb5 35. Ke4 Kc6 36. f4 Kd6 *
-PV2: [FEN "8/6pp/kp3p2/8/3P2P1/7P/1PK2P2/8 w - - 0 34"][SetUp "1"]34. d5 Kb5 35. b4 Ka6 36. Kc3 Kb5 *
-score: 12.843935012817383
+White: Tal, Mihail
+Black: Kots, Yury Isakovich
+Result: 1/2-1/2
+endgameFEN: 8/p4R1k/6pp/8/6rP/8/P6K/8 b - - 0 50
+name: Game#805945.txt
+PGN: 1. e4 c5 2. Nf3 Nc6 3. d4 cxd4 4. Nxd4 Nf6 5. Nc3 d6 6. Bg5 Qb6 7. Nb3 e6 8. Qd2 a6 9. O-O-O Bd7 10. f4 O-O-O 11. Be2 Be7 12. Rhe1 Be8 13. f5 Ne5 14. Nd4 Bd7 15. Bf4 Kb8 16. g4 Nfxg4 17. fxe6 fxe6 18. Bxg4 Nxg4 19. Nf5 Bf6 20. Bxd6+ Ka8 21. e5 Nxe5 22. Bxe5 exf5 23. Nd5 Qc6 24. Nc7+ Ka7 25. Qe3+ b6 26. Rd6 Qb7 27. Bxf6 gxf6 28. Qd4 Qxc7 29. Re7 Ka8 30. Rdxd7 Rxd7 31. Rxd7 Qc6 32. b3 Rc8 33. Qd3 b5 34. Rd6 Qh1+ 35. Kb2 Kb7 36. Qxf5 Rc7 37. Qxf6 Qg1 38. Qf3+ Ka7 39. Rd8 Rb7 40. a3 Qc5 41. Qe4 a5 42. Qe8 Qe7 43. Ra8+ Kb6 44. Qh5 Qf6+ 45. Ka2 Rc7 46. Qe2 Qc6 47. Rb8+ Ka7 48. Rxb5 Qxc2+ 49. Qxc2 Rxc2+ 50. Kb1 Rxh2 51. Rxa5+ Kb7 52. Re5 h5 53. a4 h4 54. Kc1 h3 55. Rh5 Ka7 56. Kd1 Kb7 57. Ke1 Kc6 58. Kd1 Kb7 59. Rh6 Ka7 60. Kc1 Kb7 61. Kb1 Ka7 62. b4 Kb7 63. b5 Rg2 64. Rxh3 Rg4 65. Ra3 Kb6 66. Ra2 Ka5 67. Kc2 Rg3 68. Ra1 Rh3 69. Rb1 Kb6 70. Rb4 Rh2+ 71. Kd3 Rh3+ 72. Ke2 Ka5 73. Rc4 Rb3 74. Kd2 Rh3 75. Kc2 Rg3 76. Kb2 Rh3 77. Rc3 Rh4 1/2-1/2
+PV1: [FEN "8/p4R1k/6pp/8/6rP/8/P6K/8 b - - 0 50"][SetUp "1"]50... Kg8 51. Rxa7 Rxh4+ 52. Kg3 Re4 53. a4 *
+PV2: [FEN "8/p4R1k/6pp/8/6rP/8/P6K/8 b - - 0 50"][SetUp "1"]50... Kh8 51. h5 Rh4+ 52. Kg3 Rxh5 53. Rxa7 *
+score: 13.384191513061523
 Example 4C
