@@ -489,7 +489,7 @@ def analyse():
     )
     if r.status != 200:
         print(f"Request failed with status code: {r.status}")
-        jsonify(f"Request failed with status code: {r.status}")
+        return jsonify(f"Request failed with status code: {r.status}")
 
     # r = {
     #     "data": [
