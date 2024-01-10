@@ -62,7 +62,7 @@ public class chessServer {
             server.createContext(envValue + "/ping", new PingHandler());
         }
 
-        server.setExecutor(null); // Use the default executor
+        server.setExecutor(null);
         server.start();
 
         System.out.println("Server started on 0.0.0.0:8080");
@@ -124,38 +124,11 @@ public class chessServer {
                 e.printStackTrace();
             }
 
-            // // Convert the Map's entry set to a List
-            // List<Map.Entry<String, Float>> entries = new ArrayList<>(result.entrySet());
-            //
-            // // Sort the List using a lambda expression (in descending order based on
-            // Float values)
-            // entries.sort((entry1, entry2) -> Float.compare(entry2.getValue(),
-            // entry1.getValue()));
-            //
-            // // Create a new LinkedHashMap to preserve the sorted order
-            // Map<String, Float> sortedResult = new LinkedHashMap<>();
-            //
-            // // Put the sorted entries back into the LinkedHashMap
-            // for (Map.Entry<String, Float> entry : entries) {
-            // sortedResult.put(entry.getKey(), entry.getValue());
-            // }
-
-            // Print the content of the map
-            // for (Map.Entry<String, Float> entry : result.entrySet()) {
-            // String key = entry.getKey();
-            // Float value = entry.getValue();
-            // System.out.println(key + " -> " + value);
-            // }
-
             // Define the list of names to query
             List<String> keysList = new ArrayList<>(result.keySet());
 
             // Create the filter using the "in" operator to query multiple names
             org.bson.Document filter = new org.bson.Document("name", new org.bson.Document("$in", keysList));
-
-            // fields(include("endgameFEN","White","Black", "Result","name", "PGN", "PV1",
-            // "PV2"))
-            // Execute the queryDocument projection = new Document("name", 1)
             org.bson.Document projection = new org.bson.Document();
             projection.append("_id", 0);
             projection.append("name", 1);
@@ -171,14 +144,11 @@ public class chessServer {
 
             // Process the query results
             List<String> result2 = new ArrayList<>();
-
             try (MongoCursor<org.bson.Document> cursor = queryResult.iterator()) {
                 while (cursor.hasNext()) {
                     org.bson.Document document = cursor.next();
                     String name = document.getString("name");
                     document.append("score", result.get(name));
-                    // Process each document as needed
-                    // System.out.println(document.toJson());
                     result2.add(document.toJson());
                 }
             }
@@ -199,11 +169,9 @@ public class chessServer {
     }
 
     private static void sendResponse(HttpExchange t, List<String> result) throws IOException {
-        // Convert the Map to a JSON string using Gson
         Gson gson = new Gson();
         String jsonResponse = gson.toJson(result);
 
-        // Set the response headers and send the JSON response
         t.getResponseHeaders().set("Content-Type", "application/json");
         t.sendResponseHeaders(200, jsonResponse.length());
         OutputStream os = t.getResponseBody();
@@ -214,15 +182,12 @@ public class chessServer {
     public static Map<String, Float> queryLucene(String input) throws Exception {
         IndexSearcher searcher = createSearcher();
         String escapedText = escapeCharacters(input);
-
         // Search indexed contents using search term
         TopDocs foundDocs = searchInContent(escapedText, searcher);
-
         // Total found documents
         System.out.println("Total Results :: " + foundDocs.totalHits);
 
         Map<String, Float> result = new HashMap<>();
-
         // Let's print out the path of files which have searched term
         for (ScoreDoc sd : foundDocs.scoreDocs) {
             Document d = searcher.doc(sd.doc);

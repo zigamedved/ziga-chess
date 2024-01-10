@@ -41,12 +41,11 @@ def remove_castling_rights(fen):
 def find_attackers(piece, color, elements, board, relation):
     res = []
     for el in elements:
-        attackers = list(board.attackers(color, el))  # seznam lokacij ki napadajo ta square,tu vem kdo napada piece,x>p
+        attackers = list(board.attackers(color, el))
         for att in attackers:
             figure = board.piece_at(att)
-            res.append(figure.symbol() + relation + piece + chess.square_name(el))
-            # za vsak attacker, naredi board.piece_at(attacker), pripni v rezultate attacker>piece
-            # x dobis iz board.piece_at(list(board.attackers(chess.BLACK, square))[0])
+            res.append(figure.symbol() + relation +
+                       piece + chess.square_name(el))
     return res
 
 
@@ -54,7 +53,8 @@ def find_attackers(piece, color, elements, board, relation):
 def get_static_features(fen):
     board = chess.Board(fen)
 
-    wp = list(board.pieces(chess.PAWN, chess.WHITE))  # gets locations of given piece, color
+    # gets locations of given piece, color
+    wp = list(board.pieces(chess.PAWN, chess.WHITE))
     bp = list(board.pieces(chess.PAWN, chess.BLACK))
 
     wp_att = find_attackers('P', chess.BLACK, wp, board, '>')
@@ -255,9 +255,11 @@ def get_isolated_pawns(board):  # Ipa
         if not any(board.pawns & chess.BB_FILES[file] for file in
                    (chess.square_file(square) - 1, chess.square_file(square) + 1) if 0 <= file <= 7):
             if board.color_at(square) == chess.WHITE:
-                res.append('I' + 'P' + chess.FILE_NAMES[chess.square_file(square)])
+                res.append(
+                    'I' + 'P' + chess.FILE_NAMES[chess.square_file(square)])
             else:
-                res.append('I' + 'p' + chess.FILE_NAMES[chess.square_file(square)])
+                res.append(
+                    'I' + 'p' + chess.FILE_NAMES[chess.square_file(square)])
     return np.array(res)
 
 
@@ -270,8 +272,10 @@ def is_att(color, squares, board, symbol):
 
 
 def get_key_square_control(board):
-    white = is_att(chess.WHITE, [chess.C5, chess.D5, chess.E5, chess.F5], board, 'wh')
-    black = is_att(chess.BLACK, [chess.C4, chess.D4, chess.E4, chess.F4], board, 'bl')
+    white = is_att(chess.WHITE, [chess.C5, chess.D5,
+                   chess.E5, chess.F5], board, 'wh')
+    black = is_att(chess.BLACK, [chess.C4, chess.D4,
+                   chess.E4, chess.F4], board, 'bl')
     return np.array(white + black)
 
 
@@ -324,9 +328,11 @@ def are_rooks_connected(board, color, symbol):
 
 
 def get_rook_placement_score(board):
-    wr_open_file = rooks_open_file(board, chess.WHITE, 'R')  # Ora, black rook open a file
+    # Ora, black rook open a file
+    wr_open_file = rooks_open_file(board, chess.WHITE, 'R')
     br_open_file = rooks_open_file(board, chess.BLACK, 'r')
-    wr_connected = are_rooks_connected(board, chess.WHITE, 'R')  # R-R-a white rooks connected, a file, R-R-1 rank..
+    # R-R-a white rooks connected, a file, R-R-1 rank..
+    wr_connected = are_rooks_connected(board, chess.WHITE, 'R')
     br_connected = are_rooks_connected(board, chess.BLACK, 'r')
     wr_connected = [x for x in wr_connected if x is not None]
     br_connected = [x for x in br_connected if x is not None]
@@ -341,16 +347,20 @@ def get_rook_placement_score(board):
 
 def get_more_features(fen):
     board = chess.Board(fen=fen)
-    ks = get_king_activity(board)  # 2 symbols, both sides, higher number -> less active king, kcc, close if <= 2
+    # 2 symbols, both sides, higher number -> less active king, kcc, close if <= 2
+    ks = get_king_activity(board)
     # mty = get_position_mobility(board)  # returns legal moves
-    ppw = get_passed_pawns(board, chess.WHITE, 'P')  # Ppa, passed black pawn a file
+    # Ppa, passed black pawn a file
+    ppw = get_passed_pawns(board, chess.WHITE, 'P')
     ppb = get_passed_pawns(board, chess.BLACK, 'p')
     ip = get_isolated_pawns(board)  # Ipa, isolated black pawn a file
     dp = get_doubled_pawns(board)  # Dpa, doubled black pawns a file
-    ksc = get_key_square_control(board)  # [wc5,wd5,we5], white controls c5, d5, e5
+    # [wc5,wd5,we5], white controls c5, d5, e5
+    ksc = get_key_square_control(board)
     rps = get_rook_placement_score(board)  # 10 numbers, white, black
 
-    result = np.array([ks, ppw, ppb, ip, dp, ksc, rps], dtype=object)  # removed mty
+    result = np.array([ks, ppw, ppb, ip, dp, ksc, rps],
+                      dtype=object)  # removed mty
     return [item for sub_list in result for item in sub_list]
 
 
@@ -389,69 +399,6 @@ def analyse_position(fen):
             dynamic_features = get_dynamic_features(fen, variant)
             result = result + ' '.join(dynamic_features)
     return result, variants
-
-
-def prepare_response(filename):
-    f = os.path.join("TODO", filename)
-    with open(f, 'r') as file:
-        try:
-            data = file.readlines()
-        except Exception as e:
-            print(e)
-            return []
-
-    if len(data) == 0:
-        return []
-
-    first, last = 0, 0
-    for idx, i in enumerate(data):
-        if i == '########################################\n':
-            first = idx
-        if first != 0 and i == '\n':
-            last = idx + 1
-            break
-    if first == 0 or last == 0:
-        return []
-    sublist = data[first + 1:last - 1]
-    # Create a Python dictionary for the JSON document
-    game_data = {}
-
-    for item in sublist:
-        if item == '\n':
-            continue
-        string = item.split('"')
-        game_data[string[0][1:-1]] = string[1]
-    game_data["name"] = filename
-    game_data["PGN"] = data[last]
-    return game_data
-
-
-def parse_game(data, name):
-    if len(data) == 0:
-        return []
-
-    first, last = 0, 0
-    for idx, i in enumerate(data):
-        if i == '########################################\n':
-            first = idx
-        if first != 0 and i == '\n':
-            last = idx + 1
-            break
-    if first == 0 or last == 0:
-        return []
-    sublist = data[first + 1:last - 1]
-    # Create a Python dictionary for the JSON document
-    game_data = {}
-
-    for item in sublist:
-        if item == '\n':
-            continue
-        # string = item.split("\n")[0][1:-2].replace('"','')
-        string = item.split('"')
-        game_data[string[0][1:-1]] = string[1]
-    game_data["name"] = name
-    game_data["PGN"] = data[last]
-    return game_data
 
 
 @app.route(prefix + '/hello', methods=['GET'])
@@ -513,11 +460,13 @@ def analyse():
     parsedPgn2 = '\n'.join(linesPgn2)
 
     text_responses = []
-    text_responses.append("\n\n".join(["Analysed lines of input game:", "PV1: \n"+parsedPgn1, "PV2: \n"+parsedPgn2]))
+    text_responses.append("\n\n".join(
+        ["Analysed lines of input game:", "PV1: \n"+parsedPgn1, "PV2: \n"+parsedPgn2]))
     idx = 0
     text_responses.append("\nSimilar games:")
     for data_dict in res:
-        text_response = "\n".join([f"{key}: {value}" for key, value in data_dict.items()])
+        text_response = "\n".join(
+            [f"{key}: {value}" for key, value in data_dict.items()])
         text_responses.append(f"\nGame #{idx}")
         idx += 1
         text_responses.append(text_response)
@@ -528,6 +477,7 @@ def analyse():
 
     return Response(plain_text_response, content_type="text/plain")
     # return jsonify(r)
+
 
 @app.route('/ping')
 @app.route(prefix + '/ping')
