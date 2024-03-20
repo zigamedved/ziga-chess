@@ -192,6 +192,8 @@ score: 56.89363098144531
 
 # Sources
 - https://stockfishchess.org
+- https://repozitorij.uni-lj.si/IzpisGradiva.php?id=153478&lang=slv
+- [SIGIR '14: Proceedings of the 37th international ACM SIGIR conference on Research & development in information retrieval](https://dl.acm.org/doi/10.1145/2600428.2609605)
 
 # Chess results questionnaire (system answers)
 1 A C B
