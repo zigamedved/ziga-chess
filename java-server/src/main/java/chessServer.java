@@ -40,9 +40,13 @@ import org.apache.lucene.store.FSDirectory;
 import org.apache.lucene.search.similarities.BM25Similarity;
 
 public class chessServer {
-    private static final String INDEX_DIR = "indexedFiles";
     private static MongoClient mongoClient;
     private static MongoCollection<org.bson.Document> collection;
+
+    /** Overridable for tests via -Dchess.indexDir=/path/to/index */
+    static String indexDir() {
+        return System.getProperty("chess.indexDir", "indexedFiles");
+    }
 
     public static void main(String[] args) throws IOException {
         // Creating a Mongo client, "localhost", 27017
@@ -217,7 +221,7 @@ public class chessServer {
     }
 
     private static IndexSearcher createSearcher() throws IOException {
-        Directory dir = FSDirectory.open(Paths.get(INDEX_DIR));
+        Directory dir = FSDirectory.open(Paths.get(indexDir()));
 
         // It is an interface for accessing a point-in-time view of a lucene index
         IndexReader reader = DirectoryReader.open(dir);
