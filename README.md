@@ -1,5 +1,17 @@
 # Project handling
 
+# Tests (pin current behaviour before refactors)
+
+From the repo root:
+
+```bash
+make test          # Python + Java
+make test-python   # pytest (Stockfish + Java HTTP mocked)
+make test-java     # mvn test (Lucene fixture index, no Mongo)
+```
+
+Python coverage includes unit tests for feature extractors, golden snapshots for the README sample FEN, and Flask route integration tests. Java coverage includes `escapeCharacters`, `/ping`, and Lucene `queryLucene` against a temp index (`-Dchess.indexDir`).
+
 # How to run
 
 ## JAVA server:
