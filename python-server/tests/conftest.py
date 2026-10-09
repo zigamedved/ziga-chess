@@ -20,8 +20,15 @@ PASSED_PAWN_FEN = "4k3/8/8/8/8/8/P7/4K3 w - - 0 1"
 CONNECTED_ROOKS_FEN = "4k3/8/8/8/8/8/8/R3K2R w KQ - 0 1"
 KING_CENTER_FEN = "4k3/8/8/3K4/8/8/8/8 w - - 0 1"
 
+# Test-only credentials (not production secrets).
+TEST_AUTH_USERNAME = "test-user"
+TEST_AUTH_PASSWORD = "test-password-not-for-prod"
 
-def basic_auth_header(username: str = "zigamedved", password: str = "skrivnost.1234") -> str:
+
+def basic_auth_header(
+    username: str = TEST_AUTH_USERNAME,
+    password: str = TEST_AUTH_PASSWORD,
+) -> str:
     token = base64.b64encode(f"{username}:{password}".encode("utf-8")).decode("ascii")
     return f"Basic {token}"
 
@@ -99,6 +106,10 @@ def _default_java_payload():
 @pytest.fixture
 def app_module(monkeypatch):
     """Import (or re-import) main with Stockfish + Java HTTP mocked."""
+    monkeypatch.setenv("AUTH_USERNAME", TEST_AUTH_USERNAME)
+    monkeypatch.setenv("AUTH_PASSWORD", TEST_AUTH_PASSWORD)
+    monkeypatch.setenv("JAVA_SERVICE_URL", "http://127.0.0.1:8080/position")
+
     stockfish_mod = types.ModuleType("stockfish")
     stockfish_mod.Stockfish = DummyStockfish
     monkeypatch.setitem(sys.modules, "stockfish", stockfish_mod)

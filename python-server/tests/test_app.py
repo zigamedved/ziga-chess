@@ -1,8 +1,18 @@
 """HTTP integration tests for Flask routes (Stockfish + Java mocked)."""
 
+import importlib
 import json
+import sys
+import types
 
-from conftest import README_FEN, basic_auth_header
+import pytest
+
+from conftest import (
+    README_FEN,
+    TEST_AUTH_PASSWORD,
+    TEST_AUTH_USERNAME,
+    basic_auth_header,
+)
 
 
 def test_ping_no_auth(client):
@@ -20,9 +30,27 @@ def test_hello_requires_auth(client):
     assert res.json == {"message": "Hello, this is the response from the server!"}
 
 
+def test_hello_rejects_wrong_password(client):
+    res = client.get(
+        "/hello",
+        headers={"Authorization": basic_auth_header(TEST_AUTH_USERNAME, "wrong")},
+    )
+    assert res.status_code == 401
+
+
 def test_analyse_requires_auth(client):
     res = client.post("/analyse", json={"FEN": README_FEN})
     assert res.status_code == 401
+
+
+def test_analyse_missing_fen_returns_400(client):
+    res = client.post(
+        "/analyse",
+        json={},
+        headers={"Authorization": basic_auth_header()},
+    )
+    assert res.status_code == 400
+    assert res.json["code"] == "bad_request"
 
 
 def test_analyse_invalid_fen(client, app_module, monkeypatch):
@@ -32,8 +60,9 @@ def test_analyse_invalid_fen(client, app_module, monkeypatch):
         json={"FEN": "not-a-fen"},
         headers={"Authorization": basic_auth_header()},
     )
-    assert res.status_code == 200
-    assert res.data.decode("utf-8") == "Invalid FEN!"
+    assert res.status_code == 400
+    assert res.json["code"] == "invalid_fen"
+    assert "Invalid FEN" in res.json["error"]
 
 
 def test_analyse_returns_plain_text_and_sorted_games(client):
@@ -115,3 +144,25 @@ def test_analyse_java_failure_bubbles_status(client, app_module, monkeypatch):
     )
     assert res.status_code == 200
     assert res.json == "Request failed with status code: 503"
+
+
+def test_import_fails_without_auth_env(monkeypatch):
+    monkeypatch.delenv("AUTH_USERNAME", raising=False)
+    monkeypatch.delenv("AUTH_PASSWORD", raising=False)
+
+    stockfish_mod = types.ModuleType("stockfish")
+
+    class DummyStockfish:
+        def __init__(self, *args, **kwargs):
+            pass
+
+        def set_elo_rating(self, *args, **kwargs):
+            pass
+
+    stockfish_mod.Stockfish = DummyStockfish
+    monkeypatch.setitem(sys.modules, "stockfish", stockfish_mod)
+    if "main" in sys.modules:
+        del sys.modules["main"]
+
+    with pytest.raises(RuntimeError, match="AUTH_USERNAME"):
+        importlib.import_module("main")
