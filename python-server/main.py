@@ -20,11 +20,28 @@ LIMIT_DEPTH = 8
 
 CACHE = {}
 prefix = os.environ.get("APP_PREFIX", "")
+JAVA_SERVICE_URL = os.environ.get(
+    "JAVA_SERVICE_URL", "http://127.0.0.1:8080/position"
+)
+
+
+def _load_required_secret(name: str) -> str:
+    value = os.environ.get(name)
+    if value is None or value.strip() == "":
+        raise RuntimeError(
+            f"{name} must be set via the environment. "
+            "See .env.example — hardcoded credentials have been removed."
+        )
+    return value
+
+
+AUTH_USERNAME = _load_required_secret("AUTH_USERNAME")
+AUTH_PASSWORD = _load_required_secret("AUTH_PASSWORD")
 
 
 @auth.verify_password
 def verify_password(username, password):
-    return username == 'zigamedved' and password == 'skrivnost.1234'
+    return username == AUTH_USERNAME and password == AUTH_PASSWORD
 
 
 def find_square(piece, elements):
@@ -410,24 +427,24 @@ def hello():
 @app.route(prefix + '/analyse', methods=['POST'])
 @auth.login_required
 def analyse():
-    data = request.get_json()
-    fen = data["FEN"]
+    data = request.get_json(silent=True)
+    if not isinstance(data, dict) or not isinstance(data.get("FEN"), str) or not data["FEN"].strip():
+        return jsonify({"error": "FEN is required (string)", "code": "bad_request"}), 400
+
+    fen = data["FEN"].strip()
     if not stockfish.is_fen_valid(fen):
-        return Response("Invalid FEN!", content_type="text/plain")
+        return jsonify({"error": "Invalid FEN!", "code": "invalid_fen"}), 400
 
     if fen in CACHE.keys():
         return Response(CACHE[fen], content_type="text/plain")
 
     result, [pgn1, pgn2] = analyse_position(fen)
-    data = result
     http = urllib3.PoolManager()
-    encoded_data = json.dumps(data)
-
-    request_url = "http://0.0.0.0:8080/position"
+    encoded_data = json.dumps(result)
 
     r = http.request(
         method='POST',
-        url=request_url,
+        url=JAVA_SERVICE_URL,
         body=encoded_data,
         headers={
             "Authorization": request.headers.get("Authorization"),
@@ -486,4 +503,5 @@ def ping():
 
 
 if __name__ == '__main__':
-    app.run(host="0.0.0.0", port=8081, debug=True)
+    # Never enable the interactive debugger in a shared/networked process.
+    app.run(host="0.0.0.0", port=8081, debug=False)

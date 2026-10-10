@@ -3,23 +3,23 @@ import com.sun.net.httpserver.HttpHandler;
 import com.sun.net.httpserver.HttpServer;
 
 import com.google.gson.Gson;
+import com.google.gson.JsonSyntaxException;
 import com.mongodb.client.MongoClient;
 import com.mongodb.client.FindIterable;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoCursor;
 import com.mongodb.client.MongoDatabase;
 import com.mongodb.client.MongoClients;
-import com.mongodb.client.model.Projections;
 
-import java.io.BufferedReader;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.io.InputStreamReader;
+import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.InetSocketAddress;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Base64;
@@ -40,19 +40,91 @@ import org.apache.lucene.store.FSDirectory;
 import org.apache.lucene.search.similarities.BM25Similarity;
 
 public class chessServer {
+    private static final int MAX_BODY_BYTES = 64 * 1024;
+    private static final Gson GSON = new Gson();
+
     private static MongoClient mongoClient;
     private static MongoCollection<org.bson.Document> collection;
+
+    /** Set from AUTH_USERNAME / AUTH_PASSWORD (or via configureAuth in tests). */
+    static String authUsername;
+    static String authPassword;
 
     /** Overridable for tests via -Dchess.indexDir=/path/to/index */
     static String indexDir() {
         return System.getProperty("chess.indexDir", "indexedFiles");
     }
 
+    static void configureAuth(String username, String password) {
+        authUsername = username;
+        authPassword = password;
+    }
+
+    static void requireAuthConfigured() {
+        if (isBlank(authUsername) || isBlank(authPassword)) {
+            throw new IllegalStateException(
+                    "AUTH_USERNAME and AUTH_PASSWORD must be set via the environment. "
+                            + "See .env.example — hardcoded credentials have been removed.");
+        }
+    }
+
+    private static boolean isBlank(String value) {
+        return value == null || value.trim().isEmpty();
+    }
+
+    static final String MONGO_DATABASE = "chessGames";
+    static final String MONGO_COLLECTION = "games";
+
+    /**
+     * Mongo lazily creates DBs/collections on write — refuse to start unless both
+     * already exist so misconfiguration fails fast.
+     */
+    static void requireMongoDatabaseAndCollection(
+            Iterable<String> databaseNames,
+            String databaseName,
+            Iterable<String> collectionNames,
+            String collectionName) {
+        if (!containsName(databaseNames, databaseName)) {
+            throw new IllegalStateException(
+                    "MongoDB database '" + databaseName + "' does not exist. "
+                            + "Create it (and the '" + collectionName + "' collection) before starting.");
+        }
+        if (!containsName(collectionNames, collectionName)) {
+            throw new IllegalStateException(
+                    "MongoDB collection '" + databaseName + "." + collectionName + "' does not exist. "
+                            + "Create it before starting.");
+        }
+    }
+
+    private static boolean containsName(Iterable<String> names, String expected) {
+        for (String name : names) {
+            if (expected.equals(name)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    static MongoCollection<org.bson.Document> connectMongo(String mongoUri) {
+        if (isBlank(mongoUri)) {
+            throw new IllegalStateException(
+                    "MONGO_URI must be set via the environment. See .env.example.");
+        }
+        MongoClient client = MongoClients.create(mongoUri);
+        requireMongoDatabaseAndCollection(
+                client.listDatabaseNames(),
+                MONGO_DATABASE,
+                client.getDatabase(MONGO_DATABASE).listCollectionNames(),
+                MONGO_COLLECTION);
+        mongoClient = client;
+        return client.getDatabase(MONGO_DATABASE).getCollection(MONGO_COLLECTION);
+    }
+
     public static void main(String[] args) throws IOException {
-        // Creating a Mongo client, "localhost", 27017
-        mongoClient = MongoClients.create("TODO"); // add your mongo connection string
-        MongoDatabase database = mongoClient.getDatabase("chessGames");
-        collection = database.getCollection("games");
+        configureAuth(System.getenv("AUTH_USERNAME"), System.getenv("AUTH_PASSWORD"));
+        requireAuthConfigured();
+
+        collection = connectMongo(System.getenv("MONGO_URI"));
 
         String envValue = System.getenv("APP_PREFIX");
         envValue = envValue != null ? envValue : "";
@@ -80,58 +152,128 @@ public class chessServer {
         }
     }
 
+    /**
+     * Validates Basic auth. Returns true when authorized.
+     * On failure, sends 401 and returns false — callers must return immediately.
+     */
+    static boolean authorize(HttpExchange t) throws IOException {
+        requireAuthConfigured();
+        String authHeader = t.getRequestHeaders().getFirst("Authorization");
+        if (authHeader == null || authHeader.isEmpty() || !authHeader.startsWith("Basic ")) {
+            sendUnauthorized(t);
+            return false;
+        }
+
+        String encodedCredentials = authHeader.substring("Basic ".length()).trim();
+        final byte[] decoded;
+        try {
+            // Base64 decoder throws IllegalArgumentException on malformed input.
+            decoded = Base64.getDecoder().decode(encodedCredentials);
+        } catch (IllegalArgumentException ex) {
+            sendUnauthorized(t);
+            return false;
+        }
+
+        String credentials = new String(decoded, StandardCharsets.UTF_8);
+        int colon = credentials.indexOf(':');
+        if (colon < 0) {
+            sendUnauthorized(t);
+            return false;
+        }
+        String username = credentials.substring(0, colon);
+        String password = credentials.substring(colon + 1);
+        if (!authUsername.equals(username) || !authPassword.equals(password)) {
+            sendUnauthorized(t);
+            return false;
+        }
+        return true;
+    }
+
+    static void sendUnauthorized(HttpExchange t) throws IOException {
+        t.getResponseHeaders().set("WWW-Authenticate", "Basic realm=\"ziga-chess\"");
+        t.sendResponseHeaders(401, -1);
+        t.close();
+    }
+
+    /**
+     * Reads at most MAX_BODY_BYTES and parses the Python client payload:
+     * {@code json.dumps(feature_string)} → a JSON string, or raw plain text.
+     */
+    static String readFeatureBody(HttpExchange t) throws IOException, BadRequestException {
+        byte[] rawBytes = readLimited(t.getRequestBody(), MAX_BODY_BYTES);
+        String raw = new String(rawBytes, StandardCharsets.UTF_8).trim();
+        if (raw.isEmpty()) {
+            throw new BadRequestException("Request body must not be empty");
+        }
+        try {
+            String parsed = GSON.fromJson(raw, String.class);
+            if (parsed != null && !parsed.trim().isEmpty()) {
+                return parsed.trim();
+            }
+        } catch (JsonSyntaxException ignored) {
+            // Fall through to treating the body as plain feature text.
+        }
+        // Legacy/plain path: strip surrounding quotes if present.
+        if (raw.length() >= 2 && raw.startsWith("\"") && raw.endsWith("\"")) {
+            raw = raw.substring(1, raw.length() - 1);
+        }
+        if (raw.isEmpty()) {
+            throw new BadRequestException("Feature string must not be empty");
+        }
+        return raw;
+    }
+
+    static byte[] readLimited(InputStream in, int maxBytes) throws IOException, BadRequestException {
+        ByteArrayOutputStream buffer = new ByteArrayOutputStream();
+        byte[] chunk = new byte[4096];
+        int total = 0;
+        int n;
+        while ((n = in.read(chunk)) != -1) {
+            total += n;
+            if (total > maxBytes) {
+                throw new BadRequestException("Request body exceeds " + maxBytes + " bytes");
+            }
+            buffer.write(chunk, 0, n);
+        }
+        return buffer.toByteArray();
+    }
+
+    static class BadRequestException extends Exception {
+        BadRequestException(String message) {
+            super(message);
+        }
+    }
+
     static class FenParser implements HttpHandler {
         @Override
         public void handle(HttpExchange t) throws IOException {
-            String authHeader = t.getRequestHeaders().getFirst("Authorization");
-            if (authHeader == null || authHeader.length() == 0 || !authHeader.startsWith("Basic ")) {
-                t.sendResponseHeaders(401, -1);
-                t.close();
+            if (!authorize(t)) {
+                return;
             }
 
-            // Get the encoded credentials from the header
-            String encodedCredentials = null;
-            String credentials = null;
-            String username = null;
-            String password = null;
+            final String body;
             try {
-                encodedCredentials = authHeader.substring("Basic ".length());
-                // Decode the base64-encoded credentials
-                credentials = new String(Base64.getDecoder().decode(encodedCredentials));
-                // Extract the username and password from the credentials
-                String[] usernameAndPassword = credentials.split(":");
-                username = usernameAndPassword[0];
-                password = usernameAndPassword[1];
-            } catch (Exception ex) {
-                // User is not authenticated, send a 401 Unauthorized response
-                t.sendResponseHeaders(401, -1);
-                t.close();
+                body = readFeatureBody(t);
+            } catch (BadRequestException e) {
+                sendJsonError(t, 400, e.getMessage());
+                return;
             }
 
-            if (!username.equals("zigamedved") || !password.equals("skrivnost.1234")) {
-                // User is not authenticated, send a 401 Unauthorized response
-                t.sendResponseHeaders(401, -1);
-                t.close();
-            }
-
-            // Get the request body (JSON data)
-            InputStreamReader isr = new InputStreamReader(t.getRequestBody(), "utf-8");
-            BufferedReader br = new BufferedReader(isr);
-            String body = br.readLine().replace("\"", "");
-            br.close();
-            isr.close();
-
-            Map<String, Float> result = null;
+            Map<String, Float> result;
             try {
                 result = queryLucene(body);
             } catch (Exception e) {
                 e.printStackTrace();
+                sendJsonError(t, 500, "Lucene search failed");
+                return;
             }
 
-            // Define the list of names to query
-            List<String> keysList = new ArrayList<>(result.keySet());
+            if (collection == null) {
+                sendJsonError(t, 503, "MongoDB is not configured");
+                return;
+            }
 
-            // Create the filter using the "in" operator to query multiple names
+            List<String> keysList = new ArrayList<>(result.keySet());
             org.bson.Document filter = new org.bson.Document("name", new org.bson.Document("$in", keysList));
             org.bson.Document projection = new org.bson.Document();
             projection.append("_id", 0);
@@ -146,7 +288,6 @@ public class chessServer {
 
             FindIterable<org.bson.Document> queryResult = collection.find(filter).projection(projection);
 
-            // Process the query results
             List<String> result2 = new ArrayList<>();
             try (MongoCursor<org.bson.Document> cursor = queryResult.iterator()) {
                 while (cursor.hasNext()) {
@@ -156,7 +297,6 @@ public class chessServer {
                     result2.add(document.toJson());
                 }
             }
-            // Send the response
             sendResponse(t, result2);
         }
     }
@@ -167,32 +307,41 @@ public class chessServer {
             String response = "pong";
             exchange.sendResponseHeaders(200, response.length());
             OutputStream os = exchange.getResponseBody();
-            os.write(response.getBytes());
+            os.write(response.getBytes(StandardCharsets.UTF_8));
             os.close();
         }
     }
 
     private static void sendResponse(HttpExchange t, List<String> result) throws IOException {
-        Gson gson = new Gson();
-        String jsonResponse = gson.toJson(result);
+        String jsonResponse = GSON.toJson(result);
 
         t.getResponseHeaders().set("Content-Type", "application/json");
-        t.sendResponseHeaders(200, jsonResponse.length());
+        byte[] bytes = jsonResponse.getBytes(StandardCharsets.UTF_8);
+        t.sendResponseHeaders(200, bytes.length);
         OutputStream os = t.getResponseBody();
-        os.write(jsonResponse.getBytes());
+        os.write(bytes);
+        os.close();
+    }
+
+    static void sendJsonError(HttpExchange t, int status, String message) throws IOException {
+        Map<String, String> payload = new HashMap<>();
+        payload.put("error", message);
+        payload.put("code", status == 400 ? "bad_request" : "error");
+        byte[] bytes = GSON.toJson(payload).getBytes(StandardCharsets.UTF_8);
+        t.getResponseHeaders().set("Content-Type", "application/json");
+        t.sendResponseHeaders(status, bytes.length);
+        OutputStream os = t.getResponseBody();
+        os.write(bytes);
         os.close();
     }
 
     public static Map<String, Float> queryLucene(String input) throws Exception {
         IndexSearcher searcher = createSearcher();
         String escapedText = escapeCharacters(input);
-        // Search indexed contents using search term
         TopDocs foundDocs = searchInContent(escapedText, searcher);
-        // Total found documents
         System.out.println("Total Results :: " + foundDocs.totalHits);
 
         Map<String, Float> result = new HashMap<>();
-        // Let's print out the path of files which have searched term
         for (ScoreDoc sd : foundDocs.scoreDocs) {
             Document d = searcher.doc(sd.doc);
             String path = d.get("path").split("\\\\")[2];
@@ -222,14 +371,9 @@ public class chessServer {
 
     private static IndexSearcher createSearcher() throws IOException {
         Directory dir = FSDirectory.open(Paths.get(indexDir()));
-
-        // It is an interface for accessing a point-in-time view of a lucene index
         IndexReader reader = DirectoryReader.open(dir);
-
-        // Index searcher
         IndexSearcher searcher = new IndexSearcher(reader);
         searcher.setSimilarity(new BM25Similarity());
-
         return searcher;
     }
 }

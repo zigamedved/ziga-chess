@@ -10,7 +10,17 @@ make test-python   # pytest (Stockfish + Java HTTP mocked)
 make test-java     # mvn test (Lucene fixture index, no Mongo)
 ```
 
-Python coverage includes unit tests for feature extractors, golden snapshots for the README sample FEN, and Flask route integration tests. Java coverage includes `escapeCharacters`, `/ping`, and Lucene `queryLucene` against a temp index (`-Dchess.indexDir`).
+Python coverage includes unit tests for feature extractors, golden snapshots for the README sample FEN, and Flask route integration tests. Java coverage includes `escapeCharacters`, `/ping`, auth/body helpers, and Lucene `queryLucene` against a temp index (`-Dchess.indexDir`).
+
+# Configuration / secrets
+
+Copy `.env.example` → `.env` and set:
+
+- `AUTH_USERNAME` / `AUTH_PASSWORD` (required by both services)
+- `MONGO_URI` (required by java-server)
+- `JAVA_SERVICE_URL` (optional; Python → Java)
+
+See [SECURITY.md](SECURITY.md). Hardcoded credentials have been removed.
 
 # How to run
 

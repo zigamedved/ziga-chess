@@ -10,6 +10,7 @@ import org.apache.lucene.index.IndexWriter;
 import org.apache.lucene.index.IndexWriterConfig;
 import org.apache.lucene.store.FSDirectory;
 import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 
@@ -20,17 +21,31 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.InetSocketAddress;
 import java.net.URI;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
+import java.util.Arrays;
+import java.util.Base64;
+import java.util.Collections;
+import java.util.List;
 import java.util.Map;
 
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class ChessServerTest {
 
+    @BeforeEach
+    void setAuth() {
+        chessServer.configureAuth("test-user", "test-password");
+    }
+
     @AfterEach
     void clearIndexDirProperty() {
         System.clearProperty("chess.indexDir");
+        chessServer.configureAuth(null, null);
     }
 
     @Test
@@ -38,10 +53,125 @@ public class ChessServerTest {
         assertEquals("\\!\\?\\-\\+", chessServer.escapeCharacters("!?-+"));
         assertEquals("plain", chessServer.escapeCharacters("plain"));
         assertEquals("a\\-b\\+c", chessServer.escapeCharacters("a-b+c"));
-        // Feature tokens from the Python side often include these characters.
         assertEquals("\\!kh8", chessServer.escapeCharacters("!kh8"));
         assertEquals("r\\-r\\-8", chessServer.escapeCharacters("r-r-8"));
         assertEquals("\\!re8", chessServer.escapeCharacters("!re8"));
+    }
+
+    @Test
+    void requireAuthConfigured_failsWhenMissing() {
+        chessServer.configureAuth(null, null);
+        assertThrows(IllegalStateException.class, chessServer::requireAuthConfigured);
+        chessServer.configureAuth("u", "");
+        assertThrows(IllegalStateException.class, chessServer::requireAuthConfigured);
+    }
+
+    @Test
+    void authorize_rejectsMissingHeaderAndDoesNotProceed() throws IOException {
+        FakeExchange ex = new FakeExchange();
+        assertFalse(chessServer.authorize(ex));
+        assertEquals(401, ex.statusCode);
+    }
+
+    @Test
+    void authorize_rejectsWrongPassword() throws IOException {
+        FakeExchange ex = new FakeExchange();
+        ex.requestHeaders.add("Authorization", basicAuth("test-user", "wrong"));
+        assertFalse(chessServer.authorize(ex));
+        assertEquals(401, ex.statusCode);
+    }
+
+    @Test
+    void authorize_acceptsValidCredentials() throws IOException {
+        FakeExchange ex = new FakeExchange();
+        ex.requestHeaders.add("Authorization", basicAuth("test-user", "test-password"));
+        assertTrue(chessServer.authorize(ex));
+        assertEquals(-1, ex.statusCode);
+    }
+
+    @Test
+    void authorize_rejectsMalformedBase64() throws IOException {
+        FakeExchange ex = new FakeExchange();
+        ex.requestHeaders.add("Authorization", "Basic !!!not-base64!!!");
+        assertFalse(chessServer.authorize(ex));
+        assertEquals(401, ex.statusCode);
+    }
+
+    @Test
+    void requireMongoDatabaseAndCollection_passesWhenBothExist() {
+        List<String> dbs = Arrays.asList("admin", chessServer.MONGO_DATABASE);
+        List<String> colls = Arrays.asList(chessServer.MONGO_COLLECTION, "other");
+        assertDoesNotThrow(() -> chessServer.requireMongoDatabaseAndCollection(
+                dbs, chessServer.MONGO_DATABASE, colls, chessServer.MONGO_COLLECTION));
+    }
+
+    @Test
+    void requireMongoDatabaseAndCollection_failsWhenDatabaseMissing() {
+        IllegalStateException ex = assertThrows(
+                IllegalStateException.class,
+                () -> chessServer.requireMongoDatabaseAndCollection(
+                        Collections.singletonList("admin"),
+                        chessServer.MONGO_DATABASE,
+                        Collections.singletonList(chessServer.MONGO_COLLECTION),
+                        chessServer.MONGO_COLLECTION));
+        assertTrue(ex.getMessage().contains("chessGames"));
+        assertTrue(ex.getMessage().contains("does not exist"));
+    }
+
+    @Test
+    void requireMongoDatabaseAndCollection_failsWhenCollectionMissing() {
+        IllegalStateException ex = assertThrows(
+                IllegalStateException.class,
+                () -> chessServer.requireMongoDatabaseAndCollection(
+                        Collections.singletonList(chessServer.MONGO_DATABASE),
+                        chessServer.MONGO_DATABASE,
+                        Collections.singletonList("notGames"),
+                        chessServer.MONGO_COLLECTION));
+        assertTrue(ex.getMessage().contains("games"));
+        assertTrue(ex.getMessage().contains("does not exist"));
+    }
+
+    @Test
+    void connectMongo_failsFastWhenUriMissing() {
+        IllegalStateException ex = assertThrows(
+                IllegalStateException.class,
+                () -> chessServer.connectMongo(null));
+        assertTrue(ex.getMessage().contains("MONGO_URI"));
+    }
+
+    @Test
+    void fenParser_unauthenticatedNeverReachesLucene(@TempDir Path tempDir) throws IOException {
+        // Even with a valid index present, missing auth must stop at 401.
+        buildFixtureIndex(tempDir);
+        System.setProperty("chess.indexDir", tempDir.toString());
+
+        chessServer.FenParser handler = new chessServer.FenParser();
+        FakeExchange ex = new FakeExchange();
+        ex.setRequestBody("\"Kg1 Re7\"");
+
+        handler.handle(ex);
+
+        assertEquals(401, ex.statusCode);
+    }
+
+    @Test
+    void fenParser_emptyBodyReturns400() throws IOException {
+        chessServer.FenParser handler = new chessServer.FenParser();
+        FakeExchange ex = new FakeExchange();
+        ex.requestHeaders.add("Authorization", basicAuth("test-user", "test-password"));
+        ex.setRequestBody("");
+
+        handler.handle(ex);
+
+        assertEquals(400, ex.statusCode);
+        assertTrue(ex.responseBody.toString("UTF-8").contains("empty"));
+    }
+
+    @Test
+    void readFeatureBody_parsesJsonStringPayload() throws Exception {
+        FakeExchange ex = new FakeExchange();
+        ex.setRequestBody("\"Pb2 Kg1 !re8\"");
+        assertEquals("Pb2 Kg1 !re8", chessServer.readFeatureBody(ex));
     }
 
     @Test
@@ -76,6 +206,12 @@ public class ChessServerTest {
         assertTrue(hits.containsKey("Game#fixture.txt"), "hits=" + hits);
     }
 
+    private static String basicAuth(String user, String pass) {
+        String token = Base64.getEncoder()
+                .encodeToString((user + ":" + pass).getBytes(StandardCharsets.UTF_8));
+        return "Basic " + token;
+    }
+
     private static void buildFixtureIndex(Path indexDir) throws IOException {
         try (FSDirectory directory = FSDirectory.open(indexDir);
              IndexWriter writer = new IndexWriter(
@@ -85,7 +221,6 @@ public class ChessServerTest {
             doc.add(new TextField("static", "Kg1 kg8 Re7 rf8 Pa5", Field.Store.YES));
             doc.add(new TextField("other", "Dpc ORe r-r-8", Field.Store.YES));
             doc.add(new TextField("dynamic", "!re8 !kh8", Field.Store.YES));
-            // Production path parsing: split on '\' and take index 2.
             doc.add(new StringField(
                     "path",
                     "indexedFiles\\games\\Game#fixture.txt",
@@ -99,7 +234,12 @@ public class ChessServerTest {
         private final Headers requestHeaders = new Headers();
         private final Headers responseHeaders = new Headers();
         private final ByteArrayOutputStream responseBody = new ByteArrayOutputStream();
+        private byte[] requestBodyBytes = new byte[0];
         private int statusCode = -1;
+
+        void setRequestBody(String body) {
+            this.requestBodyBytes = body.getBytes(StandardCharsets.UTF_8);
+        }
 
         @Override
         public Headers getRequestHeaders() {
@@ -113,12 +253,12 @@ public class ChessServerTest {
 
         @Override
         public URI getRequestURI() {
-            return URI.create("/ping");
+            return URI.create("/position");
         }
 
         @Override
         public String getRequestMethod() {
-            return "GET";
+            return "POST";
         }
 
         @Override
@@ -132,7 +272,7 @@ public class ChessServerTest {
 
         @Override
         public InputStream getRequestBody() {
-            return new ByteArrayInputStream(new byte[0]);
+            return new ByteArrayInputStream(requestBodyBytes);
         }
 
         @Override

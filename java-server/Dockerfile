@@ -27,5 +27,6 @@ EXPOSE 8080
 
 RUN echo "APP_PREFIX: $APP_PREFIX"
 
+# Required at runtime: AUTH_USERNAME, AUTH_PASSWORD, MONGO_URI
 # Set the entry point to run the Java application
 CMD ["java", "-jar", "/app/target/my-maven-docker-project.jar"]
