@@ -72,19 +72,59 @@ public class chessServer {
         return value == null || value.trim().isEmpty();
     }
 
-    public static void main(String[] args) throws IOException {
-        configureAuth(System.getenv("AUTH_USERNAME"), System.getenv("AUTH_PASSWORD"));
-        requireAuthConfigured();
+    static final String MONGO_DATABASE = "chessGames";
+    static final String MONGO_COLLECTION = "games";
 
-        // Creating a Mongo client, "localhost", 27017
-        String mongoUri = System.getenv("MONGO_URI");
+    /**
+     * Mongo lazily creates DBs/collections on write — refuse to start unless both
+     * already exist so misconfiguration fails fast.
+     */
+    static void requireMongoDatabaseAndCollection(
+            Iterable<String> databaseNames,
+            String databaseName,
+            Iterable<String> collectionNames,
+            String collectionName) {
+        if (!containsName(databaseNames, databaseName)) {
+            throw new IllegalStateException(
+                    "MongoDB database '" + databaseName + "' does not exist. "
+                            + "Create it (and the '" + collectionName + "' collection) before starting.");
+        }
+        if (!containsName(collectionNames, collectionName)) {
+            throw new IllegalStateException(
+                    "MongoDB collection '" + databaseName + "." + collectionName + "' does not exist. "
+                            + "Create it before starting.");
+        }
+    }
+
+    private static boolean containsName(Iterable<String> names, String expected) {
+        for (String name : names) {
+            if (expected.equals(name)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    static MongoCollection<org.bson.Document> connectMongo(String mongoUri) {
         if (isBlank(mongoUri)) {
             throw new IllegalStateException(
                     "MONGO_URI must be set via the environment. See .env.example.");
         }
-        mongoClient = MongoClients.create(mongoUri);
-        MongoDatabase database = mongoClient.getDatabase("chessGames");
-        collection = database.getCollection("games");
+        MongoClient client = MongoClients.create(mongoUri);
+        requireMongoDatabaseAndCollection(
+                client.listDatabaseNames(),
+                MONGO_DATABASE,
+                client.getDatabase(MONGO_DATABASE).listCollectionNames(),
+                MONGO_COLLECTION);
+        mongoClient = client;
+        return client.getDatabase(MONGO_DATABASE).getCollection(MONGO_COLLECTION);
+    }
+
+    public static void main(String[] args) throws IOException {
+        configureAuth(System.getenv("AUTH_USERNAME"), System.getenv("AUTH_PASSWORD"));
+        requireAuthConfigured();
+
+        collection = connectMongo(System.getenv("MONGO_URI"));
 
         String envValue = System.getenv("APP_PREFIX");
         envValue = envValue != null ? envValue : "";
@@ -124,27 +164,29 @@ public class chessServer {
             return false;
         }
 
+        String encodedCredentials = authHeader.substring("Basic ".length()).trim();
+        final byte[] decoded;
         try {
-            String encodedCredentials = authHeader.substring("Basic ".length()).trim();
-            String credentials = new String(
-                    Base64.getDecoder().decode(encodedCredentials),
-                    StandardCharsets.UTF_8);
-            int colon = credentials.indexOf(':');
-            if (colon < 0) {
-                sendUnauthorized(t);
-                return false;
-            }
-            String username = credentials.substring(0, colon);
-            String password = credentials.substring(colon + 1);
-            if (!authUsername.equals(username) || !authPassword.equals(password)) {
-                sendUnauthorized(t);
-                return false;
-            }
-            return true;
-        } catch (Exception ex) {
+            // Base64 decoder throws IllegalArgumentException on malformed input.
+            decoded = Base64.getDecoder().decode(encodedCredentials);
+        } catch (IllegalArgumentException ex) {
             sendUnauthorized(t);
             return false;
         }
+
+        String credentials = new String(decoded, StandardCharsets.UTF_8);
+        int colon = credentials.indexOf(':');
+        if (colon < 0) {
+            sendUnauthorized(t);
+            return false;
+        }
+        String username = credentials.substring(0, colon);
+        String password = credentials.substring(colon + 1);
+        if (!authUsername.equals(username) || !authPassword.equals(password)) {
+            sendUnauthorized(t);
+            return false;
+        }
+        return true;
     }
 
     static void sendUnauthorized(HttpExchange t) throws IOException {

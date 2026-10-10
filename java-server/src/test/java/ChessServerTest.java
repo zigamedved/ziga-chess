@@ -23,9 +23,13 @@ import java.net.InetSocketAddress;
 import java.net.URI;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
+import java.util.Arrays;
 import java.util.Base64;
+import java.util.Collections;
+import java.util.List;
 import java.util.Map;
 
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -83,6 +87,56 @@ public class ChessServerTest {
         ex.requestHeaders.add("Authorization", basicAuth("test-user", "test-password"));
         assertTrue(chessServer.authorize(ex));
         assertEquals(-1, ex.statusCode);
+    }
+
+    @Test
+    void authorize_rejectsMalformedBase64() throws IOException {
+        FakeExchange ex = new FakeExchange();
+        ex.requestHeaders.add("Authorization", "Basic !!!not-base64!!!");
+        assertFalse(chessServer.authorize(ex));
+        assertEquals(401, ex.statusCode);
+    }
+
+    @Test
+    void requireMongoDatabaseAndCollection_passesWhenBothExist() {
+        List<String> dbs = Arrays.asList("admin", chessServer.MONGO_DATABASE);
+        List<String> colls = Arrays.asList(chessServer.MONGO_COLLECTION, "other");
+        assertDoesNotThrow(() -> chessServer.requireMongoDatabaseAndCollection(
+                dbs, chessServer.MONGO_DATABASE, colls, chessServer.MONGO_COLLECTION));
+    }
+
+    @Test
+    void requireMongoDatabaseAndCollection_failsWhenDatabaseMissing() {
+        IllegalStateException ex = assertThrows(
+                IllegalStateException.class,
+                () -> chessServer.requireMongoDatabaseAndCollection(
+                        Collections.singletonList("admin"),
+                        chessServer.MONGO_DATABASE,
+                        Collections.singletonList(chessServer.MONGO_COLLECTION),
+                        chessServer.MONGO_COLLECTION));
+        assertTrue(ex.getMessage().contains("chessGames"));
+        assertTrue(ex.getMessage().contains("does not exist"));
+    }
+
+    @Test
+    void requireMongoDatabaseAndCollection_failsWhenCollectionMissing() {
+        IllegalStateException ex = assertThrows(
+                IllegalStateException.class,
+                () -> chessServer.requireMongoDatabaseAndCollection(
+                        Collections.singletonList(chessServer.MONGO_DATABASE),
+                        chessServer.MONGO_DATABASE,
+                        Collections.singletonList("notGames"),
+                        chessServer.MONGO_COLLECTION));
+        assertTrue(ex.getMessage().contains("games"));
+        assertTrue(ex.getMessage().contains("does not exist"));
+    }
+
+    @Test
+    void connectMongo_failsFastWhenUriMissing() {
+        IllegalStateException ex = assertThrows(
+                IllegalStateException.class,
+                () -> chessServer.connectMongo(null));
+        assertTrue(ex.getMessage().contains("MONGO_URI"));
     }
 
     @Test
