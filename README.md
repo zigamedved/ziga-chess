@@ -7,35 +7,49 @@ From the repo root:
 ```bash
 make test          # Python + Java
 make test-python   # pytest (Stockfish + Java HTTP mocked)
-make test-java     # mvn test (Lucene fixture index, no Mongo)
+make test-java     # mvn test (temp Lucene fixture; no Mongo)
 ```
 
-Python coverage includes unit tests for feature extractors, golden snapshots for the README sample FEN, and Flask route integration tests. Java coverage includes `escapeCharacters`, `/ping`, auth/body helpers, and Lucene `queryLucene` against a temp index (`-Dchess.indexDir`).
+Python coverage includes unit tests for feature extractors, golden snapshots for the README sample FEN, and Flask route integration tests. Java coverage includes auth/body helpers, Lucene search with stored metadata, and `IndexBuilder` round-trips.
+
+# Build Lucene index (required for java-server)
+
+The search index is **not** committed (see `java-server/indexedFiles/` in `.gitignore`). Rebuild from `games/games.json.zip` (Git LFS):
+
+```bash
+git lfs pull
+make index-sample          # ~100 games, quick local smoke
+make index                 # full corpus (~900k games; tens of minutes)
+# or: make index INDEX_LIMIT=1000 INDEX_DIR=java-server/indexedFiles
+```
+
+Pipeline: `scripts/prepare_lucene_docs.py` (static/other/dynamic features + metadata) → `IndexBuilder` (Lucene 8.11). Game metadata (`White`, `Black`, `PGN`, …) is stored **in Lucene** — MongoDB is no longer used.
 
 # Configuration / secrets
 
 Copy `.env.example` → `.env` and set:
 
 - `AUTH_USERNAME` / `AUTH_PASSWORD` (required by both services)
-- `MONGO_URI` (required by java-server)
 - `JAVA_SERVICE_URL` (optional; Python → Java)
+- `LUCENE_INDEX_DIR` / `LUCENE_TOP_K` (optional; java-server)
 
 See [SECURITY.md](SECURITY.md). Hardcoded credentials have been removed.
 
 # How to run
 
 ## JAVA server:
-- go to root directory and run
-- `docker build -t image-name --build-arg PREFIX=/v1/chess .`
-- `docker run --rm -p 8080:8080 your-image-name` // endpoint available at http://0.0.0.0:8080+prefix/position
+- build an index first (`make index-sample` or `make index`)
+- from `java-server/`: `docker build -t ziga-java --build-arg PREFIX=/v1/chess .`
+- `docker run --rm -p 8080:8080 -e AUTH_USERNAME=... -e AUTH_PASSWORD=... -v "$PWD/indexedFiles:/app/indexedFiles" ziga-java`
+- endpoint: `http://0.0.0.0:8080+prefix/position`
 
 ## PYTHON server:
-- go to root directory and run
-- `docker build -t image-name --build-arg PREFIX=/v1/chess .`
-- `docker run --rm -p 8081:8081 your-image-name` // endpoint available at http://0.0.0.0:8081+prefix/analyse
+- from `python-server/`: `docker build -t ziga-python --build-arg PREFIX=/v1/chess .`
+- `docker run --rm -p 8081:8081 -e AUTH_USERNAME=... -e AUTH_PASSWORD=... -e JAVA_SERVICE_URL=http://host.docker.internal:8080/position ziga-python`
+- endpoint: `http://0.0.0.0:8081+prefix/analyse`
 
 # R&D
-- improve game attributes in main.py, build index and update the indexedFiles directory in java-server project
+- improve game attributes in feature extraction, then `make index` to refresh `indexedFiles`
 
 # Request example
 - url: http://0.0.0.0:8080/analyse

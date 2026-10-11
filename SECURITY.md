@@ -13,11 +13,12 @@ See `.env.example`. The historical hardcoded password that appeared in source is
 
 ```bash
 cp .env.example .env
-# edit AUTH_* and MONGO_URI
+# edit AUTH_*
 export $(grep -v '^#' .env | xargs)   # or use your compose env_file
+make index-sample   # or make index
 ```
 
-Java also requires `MONGO_URI`. Python talks to Java via `JAVA_SERVICE_URL` (default `http://127.0.0.1:8080/position`).
+Java needs a Lucene index on disk (`make index` / `LUCENE_INDEX_DIR`). Python talks to Java via `JAVA_SERVICE_URL` (default `http://127.0.0.1:8080/position`).
 
 ## Flask
 

@@ -4,12 +4,6 @@ import com.sun.net.httpserver.HttpServer;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonSyntaxException;
-import com.mongodb.client.MongoClient;
-import com.mongodb.client.FindIterable;
-import com.mongodb.client.MongoCollection;
-import com.mongodb.client.MongoCursor;
-import com.mongodb.client.MongoDatabase;
-import com.mongodb.client.MongoClients;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -17,12 +11,15 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.InetSocketAddress;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Base64;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Base64;
 
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.analysis.Tokenizer;
@@ -41,10 +38,8 @@ import org.apache.lucene.search.similarities.BM25Similarity;
 
 public class chessServer {
     private static final int MAX_BODY_BYTES = 64 * 1024;
+    private static final int DEFAULT_TOP_K = 50;
     private static final Gson GSON = new Gson();
-
-    private static MongoClient mongoClient;
-    private static MongoCollection<org.bson.Document> collection;
 
     /** Set from AUTH_USERNAME / AUTH_PASSWORD (or via configureAuth in tests). */
     static String authUsername;
@@ -52,7 +47,24 @@ public class chessServer {
 
     /** Overridable for tests via -Dchess.indexDir=/path/to/index */
     static String indexDir() {
+        String fromEnv = System.getenv("LUCENE_INDEX_DIR");
+        if (fromEnv != null && !fromEnv.trim().isEmpty()) {
+            return fromEnv;
+        }
         return System.getProperty("chess.indexDir", "indexedFiles");
+    }
+
+    static int topK() {
+        String raw = System.getenv("LUCENE_TOP_K");
+        if (raw == null || raw.trim().isEmpty()) {
+            raw = System.getProperty("chess.topK", Integer.toString(DEFAULT_TOP_K));
+        }
+        try {
+            int value = Integer.parseInt(raw.trim());
+            return value > 0 ? value : DEFAULT_TOP_K;
+        } catch (NumberFormatException ex) {
+            return DEFAULT_TOP_K;
+        }
     }
 
     static void configureAuth(String username, String password) {
@@ -68,68 +80,29 @@ public class chessServer {
         }
     }
 
+    static void requireIndexPresent() {
+        Path dir = Paths.get(indexDir());
+        if (!Files.isDirectory(dir)) {
+            throw new IllegalStateException(
+                    "Lucene index directory missing: " + dir.toAbsolutePath()
+                            + ". Build it with `make index` (see README).");
+        }
+    }
+
     private static boolean isBlank(String value) {
         return value == null || value.trim().isEmpty();
-    }
-
-    static final String MONGO_DATABASE = "chessGames";
-    static final String MONGO_COLLECTION = "games";
-
-    /**
-     * Mongo lazily creates DBs/collections on write — refuse to start unless both
-     * already exist so misconfiguration fails fast.
-     */
-    static void requireMongoDatabaseAndCollection(
-            Iterable<String> databaseNames,
-            String databaseName,
-            Iterable<String> collectionNames,
-            String collectionName) {
-        if (!containsName(databaseNames, databaseName)) {
-            throw new IllegalStateException(
-                    "MongoDB database '" + databaseName + "' does not exist. "
-                            + "Create it (and the '" + collectionName + "' collection) before starting.");
-        }
-        if (!containsName(collectionNames, collectionName)) {
-            throw new IllegalStateException(
-                    "MongoDB collection '" + databaseName + "." + collectionName + "' does not exist. "
-                            + "Create it before starting.");
-        }
-    }
-
-    private static boolean containsName(Iterable<String> names, String expected) {
-        for (String name : names) {
-            if (expected.equals(name)) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    static MongoCollection<org.bson.Document> connectMongo(String mongoUri) {
-        if (isBlank(mongoUri)) {
-            throw new IllegalStateException(
-                    "MONGO_URI must be set via the environment. See .env.example.");
-        }
-        MongoClient client = MongoClients.create(mongoUri);
-        requireMongoDatabaseAndCollection(
-                client.listDatabaseNames(),
-                MONGO_DATABASE,
-                client.getDatabase(MONGO_DATABASE).listCollectionNames(),
-                MONGO_COLLECTION);
-        mongoClient = client;
-        return client.getDatabase(MONGO_DATABASE).getCollection(MONGO_COLLECTION);
     }
 
     public static void main(String[] args) throws IOException {
         configureAuth(System.getenv("AUTH_USERNAME"), System.getenv("AUTH_PASSWORD"));
         requireAuthConfigured();
-
-        collection = connectMongo(System.getenv("MONGO_URI"));
+        requireIndexPresent();
 
         String envValue = System.getenv("APP_PREFIX");
         envValue = envValue != null ? envValue : "";
 
         System.out.println("env variable: " + envValue);
+        System.out.println("Lucene index: " + Paths.get(indexDir()).toAbsolutePath());
 
         HttpServer server = HttpServer.create(new InetSocketAddress(8080), 0);
         server.createContext(envValue + "/position", new FenParser());
@@ -167,7 +140,6 @@ public class chessServer {
         String encodedCredentials = authHeader.substring("Basic ".length()).trim();
         final byte[] decoded;
         try {
-            // Base64 decoder throws IllegalArgumentException on malformed input.
             decoded = Base64.getDecoder().decode(encodedCredentials);
         } catch (IllegalArgumentException ex) {
             sendUnauthorized(t);
@@ -213,7 +185,6 @@ public class chessServer {
         } catch (JsonSyntaxException ignored) {
             // Fall through to treating the body as plain feature text.
         }
-        // Legacy/plain path: strip surrounding quotes if present.
         if (raw.length() >= 2 && raw.startsWith("\"") && raw.endsWith("\"")) {
             raw = raw.substring(1, raw.length() - 1);
         }
@@ -259,45 +230,21 @@ public class chessServer {
                 return;
             }
 
-            Map<String, Float> result;
+            List<Map<String, Object>> hits;
             try {
-                result = queryLucene(body);
+                hits = searchSimilar(body);
             } catch (Exception e) {
                 e.printStackTrace();
                 sendJsonError(t, 500, "Lucene search failed");
                 return;
             }
 
-            if (collection == null) {
-                sendJsonError(t, 503, "MongoDB is not configured");
-                return;
+            // Keep wire format expected by python-server: JSON array of JSON strings.
+            List<String> encoded = new ArrayList<>();
+            for (Map<String, Object> hit : hits) {
+                encoded.add(GSON.toJson(hit));
             }
-
-            List<String> keysList = new ArrayList<>(result.keySet());
-            org.bson.Document filter = new org.bson.Document("name", new org.bson.Document("$in", keysList));
-            org.bson.Document projection = new org.bson.Document();
-            projection.append("_id", 0);
-            projection.append("name", 1);
-            projection.append("endgameFEN", 1);
-            projection.append("White", 1);
-            projection.append("Black", 1);
-            projection.append("Result", 1);
-            projection.append("PGN", 1);
-            projection.append("PV1", 1);
-            projection.append("PV2", 1);
-
-            FindIterable<org.bson.Document> queryResult = collection.find(filter).projection(projection);
-
-            List<String> result2 = new ArrayList<>();
-            try (MongoCursor<org.bson.Document> cursor = queryResult.iterator()) {
-                while (cursor.hasNext()) {
-                    org.bson.Document document = cursor.next();
-                    String name = document.getString("name");
-                    document.append("score", result.get(name));
-                    result2.add(document.toJson());
-                }
-            }
-            sendResponse(t, result2);
+            sendResponse(t, encoded);
         }
     }
 
@@ -314,7 +261,6 @@ public class chessServer {
 
     private static void sendResponse(HttpExchange t, List<String> result) throws IOException {
         String jsonResponse = GSON.toJson(result);
-
         t.getResponseHeaders().set("Content-Type", "application/json");
         byte[] bytes = jsonResponse.getBytes(StandardCharsets.UTF_8);
         t.sendResponseHeaders(200, bytes.length);
@@ -335,19 +281,49 @@ public class chessServer {
         os.close();
     }
 
-    public static Map<String, Float> queryLucene(String input) throws Exception {
+    /**
+     * BM25 search over static/other/dynamic; hydrate hits from Lucene stored fields
+     * (no Mongo round-trip).
+     */
+    public static List<Map<String, Object>> searchSimilar(String input) throws Exception {
         IndexSearcher searcher = createSearcher();
         String escapedText = escapeCharacters(input);
-        TopDocs foundDocs = searchInContent(escapedText, searcher);
+        TopDocs foundDocs = searchInContent(escapedText, searcher, topK());
         System.out.println("Total Results :: " + foundDocs.totalHits);
 
-        Map<String, Float> result = new HashMap<>();
+        List<Map<String, Object>> result = new ArrayList<>();
         for (ScoreDoc sd : foundDocs.scoreDocs) {
             Document d = searcher.doc(sd.doc);
-            String path = d.get("path").split("\\\\")[2];
-            result.put(path, sd.score);
+            Map<String, Object> row = new LinkedHashMap<>();
+            row.put("name", nullToEmpty(d.get("name")));
+            row.put("endgameFEN", nullToEmpty(d.get("endgameFEN")));
+            row.put("White", nullToEmpty(d.get("White")));
+            row.put("Black", nullToEmpty(d.get("Black")));
+            row.put("Result", nullToEmpty(d.get("Result")));
+            row.put("PGN", nullToEmpty(d.get("PGN")));
+            row.put("PV1", nullToEmpty(d.get("PV1")));
+            row.put("PV2", nullToEmpty(d.get("PV2")));
+            row.put("score", sd.score);
+            result.add(row);
         }
         return result;
+    }
+
+    /** @deprecated Prefer {@link #searchSimilar(String)}; kept for older unit tests. */
+    public static Map<String, Float> queryLucene(String input) throws Exception {
+        Map<String, Float> scores = new HashMap<>();
+        for (Map<String, Object> row : searchSimilar(input)) {
+            Object name = row.get("name");
+            Object score = row.get("score");
+            if (name != null && score instanceof Number) {
+                scores.put(name.toString(), ((Number) score).floatValue());
+            }
+        }
+        return scores;
+    }
+
+    private static String nullToEmpty(String value) {
+        return value == null ? "" : value;
     }
 
     public static String escapeCharacters(String input) {
@@ -357,7 +333,8 @@ public class chessServer {
                 .replace("+", "\\+");
     }
 
-    private static TopDocs searchInContent(String textToFind, IndexSearcher searcher) throws Exception {
+    private static TopDocs searchInContent(String textToFind, IndexSearcher searcher, int limit)
+            throws Exception {
         MyAnalyzer analyzer = new MyAnalyzer();
         String[] fields = { "static", "other", "dynamic" };
         Map<String, Float> boosts = new HashMap<>();
@@ -366,7 +343,7 @@ public class chessServer {
         boosts.put("dynamic", 1.0f);
         MultiFieldQueryParser queryParser = new MultiFieldQueryParser(fields, analyzer, boosts);
         Query query = queryParser.parse(textToFind);
-        return searcher.search(query, 1000);
+        return searcher.search(query, limit);
     }
 
     private static IndexSearcher createSearcher() throws IOException {
