@@ -1,3 +1,30 @@
+# ziga-chess
+
+Bachelor thesis system for **similar rook-endgame retrieval**: given a FEN, extract chess features, search a Lucene index, and return similar games plus engine lines.
+
+**How the system works (current vs legacy):** see **[docs/ARCHITECTURE.md](docs/ARCHITECTURE.md)** — diagrams for index build, query path, and what changed when Mongo was removed.
+
+## Architecture overview
+
+```mermaid
+flowchart LR
+  ZIP["games/games.json.zip"] -->|make index| IDX["Lucene indexedFiles/<br/>features + game metadata"]
+  Client -->|POST /analyse| Py["Python :8081<br/>Stockfish + features"]
+  Py -->|POST /position| Java["Java :8080<br/>BM25 search"]
+  Java --> IDX
+  IDX -->|similar games + scores| Java --> Py --> Client
+```
+
+| Step | What happens |
+|------|----------------|
+| **Index** | Zip → feature tokens + stored metadata → Lucene (no Mongo) |
+| **Query** | FEN → Python features → Java BM25 → hydrated similar games |
+| **Add games** | Append to the zip → `make index` → restart Java |
+
+Legacy design used Lucene only for ranking, then **MongoDB** for PGN/players/PVs. That path is gone; details in the [architecture doc](docs/ARCHITECTURE.md).
+
+---
+
 # Project handling
 
 # Tests (pin current behaviour before refactors)
