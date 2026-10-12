@@ -47,6 +47,15 @@ jobs:
           java-version: "17"
           cache: maven
 
+      - name: Write .env for compose (required by AUTH_* :? interpolation)
+        run: |
+          cat > .env <<'EOF'
+          AUTH_USERNAME=ci-user
+          AUTH_PASSWORD=ci-password-not-secret
+          EOF
+          # Strip leading indentation from heredoc lines
+          sed -i 's/^[[:space:]]*//' .env
+
       - name: Build tiny Lucene index for smoke
         run: |
           cd java-server && mvn -q -DskipTests package
@@ -55,12 +64,8 @@ jobs:
             --out indexedFiles
 
       - name: Compose up
-        env:
-          AUTH_USERNAME: ci-user
-          AUTH_PASSWORD: ci-password-not-secret
         run: |
           docker compose up --build -d
-          # Wait for healthy
           for i in $(seq 1 60); do
             if curl -fsS http://127.0.0.1:8080/ping >/dev/null \
               && curl -fsS http://127.0.0.1:8081/ping >/dev/null; then
@@ -73,10 +78,11 @@ jobs:
           exit 1
 
       - name: Analyse smoke
-        env:
-          AUTH_USERNAME: ci-user
-          AUTH_PASSWORD: ci-password-not-secret
         run: |
+          set -a
+          # shellcheck disable=SC1091
+          source .env
+          set +a
           curl -fsS -u "${AUTH_USERNAME}:${AUTH_PASSWORD}" \
             -H 'Content-Type: application/json' \
             -d '{"FEN":"r4rk1/4Rppp/p1p5/P1p5/8/3P2P1/1PP2P1P/R5K1 b - - 0 25"}' \

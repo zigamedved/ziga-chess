@@ -73,7 +73,8 @@ docker compose up --build
 
 - Python analyse: `http://127.0.0.1:8081/analyse`
 - Java search: `http://127.0.0.1:8080/position`
-- Health: `GET /ping` on both ports
+- Health: `GET /ping` on both ports (always unprefixed, even if `APP_PREFIX` is set)
+- Optional `APP_PREFIX` (e.g. `/v1/chess`) is applied to both images and to `JAVA_SERVICE_URL`; leave empty for local defaults
 
 ```bash
 source .env
