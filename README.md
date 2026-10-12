@@ -62,18 +62,32 @@ Copy `.env.example` → `.env` and set:
 
 See [SECURITY.md](SECURITY.md). Hardcoded credentials have been removed.
 
-# How to run
+# How to run (Docker Compose — recommended)
 
-## JAVA server:
-- build an index first (`make index-sample` or `make index`)
-- from `java-server/`: `docker build -t ziga-java --build-arg PREFIX=/v1/chess .`
-- `docker run --rm -p 8080:8080 -e AUTH_USERNAME=... -e AUTH_PASSWORD=... -v "$PWD/indexedFiles:/app/indexedFiles" ziga-java`
-- endpoint: `http://0.0.0.0:8080+prefix/position`
+```bash
+cp .env.example .env          # set AUTH_USERNAME / AUTH_PASSWORD
+git lfs pull
+make index-sample             # or: make index
+docker compose up --build
+```
 
-## PYTHON server:
-- from `python-server/`: `docker build -t ziga-python --build-arg PREFIX=/v1/chess .`
-- `docker run --rm -p 8081:8081 -e AUTH_USERNAME=... -e AUTH_PASSWORD=... -e JAVA_SERVICE_URL=http://host.docker.internal:8080/position ziga-python`
-- endpoint: `http://0.0.0.0:8081+prefix/analyse`
+- Python analyse: `http://127.0.0.1:8081/analyse`
+- Java search: `http://127.0.0.1:8080/position`
+- Health: `GET /ping` on both ports
+
+```bash
+source .env
+curl -u "$AUTH_USERNAME:$AUTH_PASSWORD" -H 'Content-Type: application/json' \
+  -d '{"FEN":"r4rk1/4Rppp/p1p5/P1p5/8/3P2P1/1PP2P1P/R5K1 b - - 0 25"}' \
+  http://127.0.0.1:8081/analyse
+```
+
+Stockfish is **downloaded in the Python image** (not committed). For local non-Docker Python runs: `./scripts/download_stockfish.sh`.
+
+## Manual (without Compose)
+
+- Java: build index, then from `java-server/` build/run the jar or Dockerfile; mount `indexedFiles`; set `AUTH_*`.
+- Python: `STOCKFISH_PATH=... JAVA_SERVICE_URL=http://127.0.0.1:8080/position` and run gunicorn/`main.py` on port 8081.
 
 # R&D
 - improve game attributes in feature extraction, then `make index` to refresh `indexedFiles`
