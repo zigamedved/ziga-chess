@@ -4,6 +4,8 @@ Bachelor thesis system for **similar rook-endgame retrieval**: given a FEN, extr
 
 **How the system works (current vs legacy):** see **[docs/ARCHITECTURE.md](docs/ARCHITECTURE.md)** — diagrams for index build, query path, and what changed when Mongo was removed.
 
+**Wrong assumptions that already broke CI or a local run:** see **[docs/PITFALLS.md](docs/PITFALLS.md)**. Add an entry when you hit a new one.
+
 ## Architecture overview
 
 ```mermaid
