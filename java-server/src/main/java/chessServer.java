@@ -31,6 +31,8 @@ import org.apache.lucene.queryparser.classic.MultiFieldQueryParser;
 import org.apache.lucene.search.IndexSearcher;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.ScoreDoc;
+import org.apache.lucene.search.SearcherFactory;
+import org.apache.lucene.search.SearcherManager;
 import org.apache.lucene.search.TopDocs;
 import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.FSDirectory;
@@ -38,8 +40,17 @@ import org.apache.lucene.search.similarities.BM25Similarity;
 
 public class chessServer {
     private static final int MAX_BODY_BYTES = 64 * 1024;
-    private static final int DEFAULT_TOP_K = 50;
+    /** Lucene already ranks; Python only re-sorts this page. Override with LUCENE_TOP_K. */
+    private static final int DEFAULT_TOP_K = 20;
     private static final Gson GSON = new Gson();
+
+    /**
+     * One searcher lifecycle per process. Opened on first search (or at startup),
+     * refreshed when the index commits, closed on shutdown.
+     */
+    static SearcherManager searcherManager;
+    static Directory openedDirectory;
+    static String openedIndexDir;
 
     /** Set from AUTH_USERNAME / AUTH_PASSWORD (or via configureAuth in tests). */
     static String authUsername;
@@ -97,6 +108,14 @@ public class chessServer {
         configureAuth(System.getenv("AUTH_USERNAME"), System.getenv("AUTH_PASSWORD"));
         requireAuthConfigured();
         requireIndexPresent();
+        ensureSearcher();
+        Runtime.getRuntime().addShutdownHook(new Thread(() -> {
+            try {
+                closeSearchResources();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }));
 
         String envValue = System.getenv("APP_PREFIX");
         envValue = envValue != null ? envValue : "";
@@ -283,30 +302,36 @@ public class chessServer {
 
     /**
      * BM25 search over static/other/dynamic; hydrate hits from Lucene stored fields
-     * (no Mongo round-trip).
+     * (no Mongo round-trip). Reuses the process-wide {@link SearcherManager}.
      */
     public static List<Map<String, Object>> searchSimilar(String input) throws Exception {
-        IndexSearcher searcher = createSearcher();
-        String escapedText = escapeCharacters(input);
-        TopDocs foundDocs = searchInContent(escapedText, searcher, topK());
-        System.out.println("Total Results :: " + foundDocs.totalHits);
+        ensureSearcher();
+        searcherManager.maybeRefresh();
+        IndexSearcher searcher = searcherManager.acquire();
+        try {
+            String escapedText = escapeCharacters(input);
+            TopDocs foundDocs = searchInContent(escapedText, searcher, topK());
+            System.out.println("Total Results :: " + foundDocs.totalHits);
 
-        List<Map<String, Object>> result = new ArrayList<>();
-        for (ScoreDoc sd : foundDocs.scoreDocs) {
-            Document d = searcher.doc(sd.doc);
-            Map<String, Object> row = new LinkedHashMap<>();
-            row.put("name", nullToEmpty(d.get("name")));
-            row.put("endgameFEN", nullToEmpty(d.get("endgameFEN")));
-            row.put("White", nullToEmpty(d.get("White")));
-            row.put("Black", nullToEmpty(d.get("Black")));
-            row.put("Result", nullToEmpty(d.get("Result")));
-            row.put("PGN", nullToEmpty(d.get("PGN")));
-            row.put("PV1", nullToEmpty(d.get("PV1")));
-            row.put("PV2", nullToEmpty(d.get("PV2")));
-            row.put("score", sd.score);
-            result.add(row);
+            List<Map<String, Object>> result = new ArrayList<>();
+            for (ScoreDoc sd : foundDocs.scoreDocs) {
+                Document d = searcher.doc(sd.doc);
+                Map<String, Object> row = new LinkedHashMap<>();
+                row.put("name", nullToEmpty(d.get("name")));
+                row.put("endgameFEN", nullToEmpty(d.get("endgameFEN")));
+                row.put("White", nullToEmpty(d.get("White")));
+                row.put("Black", nullToEmpty(d.get("Black")));
+                row.put("Result", nullToEmpty(d.get("Result")));
+                row.put("PGN", nullToEmpty(d.get("PGN")));
+                row.put("PV1", nullToEmpty(d.get("PV1")));
+                row.put("PV2", nullToEmpty(d.get("PV2")));
+                row.put("score", sd.score);
+                result.add(row);
+            }
+            return result;
+        } finally {
+            searcherManager.release(searcher);
         }
-        return result;
     }
 
     /** @deprecated Prefer {@link #searchSimilar(String)}; kept for older unit tests. */
@@ -346,11 +371,73 @@ public class chessServer {
         return searcher.search(query, limit);
     }
 
-    private static IndexSearcher createSearcher() throws IOException {
-        Directory dir = FSDirectory.open(Paths.get(indexDir()));
-        IndexReader reader = DirectoryReader.open(dir);
-        IndexSearcher searcher = new IndexSearcher(reader);
-        searcher.setSimilarity(new BM25Similarity());
-        return searcher;
+    /**
+     * Opens the shared searcher when missing, or when {@link #indexDir()} changed
+     * (tests point at a new fixture). Safe to call on every request.
+     */
+    static void ensureSearcher() throws IOException {
+        String dir = indexDir();
+        synchronized (chessServer.class) {
+            if (searcherManager != null && dir.equals(openedIndexDir)) {
+                return;
+            }
+            closeSearchResourcesLocked();
+            openedDirectory = FSDirectory.open(Paths.get(dir));
+            searcherManager = new SearcherManager(openedDirectory, new Bm25SearcherFactory());
+            openedIndexDir = dir;
+        }
+    }
+
+    /** Closes the shared reader and directory. Idempotent. */
+    static void closeSearchResources() throws IOException {
+        synchronized (chessServer.class) {
+            closeSearchResourcesLocked();
+        }
+    }
+
+    private static void closeSearchResourcesLocked() throws IOException {
+        IOException failure = null;
+        if (searcherManager != null) {
+            try {
+                searcherManager.close();
+            } catch (IOException ex) {
+                failure = ex;
+            }
+            searcherManager = null;
+        }
+        if (openedDirectory != null) {
+            try {
+                openedDirectory.close();
+            } catch (IOException ex) {
+                if (failure == null) {
+                    failure = ex;
+                }
+            }
+            openedDirectory = null;
+        }
+        openedIndexDir = null;
+        if (failure != null) {
+            throw failure;
+        }
+    }
+
+    /** Reader currently held by the shared manager (tests assert it is reused). */
+    static IndexReader sharedReader() throws IOException {
+        ensureSearcher();
+        IndexSearcher searcher = searcherManager.acquire();
+        try {
+            return searcher.getIndexReader();
+        } finally {
+            searcherManager.release(searcher);
+        }
+    }
+
+    static final class Bm25SearcherFactory extends SearcherFactory {
+        @Override
+        public IndexSearcher newSearcher(IndexReader reader, IndexReader previous) {
+            IndexSearcher searcher = new IndexSearcher(reader);
+            searcher.setSimilarity(new BM25Similarity());
+            return searcher;
+        }
     }
 }

@@ -2,13 +2,20 @@ import com.sun.net.httpserver.Headers;
 import com.sun.net.httpserver.HttpContext;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpPrincipal;
+import com.sun.management.UnixOperatingSystemMXBean;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field;
 import org.apache.lucene.document.StoredField;
 import org.apache.lucene.document.StringField;
 import org.apache.lucene.document.TextField;
+import org.apache.lucene.index.DirectoryReader;
+import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.index.IndexWriter;
 import org.apache.lucene.index.IndexWriterConfig;
+import org.apache.lucene.search.IndexSearcher;
+import org.apache.lucene.search.MatchAllDocsQuery;
+import org.apache.lucene.search.similarities.BM25Similarity;
+import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.FSDirectory;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -21,6 +28,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.InetSocketAddress;
+import java.lang.management.ManagementFactory;
 import java.net.URI;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
@@ -31,6 +39,8 @@ import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotSame;
+import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -42,7 +52,8 @@ public class ChessServerTest {
     }
 
     @AfterEach
-    void clearIndexDirProperty() {
+    void clearIndexDirProperty() throws IOException {
+        chessServer.closeSearchResources();
         System.clearProperty("chess.indexDir");
         System.clearProperty("chess.topK");
         chessServer.configureAuth(null, null);
@@ -195,6 +206,111 @@ public class ChessServerTest {
     }
 
     @Test
+    void topK_defaultsAndHonorsProperty() {
+        System.clearProperty("chess.topK");
+        if (System.getenv("LUCENE_TOP_K") == null) {
+            assertEquals(20, chessServer.topK());
+        }
+        System.setProperty("chess.topK", "7");
+        if (System.getenv("LUCENE_TOP_K") == null) {
+            assertEquals(7, chessServer.topK());
+        }
+        System.setProperty("chess.topK", "0");
+        if (System.getenv("LUCENE_TOP_K") == null) {
+            assertEquals(20, chessServer.topK());
+        }
+    }
+
+    @Test
+    void searchSimilar_limitsToTopK(@TempDir Path tempDir) throws Exception {
+        buildMultiDocIndex(tempDir, 5);
+        System.setProperty("chess.indexDir", tempDir.toString());
+        System.setProperty("chess.topK", "2");
+
+        List<Map<String, Object>> hits = chessServer.searchSimilar("Kg1");
+
+        assertEquals(2, hits.size());
+    }
+
+    @Test
+    void searchSimilar_reusesOneReaderWithoutFdGrowth(@TempDir Path tempDir) throws Exception {
+        buildFixtureIndex(tempDir);
+        System.setProperty("chess.indexDir", tempDir.toString());
+
+        chessServer.searchSimilar("Kg1");
+        IndexReader reader = chessServer.sharedReader();
+        int refs = reader.getRefCount();
+        long fdsBefore = openFileDescriptorCount();
+
+        for (int i = 0; i < 40; i++) {
+            chessServer.searchSimilar("Kg1 Re7");
+        }
+
+        assertSame(reader, chessServer.sharedReader());
+        assertEquals(refs, chessServer.sharedReader().getRefCount());
+        long fdsAfter = openFileDescriptorCount();
+        if (fdsBefore >= 0 && fdsAfter >= 0) {
+            assertTrue(
+                    fdsAfter - fdsBefore <= 8,
+                    "open FDs grew by " + (fdsAfter - fdsBefore) + " across 40 searches");
+        }
+
+        // Same MatchAllDocsQuery both ways, so this is open/close vs acquire/release
+        // (not query parsing). A 1-doc fixture makes open() cheap; FD reuse is the check.
+        long openEachNanos = timeOpenReaderPerQuery(tempDir, 40);
+        long sharedNanos = timeSharedSearcher(40);
+        System.out.println(
+                "LUCENE_BENCH openEachMs="
+                        + (openEachNanos / 1_000_000.0)
+                        + " sharedMs="
+                        + (sharedNanos / 1_000_000.0)
+                        + " queries=40");
+    }
+
+    @Test
+    void searchSimilar_reopensWhenIndexDirChanges(@TempDir Path first, @TempDir Path second) throws Exception {
+        buildFixtureIndex(first);
+        buildFixtureIndex(second);
+        System.setProperty("chess.indexDir", first.toString());
+        chessServer.searchSimilar("Kg1");
+        IndexReader firstReader = chessServer.sharedReader();
+
+        System.setProperty("chess.indexDir", second.toString());
+        chessServer.searchSimilar("Kg1");
+        assertNotSame(firstReader, chessServer.sharedReader());
+    }
+
+    @Test
+    void searchSimilar_refreshesAfterCommit(@TempDir Path tempDir) throws Exception {
+        buildFixtureIndex(tempDir);
+        System.setProperty("chess.indexDir", tempDir.toString());
+        assertTrue(chessServer.searchSimilar("brandnewtoken").isEmpty());
+
+        try (FSDirectory directory = FSDirectory.open(tempDir);
+             IndexWriter writer = new IndexWriter(
+                     directory, new IndexWriterConfig(new chessServer.MyAnalyzer()))) {
+            Document doc = new Document();
+            doc.add(new TextField("static", "brandnewtoken", Field.Store.NO));
+            doc.add(new TextField("other", "extra", Field.Store.NO));
+            doc.add(new TextField("dynamic", "later", Field.Store.NO));
+            doc.add(new StringField("name", "Game#new.txt", Field.Store.YES));
+            doc.add(new StoredField("White", "New, White"));
+            doc.add(new StoredField("Black", "New, Black"));
+            doc.add(new StoredField("Result", "*"));
+            doc.add(new StoredField("PGN", "1. e4 *"));
+            doc.add(new StoredField("PV1", ""));
+            doc.add(new StoredField("PV2", ""));
+            doc.add(new StoredField("endgameFEN", "4k3/8/8/8/8/8/8/4K3 w - - 0 1"));
+            writer.addDocument(doc);
+            writer.commit();
+        }
+
+        List<Map<String, Object>> hits = chessServer.searchSimilar("brandnewtoken");
+        assertEquals(1, hits.size());
+        assertEquals("Game#new.txt", hits.get(0).get("name"));
+    }
+
+    @Test
     void queryLucene_escapesAndMatchesDynamicBangToken(@TempDir Path tempDir) throws Exception {
         buildFixtureIndex(tempDir);
         System.setProperty("chess.indexDir", tempDir.toString());
@@ -222,6 +338,66 @@ public class ChessServerTest {
         assertEquals(1, hits.size());
         assertEquals("Game#a.txt", hits.get(0).get("name"));
         assertEquals("W", hits.get(0).get("White"));
+    }
+
+    private static long timeOpenReaderPerQuery(Path indexDir, int queries) throws IOException {
+        long start = System.nanoTime();
+        for (int i = 0; i < queries; i++) {
+            try (Directory dir = FSDirectory.open(indexDir);
+                 IndexReader reader = DirectoryReader.open(dir)) {
+                IndexSearcher searcher = new IndexSearcher(reader);
+                searcher.setSimilarity(new BM25Similarity());
+                searcher.search(new MatchAllDocsQuery(), 20);
+            }
+        }
+        return System.nanoTime() - start;
+    }
+
+    private static long timeSharedSearcher(int queries) throws IOException {
+        chessServer.ensureSearcher();
+        long start = System.nanoTime();
+        for (int i = 0; i < queries; i++) {
+            chessServer.searcherManager.maybeRefresh();
+            IndexSearcher searcher = chessServer.searcherManager.acquire();
+            try {
+                searcher.search(new MatchAllDocsQuery(), 20);
+            } finally {
+                chessServer.searcherManager.release(searcher);
+            }
+        }
+        return System.nanoTime() - start;
+    }
+
+    private static long openFileDescriptorCount() {
+        var os = ManagementFactory.getOperatingSystemMXBean();
+        if (os instanceof UnixOperatingSystemMXBean unix) {
+            return unix.getOpenFileDescriptorCount();
+        }
+        return -1;
+    }
+
+    private static void buildMultiDocIndex(Path indexDir, int count) throws IOException {
+        try (FSDirectory directory = FSDirectory.open(indexDir);
+             IndexWriter writer = new IndexWriter(
+                     directory,
+                     new IndexWriterConfig(new chessServer.MyAnalyzer()))) {
+            for (int i = 0; i < count; i++) {
+                Document doc = new Document();
+                doc.add(new TextField("static", "Kg1 shared", Field.Store.NO));
+                doc.add(new TextField("other", "token" + i, Field.Store.NO));
+                doc.add(new TextField("dynamic", "!re8", Field.Store.NO));
+                doc.add(new StringField("name", "Game#" + i + ".txt", Field.Store.YES));
+                doc.add(new StoredField("White", "W" + i));
+                doc.add(new StoredField("Black", "B" + i));
+                doc.add(new StoredField("Result", "*"));
+                doc.add(new StoredField("PGN", "1. e4 *"));
+                doc.add(new StoredField("PV1", ""));
+                doc.add(new StoredField("PV2", ""));
+                doc.add(new StoredField("endgameFEN", "4k3/8/8/8/8/8/8/4K3 w - - 0 1"));
+                writer.addDocument(doc);
+            }
+            writer.commit();
+        }
     }
 
     private static String basicAuth(String user, String pass) {

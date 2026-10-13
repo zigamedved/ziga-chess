@@ -49,7 +49,7 @@ flowchart LR
 | Search (tokenized) | `static`, `other`, `dynamic` |
 | Stored metadata (for the API response) | `name`, `White`, `Black`, `Result`, `PGN`, `PV1`, `PV2`, `endgameFEN` |
 
-If you add games: append JSON lines to the corpus, refresh the zip, run `make index` again (full rebuild today), restart the Java server.
+If you add games: append JSON lines to the corpus, refresh the zip, run `make index` again (full rebuild today), restart the Java server. The running process keeps one `SearcherManager` and calls `maybeRefresh()` on each search, so an in-place commit is picked up. `make index` opens the index with `OpenMode.CREATE` (it wipes the directory), so restart Java after a full rebuild.
 
 ### 2. Online: analyse a position
 

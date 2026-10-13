@@ -5,43 +5,164 @@ import chess.pgn
 import chess.engine
 import numpy as np
 import json
-import urllib3
-from stockfish import Stockfish
 import os
+import platform
+import threading
+import time
+import urllib3
+from collections import OrderedDict
+from stockfish import Stockfish
 
 
 app = Flask(__name__)
 auth = HTTPBasicAuth()
 
-# Prefer STOCKFISH_PATH (Docker downloads arch-specific binary). Local defaults
-# try common filenames under engine/ without committing binaries to git.
-def _default_stockfish_path() -> str:
-    candidates = [
-        os.environ.get("STOCKFISH_PATH", ""),
-        "engine/stockfish",
-        "engine/stockfish-ubuntu-x86-64",
-        "engine/Stockfish_ARM",
-    ]
-    for path in candidates:
-        if path and os.path.isfile(path) and os.access(path, os.X_OK):
+
+def stockfish_candidates(system: str, machine: str):
+    """Binary names under engine/, most specific platform match first."""
+    system = (system or "").lower()
+    machine = (machine or "").lower()
+    preferred = []
+    if system == "darwin" and machine in ("arm64", "aarch64"):
+        preferred.append("engine/Stockfish_ARM")
+    elif system == "linux" and machine in ("x86_64", "amd64"):
+        preferred.append("engine/stockfish-ubuntu-x86-64")
+    preferred.append("engine/stockfish")
+    for legacy in ("engine/stockfish-ubuntu-x86-64", "engine/Stockfish_ARM"):
+        if legacy not in preferred:
+            preferred.append(legacy)
+    return preferred
+
+
+def resolve_stockfish_path() -> str:
+    """STOCKFISH_PATH wins. Otherwise the first executable platform candidate."""
+    explicit = os.environ.get("STOCKFISH_PATH", "").strip()
+    if explicit:
+        return explicit
+    for path in stockfish_candidates(platform.system(), platform.machine()):
+        if os.path.isfile(path) and os.access(path, os.X_OK):
             return path
-    # Fall back so Stockfish raises a clear error if nothing is installed.
-    return os.environ.get("STOCKFISH_PATH") or "engine/stockfish"
+    return "engine/stockfish"
 
 
 stockfish = Stockfish(
-    path=_default_stockfish_path(),
+    path=resolve_stockfish_path(),
     depth=12,
     parameters={"Threads": 1, "Hash": 64},
 )
 stockfish.set_elo_rating(2500)
 LIMIT_DEPTH = 8
 
-CACHE = {}
+# One engine process. Overlapping /analyse calls that need it get 503
+# instead of interleaving UCI commands. Cached FENs do not take the lock.
+# gunicorn stays at -w 1; this lock covers a threaded worker or Flask's dev server.
+_engine_lock = threading.Lock()
+
+
+def _env_int(name: str, default: int) -> int:
+    raw = os.environ.get(name, "").strip()
+    if not raw:
+        return default
+    try:
+        value = int(raw)
+    except ValueError:
+        return default
+    return value if value > 0 else default
+
+
+def _env_float(name: str, default: float) -> float:
+    raw = os.environ.get(name, "").strip()
+    if not raw:
+        return default
+    try:
+        return float(raw)
+    except ValueError:
+        return default
+
+
+def _env_positive_float(name: str, default: float) -> float:
+    value = _env_float(name, default)
+    return value if value > 0 else default
+
+
+# 0 = do not wait; a busy engine returns 503 immediately.
+ENGINE_LOCK_TIMEOUT_SECONDS = max(
+    0.0, _env_float("STOCKFISH_LOCK_TIMEOUT_SECONDS", 0.0)
+)
+
+
+class BoundedTTLCache:
+    """In-process LRU cache with TTL.
+
+    Chosen over Redis: one gunicorn worker, no extra service. Not shared
+    across processes — keep ``gunicorn -w 1``.
+    """
+
+    def __init__(self, max_entries: int = 256, ttl_seconds: float = 3600.0):
+        self.max_entries = max_entries
+        self.ttl_seconds = ttl_seconds
+        self._data = OrderedDict()
+        self._lock = threading.Lock()
+
+    def get(self, key):
+        now = time.monotonic()
+        with self._lock:
+            item = self._data.get(key)
+            if item is None:
+                return None
+            value, expires = item
+            if now >= expires:
+                del self._data[key]
+                return None
+            self._data.move_to_end(key)
+            return value
+
+    def __setitem__(self, key, value):
+        now = time.monotonic()
+        with self._lock:
+            self._purge_expired_locked(now)
+            self._data[key] = (value, now + self.ttl_seconds)
+            self._data.move_to_end(key)
+            while len(self._data) > self.max_entries:
+                self._data.popitem(last=False)
+
+    def clear(self):
+        with self._lock:
+            self._data.clear()
+
+    def __len__(self):
+        now = time.monotonic()
+        with self._lock:
+            self._purge_expired_locked(now)
+            return len(self._data)
+
+    def _purge_expired_locked(self, now: float):
+        expired = [key for key, (_, exp) in self._data.items() if now >= exp]
+        for key in expired:
+            del self._data[key]
+
+
+CACHE = BoundedTTLCache(
+    max_entries=_env_int("CACHE_MAX_ENTRIES", 256),
+    ttl_seconds=_env_positive_float("CACHE_TTL_SECONDS", 3600.0),
+)
+_http = None
+_http_lock = threading.Lock()
 prefix = os.environ.get("APP_PREFIX", "")
 JAVA_SERVICE_URL = os.environ.get(
     "JAVA_SERVICE_URL", "http://127.0.0.1:8080/position"
 )
+
+
+def http_pool():
+    """Reuse one urllib3 pool for the Java hop (created on first use)."""
+    global _http
+    if _http is not None:
+        return _http
+    with _http_lock:
+        if _http is None:
+            _http = urllib3.PoolManager()
+        return _http
 
 
 def _load_required_secret(name: str) -> str:
@@ -451,17 +572,29 @@ def analyse():
         return jsonify({"error": "FEN is required (string)", "code": "bad_request"}), 400
 
     fen = data["FEN"].strip()
-    if not stockfish.is_fen_valid(fen):
-        return jsonify({"error": "Invalid FEN!", "code": "invalid_fen"}), 400
+    cached = CACHE.get(fen)
+    if cached is not None:
+        return Response(cached, content_type="text/plain")
 
-    if fen in CACHE.keys():
-        return Response(CACHE[fen], content_type="text/plain")
+    if not _engine_lock.acquire(timeout=ENGINE_LOCK_TIMEOUT_SECONDS):
+        return jsonify({
+            "error": "Stockfish is busy; retry shortly",
+            "code": "engine_busy",
+        }), 503
 
-    result, [pgn1, pgn2] = analyse_position(fen)
-    http = urllib3.PoolManager()
+    try:
+        cached = CACHE.get(fen)
+        if cached is not None:
+            return Response(cached, content_type="text/plain")
+        if not stockfish.is_fen_valid(fen):
+            return jsonify({"error": "Invalid FEN!", "code": "invalid_fen"}), 400
+        result, [pgn1, pgn2] = analyse_position(fen)
+    finally:
+        _engine_lock.release()
+
     encoded_data = json.dumps(result)
 
-    r = http.request(
+    r = http_pool().request(
         method='POST',
         url=JAVA_SERVICE_URL,
         body=encoded_data,
@@ -484,9 +617,8 @@ def analyse():
     # }
 
     res = [json.loads(item) for item in json.loads(r.data)]
-    CACHE[fen] = res
 
-    # SORT
+    # Lucene already returns this page in score order (LUCENE_TOP_K, default 20).
     res = sorted(res, key=lambda x: x["score"], reverse=True)
 
     linesPgn1 = str(pgn1).split('\n')[6:]
