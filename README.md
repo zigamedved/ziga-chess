@@ -37,7 +37,7 @@ make test-python   # pytest (Stockfish + Java HTTP mocked)
 make test-java     # mvn test (temp Lucene fixture; no Mongo)
 ```
 
-Python coverage includes unit tests for feature extractors, golden snapshots for the README sample FEN, and Flask route integration tests. Java coverage includes auth/body helpers, Lucene search with stored metadata, and `IndexBuilder` round-trips.
+Python coverage includes unit tests for feature extractors, golden snapshots for the README sample FEN, and Flask route integration tests. The analyse service is split into `chessapp/features`, `chessapp/engine`, `chessapp/api`, and `chessapp/search_client` (`main.py` is the gunicorn entry). Java is `chessServer` plus `AuthFilter`, `FenParser`, and `LuceneSearchService`, with auth/body helpers, Lucene search against a fixture index, and `IndexBuilder` round-trips.
 
 # Build Lucene index (required for java-server)
 

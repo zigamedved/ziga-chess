@@ -103,6 +103,13 @@ def _default_java_payload():
     ]
 
 
+def unload_app_modules():
+    """Drop main and chessapp so the next import rebuilds Stockfish and auth."""
+    for name in list(sys.modules):
+        if name == "main" or name == "chessapp" or name.startswith("chessapp."):
+            del sys.modules[name]
+
+
 @pytest.fixture
 def app_module(monkeypatch):
     """Import (or re-import) main with Stockfish + Java HTTP mocked."""
@@ -114,12 +121,14 @@ def app_module(monkeypatch):
     stockfish_mod.Stockfish = DummyStockfish
     monkeypatch.setitem(sys.modules, "stockfish", stockfish_mod)
 
-    if "main" in sys.modules:
-        del sys.modules["main"]
+    unload_app_modules()
 
     module = importlib.import_module("main")
-    # Keep analyse tree shallow so tests stay fast.
-    module.LIMIT_DEPTH = 1
+    import chessapp.engine as engine_mod
+    import chessapp.search_client as search_client
+
+    # evaluate() reads LIMIT_DEPTH from the engine module, not from main.
+    engine_mod.LIMIT_DEPTH = 1
     module.CACHE.clear()
 
     class DummyPoolManager:
@@ -132,7 +141,7 @@ def app_module(monkeypatch):
                 data=json.dumps(_default_java_payload()).encode("utf-8"),
             )
 
-    monkeypatch.setattr(module.urllib3, "PoolManager", lambda: DummyPoolManager())
+    monkeypatch.setattr(search_client.urllib3, "PoolManager", lambda: DummyPoolManager())
     return module
 
 

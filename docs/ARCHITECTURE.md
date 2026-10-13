@@ -152,6 +152,8 @@ sequenceDiagram
 - **Python** = understand the *query* position (Stockfish + features)  
 - **Java / Lucene** = find and return *similar* games  
 
+Python is split under `python-server/chessapp/` (`features`, `engine`, `api`, `search_client`). `main.py` only exposes the gunicorn app. The Stockfish binary still lives in `python-server/engine/` (not a Python package). Java HTTP startup is `chessServer`; auth is `AuthFilter`, `POST /position` is `FenParser`, and BM25 is `LuceneSearchService`.  
+
 ---
 
 ## Related commands

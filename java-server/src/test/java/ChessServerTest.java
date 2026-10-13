@@ -48,45 +48,45 @@ public class ChessServerTest {
 
     @BeforeEach
     void setAuth() {
-        chessServer.configureAuth("test-user", "test-password");
+        AuthFilter.configureAuth("test-user", "test-password");
     }
 
     @AfterEach
     void clearIndexDirProperty() throws IOException {
-        chessServer.closeSearchResources();
+        LuceneSearchService.closeSearchResources();
         System.clearProperty("chess.indexDir");
         System.clearProperty("chess.topK");
-        chessServer.configureAuth(null, null);
+        AuthFilter.configureAuth(null, null);
     }
 
     @Test
     void escapeCharacters_escapesLuceneSpecialsUsedByApp() {
-        assertEquals("\\!\\?\\-\\+", chessServer.escapeCharacters("!?-+"));
-        assertEquals("plain", chessServer.escapeCharacters("plain"));
-        assertEquals("a\\-b\\+c", chessServer.escapeCharacters("a-b+c"));
-        assertEquals("\\!kh8", chessServer.escapeCharacters("!kh8"));
-        assertEquals("r\\-r\\-8", chessServer.escapeCharacters("r-r-8"));
-        assertEquals("\\!re8", chessServer.escapeCharacters("!re8"));
+        assertEquals("\\!\\?\\-\\+", LuceneSearchService.escapeCharacters("!?-+"));
+        assertEquals("plain", LuceneSearchService.escapeCharacters("plain"));
+        assertEquals("a\\-b\\+c", LuceneSearchService.escapeCharacters("a-b+c"));
+        assertEquals("\\!kh8", LuceneSearchService.escapeCharacters("!kh8"));
+        assertEquals("r\\-r\\-8", LuceneSearchService.escapeCharacters("r-r-8"));
+        assertEquals("\\!re8", LuceneSearchService.escapeCharacters("!re8"));
     }
 
     @Test
     void requireAuthConfigured_failsWhenMissing() {
-        chessServer.configureAuth(null, null);
-        assertThrows(IllegalStateException.class, chessServer::requireAuthConfigured);
-        chessServer.configureAuth("u", "");
-        assertThrows(IllegalStateException.class, chessServer::requireAuthConfigured);
+        AuthFilter.configureAuth(null, null);
+        assertThrows(IllegalStateException.class, AuthFilter::requireAuthConfigured);
+        AuthFilter.configureAuth("u", "");
+        assertThrows(IllegalStateException.class, AuthFilter::requireAuthConfigured);
     }
 
     @Test
     void requireIndexPresent_failsWhenMissing(@TempDir Path tempDir) {
         System.setProperty("chess.indexDir", tempDir.resolve("no-such-index").toString());
-        assertThrows(IllegalStateException.class, chessServer::requireIndexPresent);
+        assertThrows(IllegalStateException.class, LuceneSearchService::requireIndexPresent);
     }
 
     @Test
     void authorize_rejectsMissingHeaderAndDoesNotProceed() throws IOException {
         FakeExchange ex = new FakeExchange();
-        assertFalse(chessServer.authorize(ex));
+        assertFalse(AuthFilter.authorize(ex));
         assertEquals(401, ex.statusCode);
     }
 
@@ -94,7 +94,7 @@ public class ChessServerTest {
     void authorize_rejectsWrongPassword() throws IOException {
         FakeExchange ex = new FakeExchange();
         ex.requestHeaders.add("Authorization", basicAuth("test-user", "wrong"));
-        assertFalse(chessServer.authorize(ex));
+        assertFalse(AuthFilter.authorize(ex));
         assertEquals(401, ex.statusCode);
     }
 
@@ -102,7 +102,7 @@ public class ChessServerTest {
     void authorize_acceptsValidCredentials() throws IOException {
         FakeExchange ex = new FakeExchange();
         ex.requestHeaders.add("Authorization", basicAuth("test-user", "test-password"));
-        assertTrue(chessServer.authorize(ex));
+        assertTrue(AuthFilter.authorize(ex));
         assertEquals(-1, ex.statusCode);
     }
 
@@ -110,7 +110,7 @@ public class ChessServerTest {
     void authorize_rejectsMalformedBase64() throws IOException {
         FakeExchange ex = new FakeExchange();
         ex.requestHeaders.add("Authorization", "Basic !!!not-base64!!!");
-        assertFalse(chessServer.authorize(ex));
+        assertFalse(AuthFilter.authorize(ex));
         assertEquals(401, ex.statusCode);
     }
 
@@ -119,7 +119,7 @@ public class ChessServerTest {
         buildFixtureIndex(tempDir);
         System.setProperty("chess.indexDir", tempDir.toString());
 
-        chessServer.FenParser handler = new chessServer.FenParser();
+        FenParser handler = new FenParser();
         FakeExchange ex = new FakeExchange();
         ex.setRequestBody("\"Kg1 Re7\"");
 
@@ -130,7 +130,7 @@ public class ChessServerTest {
 
     @Test
     void fenParser_emptyBodyReturns400() throws IOException {
-        chessServer.FenParser handler = new chessServer.FenParser();
+        FenParser handler = new FenParser();
         FakeExchange ex = new FakeExchange();
         ex.requestHeaders.add("Authorization", basicAuth("test-user", "test-password"));
         ex.setRequestBody("");
@@ -146,7 +146,7 @@ public class ChessServerTest {
         buildFixtureIndex(tempDir);
         System.setProperty("chess.indexDir", tempDir.toString());
 
-        chessServer.FenParser handler = new chessServer.FenParser();
+        FenParser handler = new FenParser();
         FakeExchange ex = new FakeExchange();
         ex.requestHeaders.add("Authorization", basicAuth("test-user", "test-password"));
         ex.setRequestBody("\"Kg1 Re7 Dpc\"");
@@ -165,7 +165,7 @@ public class ChessServerTest {
     void readFeatureBody_parsesJsonStringPayload() throws Exception {
         FakeExchange ex = new FakeExchange();
         ex.setRequestBody("\"Pb2 Kg1 !re8\"");
-        assertEquals("Pb2 Kg1 !re8", chessServer.readFeatureBody(ex));
+        assertEquals("Pb2 Kg1 !re8", FenParser.readFeatureBody(ex));
     }
 
     @Test
@@ -184,7 +184,7 @@ public class ChessServerTest {
         buildFixtureIndex(tempDir);
         System.setProperty("chess.indexDir", tempDir.toString());
 
-        List<Map<String, Object>> hits = chessServer.searchSimilar("Kg1 Re7 Dpc");
+        List<Map<String, Object>> hits = LuceneSearchService.searchSimilar("Kg1 Re7 Dpc");
 
         assertFalse(hits.isEmpty());
         Map<String, Object> hit = hits.get(0);
@@ -199,7 +199,7 @@ public class ChessServerTest {
         buildFixtureIndex(tempDir);
         System.setProperty("chess.indexDir", tempDir.toString());
 
-        Map<String, Float> hits = chessServer.queryLucene("Kg1 Re7 Dpc");
+        Map<String, Float> hits = LuceneSearchService.queryLucene("Kg1 Re7 Dpc");
 
         assertTrue(hits.containsKey("Game#fixture.txt"), "hits=" + hits);
         assertTrue(hits.get("Game#fixture.txt") > 0f);
@@ -209,15 +209,15 @@ public class ChessServerTest {
     void topK_defaultsAndHonorsProperty() {
         System.clearProperty("chess.topK");
         if (System.getenv("LUCENE_TOP_K") == null) {
-            assertEquals(20, chessServer.topK());
+            assertEquals(20, LuceneSearchService.topK());
         }
         System.setProperty("chess.topK", "7");
         if (System.getenv("LUCENE_TOP_K") == null) {
-            assertEquals(7, chessServer.topK());
+            assertEquals(7, LuceneSearchService.topK());
         }
         System.setProperty("chess.topK", "0");
         if (System.getenv("LUCENE_TOP_K") == null) {
-            assertEquals(20, chessServer.topK());
+            assertEquals(20, LuceneSearchService.topK());
         }
     }
 
@@ -227,7 +227,7 @@ public class ChessServerTest {
         System.setProperty("chess.indexDir", tempDir.toString());
         System.setProperty("chess.topK", "2");
 
-        List<Map<String, Object>> hits = chessServer.searchSimilar("Kg1");
+        List<Map<String, Object>> hits = LuceneSearchService.searchSimilar("Kg1");
 
         assertEquals(2, hits.size());
     }
@@ -237,17 +237,17 @@ public class ChessServerTest {
         buildFixtureIndex(tempDir);
         System.setProperty("chess.indexDir", tempDir.toString());
 
-        chessServer.searchSimilar("Kg1");
-        IndexReader reader = chessServer.sharedReader();
+        LuceneSearchService.searchSimilar("Kg1");
+        IndexReader reader = LuceneSearchService.sharedReader();
         int refs = reader.getRefCount();
         long fdsBefore = openFileDescriptorCount();
 
         for (int i = 0; i < 40; i++) {
-            chessServer.searchSimilar("Kg1 Re7");
+            LuceneSearchService.searchSimilar("Kg1 Re7");
         }
 
-        assertSame(reader, chessServer.sharedReader());
-        assertEquals(refs, chessServer.sharedReader().getRefCount());
+        assertSame(reader, LuceneSearchService.sharedReader());
+        assertEquals(refs, LuceneSearchService.sharedReader().getRefCount());
         long fdsAfter = openFileDescriptorCount();
         if (fdsBefore >= 0 && fdsAfter >= 0) {
             assertTrue(
@@ -272,23 +272,23 @@ public class ChessServerTest {
         buildFixtureIndex(first);
         buildFixtureIndex(second);
         System.setProperty("chess.indexDir", first.toString());
-        chessServer.searchSimilar("Kg1");
-        IndexReader firstReader = chessServer.sharedReader();
+        LuceneSearchService.searchSimilar("Kg1");
+        IndexReader firstReader = LuceneSearchService.sharedReader();
 
         System.setProperty("chess.indexDir", second.toString());
-        chessServer.searchSimilar("Kg1");
-        assertNotSame(firstReader, chessServer.sharedReader());
+        LuceneSearchService.searchSimilar("Kg1");
+        assertNotSame(firstReader, LuceneSearchService.sharedReader());
     }
 
     @Test
     void searchSimilar_refreshesAfterCommit(@TempDir Path tempDir) throws Exception {
         buildFixtureIndex(tempDir);
         System.setProperty("chess.indexDir", tempDir.toString());
-        assertTrue(chessServer.searchSimilar("brandnewtoken").isEmpty());
+        assertTrue(LuceneSearchService.searchSimilar("brandnewtoken").isEmpty());
 
         try (FSDirectory directory = FSDirectory.open(tempDir);
              IndexWriter writer = new IndexWriter(
-                     directory, new IndexWriterConfig(new chessServer.MyAnalyzer()))) {
+                     directory, new IndexWriterConfig(new LuceneSearchService.MyAnalyzer()))) {
             Document doc = new Document();
             doc.add(new TextField("static", "brandnewtoken", Field.Store.NO));
             doc.add(new TextField("other", "extra", Field.Store.NO));
@@ -305,7 +305,7 @@ public class ChessServerTest {
             writer.commit();
         }
 
-        List<Map<String, Object>> hits = chessServer.searchSimilar("brandnewtoken");
+        List<Map<String, Object>> hits = LuceneSearchService.searchSimilar("brandnewtoken");
         assertEquals(1, hits.size());
         assertEquals("Game#new.txt", hits.get(0).get("name"));
     }
@@ -315,7 +315,7 @@ public class ChessServerTest {
         buildFixtureIndex(tempDir);
         System.setProperty("chess.indexDir", tempDir.toString());
 
-        Map<String, Float> hits = chessServer.queryLucene("!re8");
+        Map<String, Float> hits = LuceneSearchService.queryLucene("!re8");
 
         assertTrue(hits.containsKey("Game#fixture.txt"), "hits=" + hits);
     }
@@ -334,7 +334,7 @@ public class ChessServerTest {
         assertEquals(1, n);
 
         System.setProperty("chess.indexDir", index.toString());
-        List<Map<String, Object>> hits = chessServer.searchSimilar("Ke1");
+        List<Map<String, Object>> hits = LuceneSearchService.searchSimilar("Ke1");
         assertEquals(1, hits.size());
         assertEquals("Game#a.txt", hits.get(0).get("name"));
         assertEquals("W", hits.get(0).get("White"));
@@ -354,15 +354,15 @@ public class ChessServerTest {
     }
 
     private static long timeSharedSearcher(int queries) throws IOException {
-        chessServer.ensureSearcher();
+        LuceneSearchService.ensureSearcher();
         long start = System.nanoTime();
         for (int i = 0; i < queries; i++) {
-            chessServer.searcherManager.maybeRefresh();
-            IndexSearcher searcher = chessServer.searcherManager.acquire();
+            LuceneSearchService.searcherManager.maybeRefresh();
+            IndexSearcher searcher = LuceneSearchService.searcherManager.acquire();
             try {
                 searcher.search(new MatchAllDocsQuery(), 20);
             } finally {
-                chessServer.searcherManager.release(searcher);
+                LuceneSearchService.searcherManager.release(searcher);
             }
         }
         return System.nanoTime() - start;
@@ -380,7 +380,7 @@ public class ChessServerTest {
         try (FSDirectory directory = FSDirectory.open(indexDir);
              IndexWriter writer = new IndexWriter(
                      directory,
-                     new IndexWriterConfig(new chessServer.MyAnalyzer()))) {
+                     new IndexWriterConfig(new LuceneSearchService.MyAnalyzer()))) {
             for (int i = 0; i < count; i++) {
                 Document doc = new Document();
                 doc.add(new TextField("static", "Kg1 shared", Field.Store.NO));
@@ -410,7 +410,7 @@ public class ChessServerTest {
         try (FSDirectory directory = FSDirectory.open(indexDir);
              IndexWriter writer = new IndexWriter(
                      directory,
-                     new IndexWriterConfig(new chessServer.MyAnalyzer()))) {
+                     new IndexWriterConfig(new LuceneSearchService.MyAnalyzer()))) {
             Document doc = new Document();
             doc.add(new TextField("static", "Kg1 kg8 Re7 rf8 Pa5", Field.Store.NO));
             doc.add(new TextField("other", "Dpc ORe r-r-8", Field.Store.NO));

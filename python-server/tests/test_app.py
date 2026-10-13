@@ -12,6 +12,7 @@ from conftest import (
     TEST_AUTH_PASSWORD,
     TEST_AUTH_USERNAME,
     basic_auth_header,
+    unload_app_modules,
 )
 
 
@@ -112,7 +113,9 @@ def test_analyse_caches_by_fen(client, app_module, monkeypatch):
 
             return Resp()
 
-    monkeypatch.setattr(app_module.urllib3, "PoolManager", lambda: CountingPool())
+    import chessapp.search_client as search_client
+
+    monkeypatch.setattr(search_client.urllib3, "PoolManager", lambda: CountingPool())
     app_module.CACHE.clear()
 
     headers = {"Authorization": basic_auth_header()}
@@ -134,7 +137,9 @@ def test_analyse_java_failure_bubbles_status(client, app_module, monkeypatch):
 
             return Resp()
 
-    monkeypatch.setattr(app_module.urllib3, "PoolManager", lambda: FailingPool())
+    import chessapp.search_client as search_client
+
+    monkeypatch.setattr(search_client.urllib3, "PoolManager", lambda: FailingPool())
     app_module.CACHE.clear()
 
     res = client.post(
@@ -162,7 +167,9 @@ def test_analyse_returns_503_when_engine_busy(client, app_module):
 
             return Resp()
 
-    app_module._http = CountingPool()
+    import chessapp.search_client as search_client
+
+    search_client._http = CountingPool()
     assert app_module._engine_lock.acquire(timeout=0)
     try:
         res = client.post(
@@ -225,7 +232,9 @@ def test_http_pool_is_reused(client, app_module, monkeypatch):
 
             return Resp()
 
-    monkeypatch.setattr(app_module.urllib3, "PoolManager", CountingPool)
+    import chessapp.search_client as search_client
+
+    monkeypatch.setattr(search_client.urllib3, "PoolManager", CountingPool)
     app_module.CACHE.clear()
     headers = {"Authorization": basic_auth_header()}
     first = client.post("/analyse", json={"FEN": README_FEN}, headers=headers)
@@ -252,7 +261,9 @@ def test_resolve_stockfish_path_uses_env_verbatim(app_module, monkeypatch):
 
 def test_cache_lru_and_ttl(app_module, monkeypatch):
     now = {"t": 1_000.0}
-    monkeypatch.setattr(app_module.time, "monotonic", lambda: now["t"])
+    import chessapp.cache as cache_mod
+
+    monkeypatch.setattr(cache_mod.time, "monotonic", lambda: now["t"])
     cache = app_module.BoundedTTLCache(max_entries=2, ttl_seconds=10)
     cache["a"] = "1"
     cache["b"] = "2"
@@ -266,6 +277,18 @@ def test_cache_lru_and_ttl(app_module, monkeypatch):
     assert cache.get("a") is None
     assert cache.get("c") is None
     assert len(cache) == 0
+
+
+def test_package_layout(app_module):
+    import chessapp.api as api
+    import chessapp.engine as engine_mod
+    import chessapp.features as features
+    import chessapp.search_client as search_client
+
+    assert api.app is app_module.app
+    assert features.get_static_features is app_module.get_static_features
+    assert engine_mod.analyse_position is app_module.analyse_position
+    assert callable(search_client.http_pool)
 
 
 def test_import_fails_without_auth_env(monkeypatch):
@@ -283,8 +306,7 @@ def test_import_fails_without_auth_env(monkeypatch):
 
     stockfish_mod.Stockfish = DummyStockfish
     monkeypatch.setitem(sys.modules, "stockfish", stockfish_mod)
-    if "main" in sys.modules:
-        del sys.modules["main"]
+    unload_app_modules()
 
     with pytest.raises(RuntimeError, match="AUTH_USERNAME"):
         importlib.import_module("main")
