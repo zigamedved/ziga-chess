@@ -1,0 +1,2 @@
+{"name":"Game#ci1.txt","White":"CI, White","Black":"CI, Black","Result":"1-0","PGN":"1. e4 e5 1-0","PV1":"","PV2":"","endgameFEN":"r4rk1/4Rppp/p1p5/P1p5/8/3P2P1/1PP2P1P/R5K1 b - - 0 25","static":"Kg1 kg8 Re7 rf8 Pa5 Dpc","other":"ORe r-r-8","dynamic":"!re8 !kh8"}
+{"name":"Game#ci2.txt","White":"CI, A","Black":"CI, B","Result":"1/2-1/2","PGN":"1. d4 d5 1/2-1/2","PV1":"","PV2":"","endgameFEN":"4k3/8/8/8/8/8/8/4K3 w - - 0 1","static":"Ke1 ke8","other":"Kcc","dynamic":"!Ke2"}

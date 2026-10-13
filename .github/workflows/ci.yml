@@ -1,0 +1,94 @@
+name: ci
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "17"
+          cache: maven
+
+      - name: Python tests
+        working-directory: python-server
+        run: |
+          python -m venv .venv
+          .venv/bin/pip install -q -U pip setuptools wheel
+          .venv/bin/pip install -q "numpy>=1.26,<2" "chess==1.9.4" "Flask==2.3.2" \
+            "Werkzeug==2.3.6" "flask_httpauth==4.8.0" "stockfish==3.28.0" \
+            "urllib3~=2.0.4" -r requirements-dev.txt
+          .venv/bin/pytest -q
+
+      - name: Java tests
+        working-directory: java-server
+        run: mvn -q test
+
+  compose-smoke:
+    runs-on: ubuntu-latest
+    needs: test
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "17"
+          cache: maven
+
+      - name: Write .env for compose (required by AUTH_* :? interpolation)
+        run: |
+          cat > .env <<'EOF'
+          AUTH_USERNAME=ci-user
+          AUTH_PASSWORD=ci-password-not-secret
+          EOF
+          # Strip leading indentation from heredoc lines
+          sed -i 's/^[[:space:]]*//' .env
+
+      - name: Build tiny Lucene index for smoke
+        run: |
+          cd java-server && mvn -q -DskipTests package
+          java -cp target/my-maven-docker-project.jar IndexBuilder \
+            --docs ../fixtures/ci-docs.ndjson \
+            --out indexedFiles
+
+      - name: Compose up
+        run: |
+          docker compose up --build -d
+          for i in $(seq 1 60); do
+            if curl -fsS http://127.0.0.1:8080/ping >/dev/null \
+              && curl -fsS http://127.0.0.1:8081/ping >/dev/null; then
+              echo "services healthy"
+              exit 0
+            fi
+            sleep 2
+          done
+          docker compose logs
+          exit 1
+
+      - name: Analyse smoke
+        run: |
+          set -a
+          # shellcheck disable=SC1091
+          source .env
+          set +a
+          curl -fsS -u "${AUTH_USERNAME}:${AUTH_PASSWORD}" \
+            -H 'Content-Type: application/json' \
+            -d '{"FEN":"r4rk1/4Rppp/p1p5/P1p5/8/3P2P1/1PP2P1P/R5K1 b - - 0 25"}' \
+            http://127.0.0.1:8081/analyse | head -c 400
+          echo
+
+      - name: Compose down
+        if: always()
+        run: docker compose down -v

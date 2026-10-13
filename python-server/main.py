@@ -13,8 +13,27 @@ import os
 app = Flask(__name__)
 auth = HTTPBasicAuth()
 
-stockfish = Stockfish(path='engine/stockfish-ubuntu-x86-64', depth=12,  # Stockfish_ARM stockfish
-                      parameters={"Threads": 1, "Hash": 64})
+# Prefer STOCKFISH_PATH (Docker downloads arch-specific binary). Local defaults
+# try common filenames under engine/ without committing binaries to git.
+def _default_stockfish_path() -> str:
+    candidates = [
+        os.environ.get("STOCKFISH_PATH", ""),
+        "engine/stockfish",
+        "engine/stockfish-ubuntu-x86-64",
+        "engine/Stockfish_ARM",
+    ]
+    for path in candidates:
+        if path and os.path.isfile(path) and os.access(path, os.X_OK):
+            return path
+    # Fall back so Stockfish raises a clear error if nothing is installed.
+    return os.environ.get("STOCKFISH_PATH") or "engine/stockfish"
+
+
+stockfish = Stockfish(
+    path=_default_stockfish_path(),
+    depth=12,
+    parameters={"Threads": 1, "Hash": 64},
+)
 stockfish.set_elo_rating(2500)
 LIMIT_DEPTH = 8
 

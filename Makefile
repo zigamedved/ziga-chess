@@ -1,10 +1,19 @@
-.PHONY: test test-python test-java index index-sample package-java
+.PHONY: test test-python test-java index index-sample package-java compose-up compose-down download-stockfish
 
 DOCS_NDJSON ?= /tmp/ziga-chess-lucene-docs.ndjson
 INDEX_DIR ?= java-server/indexedFiles
 INDEX_LIMIT ?= 0
 
 test: test-python test-java
+
+download-stockfish:
+	./scripts/download_stockfish.sh
+
+compose-up:
+	docker compose up --build
+
+compose-down:
+	docker compose down
 
 test-python:
 	cd python-server && \

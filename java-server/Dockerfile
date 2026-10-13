@@ -1,33 +1,27 @@
-# Use the official Maven image to build your application
-FROM public.ecr.aws/docker/library/maven:3.9-amazoncorretto-17
+# Multi-stage: build with Maven, run on a slim JRE.
+FROM public.ecr.aws/docker/library/maven:3.9-amazoncorretto-17 AS build
 
-# Set the desired prefix as a build argument
-ARG PREFIX
-
-# Set the working directory in the container
+ARG PREFIX=
 WORKDIR /app
+COPY pom.xml .
+COPY src ./src
+RUN mvn -q -DskipTests package
 
-# Copy the source code into the container
-COPY . /app/
+FROM public.ecr.aws/docker/library/eclipse-temurin:17-jre
 
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends curl \
+    && rm -rf /var/lib/apt/lists/*
+
+ARG PREFIX=
 ENV APP_PREFIX=$PREFIX
-
-# Build the application using Maven
-RUN mvn clean package
-
-ENV APP_PREFIX=$PREFIX
-
-# Set the working directory in the container
-WORKDIR /app
-
-# Lucene index is not copied into the image — build with `make index` and mount
-# the directory, or set LUCENE_INDEX_DIR to a prebuilt path.
-# Example: docker run -v "$PWD/java-server/indexedFiles:/app/indexedFiles" ...
-
-EXPOSE 8080
-
-RUN echo "APP_PREFIX: $APP_PREFIX"
-
 # Required at runtime: AUTH_USERNAME, AUTH_PASSWORD
 # Optional: LUCENE_INDEX_DIR (default ./indexedFiles), LUCENE_TOP_K (default 50)
-CMD ["java", "-jar", "/app/target/my-maven-docker-project.jar"]
+
+WORKDIR /app
+COPY --from=build /app/target/my-maven-docker-project.jar /app/app.jar
+
+# Index is mounted at runtime (see docker-compose.yml). Not baked into the image.
+EXPOSE 8080
+
+CMD ["java", "-jar", "/app/app.jar"]
