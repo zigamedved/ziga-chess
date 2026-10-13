@@ -25,7 +25,7 @@ services:
       AUTH_USERNAME: ${AUTH_USERNAME:?Set AUTH_USERNAME in .env}
       AUTH_PASSWORD: ${AUTH_PASSWORD:?Set AUTH_PASSWORD in .env}
       LUCENE_INDEX_DIR: /app/indexedFiles
-      LUCENE_TOP_K: ${LUCENE_TOP_K:-50}
+      LUCENE_TOP_K: ${LUCENE_TOP_K:-20}
       APP_PREFIX: ${APP_PREFIX:-}
     volumes:
       - ./java-server/indexedFiles:/app/indexedFiles:ro
@@ -51,6 +51,9 @@ services:
       JAVA_SERVICE_URL: http://java-server:8080${APP_PREFIX:-}/position
       STOCKFISH_PATH: /app/engine/stockfish
       APP_PREFIX: ${APP_PREFIX:-}
+      CACHE_MAX_ENTRIES: ${CACHE_MAX_ENTRIES:-256}
+      CACHE_TTL_SECONDS: ${CACHE_TTL_SECONDS:-3600}
+      STOCKFISH_LOCK_TIMEOUT_SECONDS: ${STOCKFISH_LOCK_TIMEOUT_SECONDS:-0}
     depends_on:
       java-server:
         condition: service_healthy

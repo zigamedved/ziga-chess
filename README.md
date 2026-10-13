@@ -58,9 +58,30 @@ Copy `.env.example` → `.env` and set:
 
 - `AUTH_USERNAME` / `AUTH_PASSWORD` (required by both services)
 - `JAVA_SERVICE_URL` (optional; Python → Java)
-- `LUCENE_INDEX_DIR` / `LUCENE_TOP_K` (optional; java-server)
+- `LUCENE_INDEX_DIR` / `LUCENE_TOP_K` (optional; java-server, default top 20)
+- `STOCKFISH_PATH` (optional; otherwise platform detection under `engine/`)
+- `CACHE_MAX_ENTRIES` / `CACHE_TTL_SECONDS` (optional; in-process LRU, default 256 / 1 hour)
+- `STOCKFISH_LOCK_TIMEOUT_SECONDS` (optional; default `0` → HTTP 503 while the engine is busy)
 
 See [SECURITY.md](SECURITY.md). Hardcoded credentials have been removed.
+
+# Performance
+
+- **Lucene:** one `SearcherManager` per Java process (opened at startup, closed on shutdown). `/position` acquires and releases a searcher; it does not open a new `DirectoryReader` per request. `maybeRefresh()` sees an in-place commit. A full `make index` still needs a Java restart (`OpenMode.CREATE` wipes the directory).
+- **Top-N:** Lucene returns at most `LUCENE_TOP_K` hits (default 20), already ranked by BM25. Python re-sorts that page by score for the text response.
+- **Cache:** plain-text `/analyse` bodies live in an in-process LRU with TTL (default 256 entries, 1 hour). Not Redis, and not shared across gunicorn workers — the image stays at `-w 1`.
+- **Stockfish:** `STOCKFISH_PATH` if set, otherwise `engine/Stockfish_ARM` on Apple Silicon, `engine/stockfish-ubuntu-x86-64` on Linux x86_64, then `engine/stockfish`. One engine process. A second overlapping `/analyse` that needs the engine gets **503** `engine_busy` (default wait is 0). A cached FEN does not take the lock. The HTTP client to Java is one reused `urllib3` pool.
+
+Rough latency for the README sample FEN `r4rk1/4Rppp/p1p5/P1p5/8/3P2P1/1PP2P1P/R5K1 b - - 0 25`:
+
+| Path | Before | After |
+|------|--------|-------|
+| Lucene, 40 queries on a 1-doc fixture (this machine) | **~20 ms** opening a `DirectoryReader` every query | **~6 ms** acquire/release on one searcher (about 3×; `LUCENE_BENCH` in `make test-java`) |
+| First `/analyse` of the sample FEN | Stockfish depth 12 and a depth-8 PV tree dominate | unchanged; the Lucene hop is the small part |
+| Repeat `/analyse` of the same FEN | unbounded dict hit | LRU+TTL hit; skips Stockfish and Java |
+| Second `/analyse` while the engine is busy | threads share one Stockfish process | **503** `engine_busy` |
+
+The Lucene numbers are a local microbench (same `MatchAllDocsQuery`, tiny fixture), not a full `/analyse`. They show the reader is no longer reopened; the test also checks that 40 searches keep the same `IndexReader` and do not grow open file descriptors. A full `indexedFiles` tree costs more to open, so the gap widens there.
 
 # How to run (Docker Compose — recommended)
 

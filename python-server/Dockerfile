@@ -39,5 +39,5 @@ ENV STOCKFISH_PATH=/app/engine/stockfish
 # main.py / gunicorn bind to 8081 (java-server uses 8080).
 EXPOSE 8081
 
-# Single worker: global Stockfish instance is not multi-process safe.
+# Single worker: Stockfish, the engine lock, and the analyse cache are in-process.
 CMD ["gunicorn", "-b", "0.0.0.0:8081", "-w", "1", "--timeout", "180", "main:app"]
