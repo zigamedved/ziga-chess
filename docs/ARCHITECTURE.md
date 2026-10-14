@@ -4,6 +4,8 @@ This project finds **similar rook endgames** for a position (FEN). It extracts c
 
 This page describes the **current** data/query flow and how it differs from the **legacy** (pre–PR #15) design.
 
+The target is one JVM process (Lucene in-process, Python features via a subprocess). That is [ADR 0001](adr/0001-single-service.md). The two-service flow below is still what runs.
+
 ---
 
 ## At a glance

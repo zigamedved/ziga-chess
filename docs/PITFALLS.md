@@ -70,6 +70,13 @@ Date is the day the mistake was found, not the day the code was first written.
 
 ## Tests and refactors
 
+### 2026-10-14 — issue #2 still describes Mongo and a missing indexer
+
+- **Assumed:** the epic's context block is the current design: Java enriches Lucene hits from Mongo, and there is no index builder in the repo.
+- **Actually:** PR #15 stored metadata on Lucene documents and added `IndexBuilder` / `make index`. Compose, env auth, and the `chessapp` split landed after the issue was written.
+- **Broke:** nothing in CI. Following the issue text would put Mongo back and invent a second indexing path.
+- **Do this:** treat [#2](https://github.com/zigamedved/ziga-chess/issues/2) as the consolidation goal. Use [ADR 0001](adr/0001-single-service.md) and `docs/ARCHITECTURE.md` for what the system does now.
+
 ### 2026-10-13 — issue text was behind the code
 
 - **Assumed:** #6 still opened a Lucene reader and searched 1000 hits, and the Stockfish path was hard-coded to `engine/stockfish-ubuntu-x86-64`. #11 still had no tests.

@@ -2,7 +2,7 @@
 
 Bachelor thesis system for **similar rook-endgame retrieval**: given a FEN, extract chess features, search a Lucene index, and return similar games plus engine lines.
 
-**How the system works (current vs legacy):** see **[docs/ARCHITECTURE.md](docs/ARCHITECTURE.md)** — diagrams for index build, query path, and what changed when Mongo was removed.
+**How the system works (current vs legacy):** see **[docs/ARCHITECTURE.md](docs/ARCHITECTURE.md)** — diagrams for index build, query path, and what changed when Mongo was removed. Target shape (not built yet): [ADR 0001](docs/adr/0001-single-service.md).
 
 **Wrong assumptions that already broke CI or a local run:** see **[docs/PITFALLS.md](docs/PITFALLS.md)**. Add an entry when you hit a new one.
 
