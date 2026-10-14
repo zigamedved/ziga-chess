@@ -8,7 +8,7 @@ java-server/target/
 
 # Python local env / caches
 python-server/.venv/
-python-server/__pycache__/
+__pycache__/
 python-server/.pytest_cache/
 
 # Index build intermediates (default make index output lives under /tmp)
