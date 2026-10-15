@@ -9,8 +9,8 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Paths;
 
 /**
- * Process entry. Wires {@link AuthFilter}, {@link FenParser}, and
- * {@link LuceneSearchService} onto the HTTP server.
+ * Process entry. Wires {@link AuthFilter}, {@link FenParser}, {@link AnalyseHandler},
+ * and {@link LuceneSearchService} onto the HTTP server.
  */
 public class chessServer {
     public static void main(String[] args) throws IOException {
@@ -34,6 +34,7 @@ public class chessServer {
 
         HttpServer server = HttpServer.create(new InetSocketAddress(8080), 0);
         server.createContext(envValue + "/position", new FenParser());
+        server.createContext(envValue + "/analyse", new AnalyseHandler());
         server.createContext("/ping", new PingHandler());
         if (!envValue.isEmpty()) {
             server.createContext(envValue + "/ping", new PingHandler());

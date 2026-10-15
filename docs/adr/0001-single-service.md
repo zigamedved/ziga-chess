@@ -55,7 +55,7 @@ Option A.
 Each slice is its own PR. None of them are done by this ADR.
 
 1. **Feature CLI.** `python -m chessapp.cli` (from `python-server/`) reads one FEN from argv or stdin and prints one JSON object: `fen`, `features` (the string sent to `POST /position`), `pv1`, `pv2` (same text as the HTTP body, via `chessapp.response.format_pv`). It does not import the Flask app, so it does not need `AUTH_*`. HTTP `/analyse` still calls `analyse_position`.
-2. **JVM `/analyse`.** Java runs that CLI, then `LuceneSearchService.searchSimilar`, and returns today's plain-text body. One auth check. Golden-path test against the fixture index.
+2. **JVM `/analyse`.** Java `POST /analyse` (same `APP_PREFIX` as `/position`) runs the CLI, then `LuceneSearchService.searchSimilar`, and returns the plain-text body from `AnalyseText` / `format_analyse_text`. One auth check. The JRE image has no Python, so compose and the README curl stay on the Python service until the next slice.
 3. **Drop the hop.** Remove `POST /position` as a public dependency, the Python HTTP proxy, and the second compose service. One image, port 8081, README one-command run updated.
 4. **Optional.** Reimplement features in Java and delete the CLI if the subprocess shows up in latency.
 

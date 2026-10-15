@@ -19,6 +19,13 @@ Date is the day the mistake was found, not the day the code was first written.
 
 ## CI and runtime
 
+### 2026-10-15 — Java `POST /analyse` does not run inside the current image
+
+- **Assumed:** once `chessServer` exposes `/analyse`, compose-smoke and the README curl can move from Python `:8081` to Java `:8080`.
+- **Actually:** the Java image is a JRE plus the jar. `FeatureCli` needs `python3` and `chessapp` (`CHESSAPP_DIR` or cwd). Those exist on a dev machine and in the Python image, not in `java-server/Dockerfile`.
+- **Broke:** nothing yet. Switching the smoke curl before the images are merged would fail the CLI at startup of the request.
+- **Do this:** keep compose on Python `:8081` until the single-image slice. Set `CHESSAPP_DIR` to `python-server/` when calling Java `/analyse` from the host.
+
 ### 2026-10-12 — `docker compose down` still needs `AUTH_*`
 
 - **Assumed:** the compose-smoke job only needs `AUTH_USERNAME` / `AUTH_PASSWORD` on `docker compose up`. Teardown under `if: always()` can run without them.

@@ -108,9 +108,13 @@ public class FenParser implements HttpHandler {
     }
 
     static void sendJsonError(HttpExchange t, int status, String message) throws IOException {
+        sendJsonError(t, status, message, status == 400 ? "bad_request" : "error");
+    }
+
+    static void sendJsonError(HttpExchange t, int status, String message, String code) throws IOException {
         Map<String, String> payload = new HashMap<>();
         payload.put("error", message);
-        payload.put("code", status == 400 ? "bad_request" : "error");
+        payload.put("code", code);
         byte[] bytes = GSON.toJson(payload).getBytes(StandardCharsets.UTF_8);
         t.getResponseHeaders().set("Content-Type", "application/json");
         t.sendResponseHeaders(status, bytes.length);

@@ -73,7 +73,7 @@ sequenceDiagram
   Py-->>Client: plain-text PVs + similar games
 ```
 
-`python -m chessapp.cli` runs the same feature extraction and prints JSON (`features`, `pv1`, `pv2`) for the future in-process hop. The HTTP path above is still what serves clients.
+`python -m chessapp.cli` runs the same feature extraction and prints JSON (`features`, `pv1`, `pv2`). Java `POST /analyse` can run that CLI and search Lucene in-process. Clients still use Python `:8081` until the hop is removed: the Java image does not contain Python.
 
 Lucene does **both** similarity search **and** serving game data. MongoDB is not involved.
 
