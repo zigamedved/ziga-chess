@@ -73,6 +73,8 @@ sequenceDiagram
   Py-->>Client: plain-text PVs + similar games
 ```
 
+`python -m chessapp.cli` runs the same feature extraction and prints JSON (`features`, `pv1`, `pv2`) for the future in-process hop. The HTTP path above is still what serves clients.
+
 Lucene does **both** similarity search **and** serving game data. MongoDB is not involved.
 
 ```mermaid
