@@ -8,6 +8,7 @@ from flask_httpauth import HTTPBasicAuth
 
 from chessapp.cache import CACHE
 from chessapp import engine
+from chessapp.response import format_pv
 from chessapp.search_client import JAVA_SERVICE_URL, http_pool
 
 app = Flask(__name__)
@@ -88,11 +89,8 @@ def analyse():
     # Lucene already returns this page in score order (LUCENE_TOP_K, default 20).
     res = sorted(res, key=lambda x: x["score"], reverse=True)
 
-    linesPgn1 = str(pgn1).split('\n')[6:]
-    parsedPgn1 = '\n'.join(linesPgn1)
-
-    linesPgn2 = str(pgn2).split('\n')[6:]
-    parsedPgn2 = '\n'.join(linesPgn2)
+    parsedPgn1 = format_pv(pgn1)
+    parsedPgn2 = format_pv(pgn2)
 
     text_responses = []
     text_responses.append("\n\n".join(
