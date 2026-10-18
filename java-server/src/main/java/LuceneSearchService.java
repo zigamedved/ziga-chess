@@ -90,6 +90,7 @@ public class LuceneSearchService {
             List<Map<String, Object>> result = new ArrayList<>();
             for (ScoreDoc sd : foundDocs.scoreDocs) {
                 Document d = searcher.doc(sd.doc);
+                // Insertion order is the plain-text field order (AnalyseText walks entrySet).
                 Map<String, Object> row = new LinkedHashMap<>();
                 row.put("name", nullToEmpty(d.get("name")));
                 row.put("endgameFEN", nullToEmpty(d.get("endgameFEN")));

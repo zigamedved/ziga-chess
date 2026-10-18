@@ -56,6 +56,8 @@ public class ChessServerTest {
         LuceneSearchService.closeSearchResources();
         System.clearProperty("chess.indexDir");
         System.clearProperty("chess.topK");
+        System.clearProperty("chess.featureCli");
+        System.clearProperty("chess.featurePython");
         AuthFilter.configureAuth(null, null);
     }
 
@@ -397,6 +399,107 @@ public class ChessServerTest {
                 writer.addDocument(doc);
             }
             writer.commit();
+        }
+    }
+
+    @Test
+    void analyseText_matchesPythonJoin() {
+        Map<String, Object> game = new java.util.LinkedHashMap<>();
+        game.put("name", "Game#fixture.txt");
+        game.put("score", 1.5d);
+        String text = AnalyseText.format("pv-one", "pv-two", java.util.List.of(game));
+        assertTrue(text.startsWith("Analysed lines of input game:\n\nPV1: \npv-one\n\nPV2: \npv-two"));
+        assertTrue(text.contains("\nSimilar games:"));
+        assertTrue(text.contains("\nGame #0"));
+        assertTrue(text.contains("name: Game#fixture.txt"));
+        assertTrue(text.contains("score: 1.5"));
+        assertEquals("99.0", AnalyseText.stringify(99.0d));
+    }
+
+    @Test
+    void analyseHandler_requiresAuthAndFen(@TempDir Path tempDir) throws Exception {
+        buildFixtureIndex(tempDir);
+        System.setProperty("chess.indexDir", tempDir.toString());
+        AnalyseHandler handler = new AnalyseHandler(fen -> {
+            throw new AssertionError("CLI should not run");
+        });
+
+        FakeExchange missingAuth = new FakeExchange();
+        missingAuth.setRequestBody("{\"FEN\":\"8/8/8/8/8/8/8/8 w - - 0 1\"}");
+        handler.handle(missingAuth);
+        assertEquals(401, missingAuth.statusCode);
+
+        FakeExchange missingFen = new FakeExchange();
+        missingFen.requestHeaders.add("Authorization", basicAuth("test-user", "test-password"));
+        missingFen.setRequestBody("{}");
+        handler.handle(missingFen);
+        assertEquals(400, missingFen.statusCode);
+        assertTrue(missingFen.responseBody.toString("UTF-8").contains("bad_request"));
+    }
+
+    @Test
+    void analyseHandler_searchesFeaturesFromCli(@TempDir Path tempDir) throws Exception {
+        buildFixtureIndex(tempDir);
+        System.setProperty("chess.indexDir", tempDir.toString());
+        AnalyseHandler handler = new AnalyseHandler(fen ->
+                new FeatureCli.Result(fen, "Kg1 Re7 Dpc", "pv-one", "pv-two"));
+
+        FakeExchange ex = new FakeExchange();
+        ex.requestHeaders.add("Authorization", basicAuth("test-user", "test-password"));
+        ex.setRequestBody("{\"FEN\":\"r4rk1/4Rppp/p1p5/P1p5/8/3P2P1/1PP2P1P/R5K1 b - - 0 25\"}");
+        handler.handle(ex);
+
+        assertEquals(200, ex.statusCode);
+        assertTrue(ex.responseHeaders.getFirst("Content-Type").startsWith("text/plain"));
+        String body = ex.responseBody.toString("UTF-8");
+        assertTrue(body.contains("PV1: \npv-one"));
+        assertTrue(body.contains("PV2: \npv-two"));
+        assertTrue(body.contains("Game#fixture.txt"), body);
+        assertTrue(body.contains("Similar games:"));
+        String game = body.substring(body.indexOf("Game #0"));
+        assertFieldOrder(game, "name:", "endgameFEN:", "White:", "Black:", "Result:", "PGN:", "PV1:", "PV2:", "score:");
+    }
+
+    @Test
+    void analyseHandler_invalidFenFromCliIs400() throws Exception {
+        AnalyseHandler handler = new AnalyseHandler(fen -> {
+            throw new FeatureCli.InvalidFenException("Invalid FEN");
+        });
+        FakeExchange ex = new FakeExchange();
+        ex.requestHeaders.add("Authorization", basicAuth("test-user", "test-password"));
+        ex.setRequestBody("{\"FEN\":\"not-a-fen\"}");
+        handler.handle(ex);
+        assertEquals(400, ex.statusCode);
+        assertTrue(ex.responseBody.toString("UTF-8").contains("invalid_fen"));
+    }
+
+    @Test
+    void featureCli_runsScriptAndParsesJson(@TempDir Path tempDir) throws Exception {
+        Path script = tempDir.resolve("fake_cli.py");
+        Files.writeString(script, ""
+                + "import json, sys\n"
+                + "json.dump({"
+                + "\"fen\": sys.argv[1],"
+                + "\"features\": \"Kg1 Re7 Dpc\","
+                + "\"pv1\": \"pv-one\","
+                + "\"pv2\": \"pv-two\""
+                + "}, sys.stdout)\n"
+                + "sys.stdout.write(\"\\n\")\n");
+        System.setProperty("chess.featureCli", script.toString());
+
+        FeatureCli.Result result = FeatureCli.run("8/8/8/8/8/8/4k3/4K3 w - - 0 1");
+        assertEquals("8/8/8/8/8/8/4k3/4K3 w - - 0 1", result.fen);
+        assertEquals("Kg1 Re7 Dpc", result.features);
+        assertEquals("pv-one", result.pv1);
+        assertEquals("pv-two", result.pv2);
+    }
+
+    private static void assertFieldOrder(String body, String... labels) {
+        int previous = -1;
+        for (String label : labels) {
+            int at = body.indexOf(label);
+            assertTrue(at > previous, "expected " + label + " after earlier fields in " + body);
+            previous = at;
         }
     }
 
