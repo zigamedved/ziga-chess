@@ -4,13 +4,13 @@
 - **Date:** 2026-10-14
 - **Issue:** [#2](https://github.com/zigamedved/ziga-chess/issues/2)
 
-This record chooses the target shape. It does not change the running system. Today a request still goes Python `:8081` `POST /analyse` → Java `:8080` `POST /position`.
+This record chooses the target shape. Slices 1–3 have landed: one JVM on port **8081** runs `python -m chessapp.cli` for features and Stockfish, then searches Lucene in-process. Slice 4 (features in Java) is still optional.
 
 ## Context
 
 The retrieval core is Lucene 8.11 on the JVM: BM25 over `static`, `other`, and `dynamic`, with game metadata in stored fields (`LuceneSearchService`). The index is built by `make index` (`scripts/prepare_lucene_docs.py` → `IndexBuilder`). MongoDB is already gone.
 
-The public API is Python (`chessapp`, gunicorn `main:app`). It runs Stockfish, builds the feature string, and HTTP POSTs that string to Java. Both processes check the same `AUTH_USERNAME` / `AUTH_PASSWORD`. Compose wires `JAVA_SERVICE_URL` and `APP_PREFIX`.
+The public API used to be Python (`chessapp`, gunicorn `main:app`). It ran Stockfish, built the feature string, and HTTP POSTed that string to Java. Both processes checked the same `AUTH_USERNAME` / `AUTH_PASSWORD`. Compose wired `JAVA_SERVICE_URL` and `APP_PREFIX`.
 
 Issue #2's body still describes a Mongo enrichment hop and says the index builder is not in the repo. Both are out of date. Do not reintroduce Mongo or a second index pipeline while consolidating.
 
@@ -47,16 +47,16 @@ Option A.
 
 - Rankings stay comparable because the same index, analyzer, and BM25 setup answer the query. A later PR should pin that with the existing fixture index, not a new engine.
 - Python feature code can move without a PyLucene build. The Stockfish binary still lives in `engine/` and is downloaded, not committed.
-- Two containers remain until the migration slices below land. Compose and `JAVA_SERVICE_URL` stay required until the hop is deleted.
+- Compose is one service. `JAVA_SERVICE_URL` is not part of that path. The Flask app remains for tests and for running `main:app` by hand.
 - A full port of feature extraction to Java is optional and later. It is not required to close the epic.
 
 ## Migration slices
 
-Each slice is its own PR. None of them are done by this ADR.
+Each slice is its own PR. This ADR did not implement them.
 
-1. **Feature CLI.** `python -m chessapp.cli` (from `python-server/`) reads one FEN from argv or stdin and prints one JSON object: `fen`, `features` (the string sent to `POST /position`), `pv1`, `pv2` (same text as the HTTP body, via `chessapp.response.format_pv`). It does not import the Flask app, so it does not need `AUTH_*`. HTTP `/analyse` still calls `analyse_position`.
-2. **JVM `/analyse`.** Java `POST /analyse` (same `APP_PREFIX` as `/position`) runs the CLI, then `LuceneSearchService.searchSimilar`, and returns the plain-text body from `AnalyseText` / `format_analyse_text`. One auth check. The JRE image has no Python, so compose and the README curl stay on the Python service until the next slice.
-3. **Drop the hop.** Remove `POST /position` as a public dependency, the Python HTTP proxy, and the second compose service. One image, port 8081, README one-command run updated.
+1. **Feature CLI.** Done. `python -m chessapp.cli` (from `python-server/`) reads one FEN from argv or stdin and prints one JSON object: `fen`, `features`, `pv1`, `pv2` (via `chessapp.response.format_pv`). It does not import the Flask app, so it does not need `AUTH_*`.
+2. **JVM `/analyse`.** Done. Java `POST /analyse` (same `APP_PREFIX` as `/position`) runs the CLI, then `LuceneSearchService.searchSimilar`, and returns the plain-text body from `AnalyseText` / `format_analyse_text`. One auth check.
+3. **Drop the hop.** Done. One image, port 8081. Compose does not run the Python HTTP proxy. `POST /position` stays on the same process for a raw feature string; clients use `POST /analyse`.
 4. **Optional.** Reimplement features in Java and delete the CLI if the subprocess shows up in latency.
 
 ## Out of scope

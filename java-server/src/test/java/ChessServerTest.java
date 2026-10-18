@@ -58,7 +58,21 @@ public class ChessServerTest {
         System.clearProperty("chess.topK");
         System.clearProperty("chess.featureCli");
         System.clearProperty("chess.featurePython");
+        System.clearProperty("chess.port");
         AuthFilter.configureAuth(null, null);
+    }
+
+    @Test
+    void listenPort_defaultsToPublicPort() {
+        assertEquals(8081, chessServer.parsePort(null));
+        assertEquals(8081, chessServer.parsePort("  "));
+        assertEquals(9090, chessServer.parsePort("9090"));
+    }
+
+    @Test
+    void listenPort_propertyOverridesEnv() {
+        System.setProperty("chess.port", "9091");
+        assertEquals(9091, chessServer.listenPort());
     }
 
     @Test

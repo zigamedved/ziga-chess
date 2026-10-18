@@ -32,7 +32,8 @@ public class chessServer {
         System.out.println("env variable: " + envValue);
         System.out.println("Lucene index: " + Paths.get(LuceneSearchService.indexDir()).toAbsolutePath());
 
-        HttpServer server = HttpServer.create(new InetSocketAddress(8080), 0);
+        int port = listenPort();
+        HttpServer server = HttpServer.create(new InetSocketAddress(port), 0);
         server.createContext(envValue + "/position", new FenParser());
         server.createContext(envValue + "/analyse", new AnalyseHandler());
         server.createContext("/ping", new PingHandler());
@@ -43,7 +44,32 @@ public class chessServer {
         server.setExecutor(null);
         server.start();
 
-        System.out.println("Server started on 0.0.0.0:8080");
+        System.out.println("Server started on 0.0.0.0:" + port);
+    }
+
+    /** {@code chess.port} property, then {@code PORT}, then 8081. */
+    static int listenPort() {
+        String property = System.getProperty("chess.port");
+        if (property != null && !property.trim().isEmpty()) {
+            return parsePort(property);
+        }
+        return parsePort(System.getenv("PORT"));
+    }
+
+    static int parsePort(String raw) {
+        if (raw == null || raw.trim().isEmpty()) {
+            return 8081;
+        }
+        final int port;
+        try {
+            port = Integer.parseInt(raw.trim());
+        } catch (NumberFormatException ex) {
+            throw new IllegalArgumentException("PORT is not an integer: " + raw);
+        }
+        if (port <= 0 || port > 65535) {
+            throw new IllegalArgumentException("PORT out of range: " + raw);
+        }
+        return port;
     }
 
     static class PingHandler implements HttpHandler {

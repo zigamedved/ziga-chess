@@ -67,9 +67,8 @@ jobs:
         run: |
           docker compose up --build -d
           for i in $(seq 1 60); do
-            if curl -fsS http://127.0.0.1:8080/ping >/dev/null \
-              && curl -fsS http://127.0.0.1:8081/ping >/dev/null; then
-              echo "services healthy"
+            if curl -fsS http://127.0.0.1:8081/ping >/dev/null; then
+              echo "service healthy"
               exit 0
             fi
             sleep 2

@@ -4,7 +4,7 @@ This project finds **similar rook endgames** for a position (FEN). It extracts c
 
 This page describes the **current** data/query flow and how it differs from the **legacy** (pre–PR #15) design.
 
-The target is one JVM process (Lucene in-process, Python features via a subprocess). That is [ADR 0001](adr/0001-single-service.md). The two-service flow below is still what runs.
+The running server is one JVM process (Lucene in-process, Python features via a subprocess). That shape is [ADR 0001](adr/0001-single-service.md). A later optional slice can reimplement features in Java.
 
 ---
 
@@ -58,38 +58,38 @@ If you add games: append JSON lines to the corpus, refresh the zip, run `make in
 ```mermaid
 sequenceDiagram
   participant Client
-  participant Py as Python :8081<br/>POST /analyse
+  participant Java as JVM :8081<br/>POST /analyse
+  participant CLI as python -m chessapp.cli
   participant SF as Stockfish
-  participant Java as Java :8080<br/>POST /position
   participant Lucene as Lucene index
 
-  Client->>Py: FEN + Basic auth
-  Py->>SF: evaluate / PVs
-  Py->>Py: feature string<br/>(static + other + dynamic)
-  Py->>Java: feature string + auth
+  Client->>Java: FEN + Basic auth
+  Java->>CLI: one FEN
+  CLI->>SF: evaluate / PVs
+  CLI-->>Java: JSON features, pv1, pv2
   Java->>Lucene: BM25 over static/other/dynamic
   Lucene-->>Java: top‑K hits<br/>(score + stored metadata)
-  Java-->>Py: JSON array of games + scores
-  Py-->>Client: plain-text PVs + similar games
+  Java-->>Client: plain-text PVs + similar games
 ```
 
-`python -m chessapp.cli` runs the same feature extraction and prints JSON (`features`, `pv1`, `pv2`). Java `POST /analyse` can run that CLI and search Lucene in-process. Clients still use Python `:8081` until the hop is removed: the Java image does not contain Python.
+Auth is checked once, on the JVM. The image contains the JRE, `chessapp`, and the Stockfish binary. `CHESSAPP_DIR` is the directory that holds the `chessapp` package. `POST /position` is still registered on the same port for a raw feature string; the client path is `POST /analyse`.
+
+Each `/analyse` starts a new CLI process, so the Flask LRU and the `engine_busy` lock do not apply to compose. They still apply if you run `main:app` yourself.
 
 Lucene does **both** similarity search **and** serving game data. MongoDB is not involved.
 
 ```mermaid
 flowchart TB
   Client["Client"]
-  Py["Python Flask<br/>feature extraction + Stockfish"]
-  Java["Java HttpServer<br/>auth + Lucene search"]
+  Java["JVM :8081<br/>auth + Lucene"]
+  CLI["python -m chessapp.cli<br/>features + Stockfish"]
   Idx["indexedFiles/<br/>features + metadata"]
 
-  Client -->|"POST /analyse"| Py
-  Py -->|"POST /position<br/>feature tokens"| Java
+  Client -->|"POST /analyse"| Java
+  Java --> CLI
   Java --> Idx
   Idx -->|"hits with White/Black/PGN/…"| Java
-  Java --> Py
-  Py --> Client
+  Java --> Client
 ```
 
 ---
@@ -156,7 +156,7 @@ sequenceDiagram
 - **Python** = understand the *query* position (Stockfish + features)  
 - **Java / Lucene** = find and return *similar* games  
 
-Python is split under `python-server/chessapp/` (`features`, `engine`, `api`, `search_client`). `main.py` only exposes the gunicorn app. The Stockfish binary still lives in `python-server/engine/` (not a Python package). Java HTTP startup is `chessServer`; auth is `AuthFilter`, `POST /position` is `FenParser`, and BM25 is `LuceneSearchService`.  
+Python is split under `python-server/chessapp/` (`features`, `engine`, `api`, `search_client`). `main.py` is the Flask app used by tests. The Stockfish binary still lives in `python-server/engine/` (not a Python package). The image copies that package and downloads the binary beside it. Java HTTP startup is `chessServer` on port 8081; auth is `AuthFilter`, `POST /analyse` is `AnalyseHandler` (it runs `FeatureCli`), `POST /position` is `FenParser`, and BM25 is `LuceneSearchService`.  
 
 ---
 
