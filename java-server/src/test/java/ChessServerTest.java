@@ -456,6 +456,8 @@ public class ChessServerTest {
         assertTrue(body.contains("PV2: \npv-two"));
         assertTrue(body.contains("Game#fixture.txt"), body);
         assertTrue(body.contains("Similar games:"));
+        String game = body.substring(body.indexOf("Game #0"));
+        assertFieldOrder(game, "name:", "endgameFEN:", "White:", "Black:", "Result:", "PGN:", "PV1:", "PV2:", "score:");
     }
 
     @Test
@@ -490,6 +492,15 @@ public class ChessServerTest {
         assertEquals("Kg1 Re7 Dpc", result.features);
         assertEquals("pv-one", result.pv1);
         assertEquals("pv-two", result.pv2);
+    }
+
+    private static void assertFieldOrder(String body, String... labels) {
+        int previous = -1;
+        for (String label : labels) {
+            int at = body.indexOf(label);
+            assertTrue(at > previous, "expected " + label + " after earlier fields in " + body);
+            previous = at;
+        }
     }
 
     private static String basicAuth(String user, String pass) {

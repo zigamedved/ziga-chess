@@ -57,24 +57,30 @@ public final class FeatureCli {
         }
         Path errFile = Files.createTempFile("ziga-feature-cli-", ".err");
         builder.redirectError(errFile.toFile());
-        Process process = builder.start();
-        final byte[] stdout;
-        try (InputStream in = process.getInputStream()) {
-            stdout = in.readAllBytes();
+        Process process = null;
+        try {
+            process = builder.start();
+            final byte[] stdout;
+            try (InputStream in = process.getInputStream()) {
+                stdout = in.readAllBytes();
+            }
+            if (!process.waitFor(TIMEOUT_SECONDS, TimeUnit.SECONDS)) {
+                throw new IOException("Feature CLI timed out");
+            }
+            String stderr = Files.readString(errFile);
+            if (process.exitValue() == 2) {
+                throw new InvalidFenException(stderr.isBlank() ? "Invalid FEN" : stderr.trim());
+            }
+            if (process.exitValue() != 0) {
+                throw new IOException("Feature CLI exited " + process.exitValue() + ": " + stderr.trim());
+            }
+            return parse(new String(stdout, StandardCharsets.UTF_8));
+        } finally {
+            if (process != null && process.isAlive()) {
+                process.destroyForcibly();
+            }
+            Files.deleteIfExists(errFile);
         }
-        if (!process.waitFor(TIMEOUT_SECONDS, TimeUnit.SECONDS)) {
-            process.destroyForcibly();
-            throw new IOException("Feature CLI timed out");
-        }
-        String stderr = Files.readString(errFile);
-        Files.deleteIfExists(errFile);
-        if (process.exitValue() == 2) {
-            throw new InvalidFenException(stderr.isBlank() ? "Invalid FEN" : stderr.trim());
-        }
-        if (process.exitValue() != 0) {
-            throw new IOException("Feature CLI exited " + process.exitValue() + ": " + stderr.trim());
-        }
-        return parse(new String(stdout, StandardCharsets.UTF_8));
     }
 
     static Result parse(String stdout) throws IOException {
