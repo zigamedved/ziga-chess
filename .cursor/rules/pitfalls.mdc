@@ -10,8 +10,9 @@ alwaysApply: true
 Highest-cost repeats:
 
 - Compose `:?` vars (`AUTH_USERNAME`, `AUTH_PASSWORD`) are required for `docker compose down` too. Write `.env` once per CI job. An indented YAML heredoc leaves leading spaces in that file.
-- `APP_PREFIX` belongs on `JAVA_SERVICE_URL`. Healthchecks stay on unprefixed `/ping`.
-- `python-server/engine/` is the Stockfish binary, not a Python package. A split must `COPY` the new package into the image.
+- The public server is one image on port 8081 (JRE, `python3`, `chessapp`, Stockfish). `CHESSAPP_DIR` is the directory that contains the `chessapp` package. Do not add a second compose service or point smoke at `:8080`. Pin `python:3.9-slim-bookworm`; the floating `3.9-slim` tag is Trixie and has no OpenJDK 17.
+- `APP_PREFIX` prefixes `/analyse` and `/position` on that one process. Healthchecks stay on unprefixed `/ping`.
+- `python-server/engine/` is the Stockfish binary, not a Python package. The image must `COPY` `chessapp` and install the binary beside it.
 - Patch the module that looks the name up (`chessapp.*`), not a re-export on `main`. Unload `chessapp*` before a re-import.
 - `gh pr view` / `gh issue view` need `--json`. Pytest can segfault in the sandbox; re-run it outside before calling it red.
 - Do not commit `java-server/target` class files. They are gitignored and still tracked.

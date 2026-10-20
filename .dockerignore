@@ -1,0 +1,10 @@
+.git
+.github
+**/.venv
+**/__pycache__
+**/*.pyc
+**/.pytest_cache
+java-server/target
+java-server/indexedFiles
+python-server/engine
+games

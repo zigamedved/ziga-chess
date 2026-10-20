@@ -19,6 +19,20 @@ Date is the day the mistake was found, not the day the code was first written.
 
 ## CI and runtime
 
+### 2026-10-18 — `python:3.9-slim` no longer has OpenJDK 17
+
+- **Assumed:** `python:3.9-slim` is still Debian Bookworm, so `apt-get install openjdk-17-jre-headless` works in the combined image.
+- **Actually:** the floating tag is Debian Trixie. Trixie has dropped OpenJDK 17. The package error points at OpenJDK 21.
+- **Broke:** the local image build for the single-service Dockerfile, before Stockfish or the jar were copied.
+- **Do this:** pin `python:3.9-slim-bookworm` (or another base that still ships a Java 17 JRE). Do not switch the server to Java 21 just to follow the floating tag.
+
+### 2026-10-18 — the public server is one image on port 8081
+
+- **Assumed:** `POST /analyse` can stay a Python container that HTTP-calls Java on 8080, or the smoke curl can move to `:8080` once the JVM exposes `/analyse`.
+- **Actually:** compose builds the root `Dockerfile`. That image is a JRE plus `python3`, `chessapp`, and Stockfish. The JVM listens on 8081 (`PORT`), sets `CHESSAPP_DIR=/app/python-server`, and runs `python -m chessapp.cli`. There is no second service and no `JAVA_SERVICE_URL`.
+- **Broke:** nothing in this slice. Pointing smoke at `:8080`, or shipping a JRE-only image, fails the CLI or the healthcheck.
+- **Do this:** keep one compose service. Curl `http://127.0.0.1:8081/ping` and `:8081/analyse`. `APP_PREFIX` prefixes `/analyse` and `/position` only. Healthchecks stay on unprefixed `/ping`. The Stockfish binary is `/app/python-server/engine/stockfish`, not a Python package. Do not `COPY` `main.py` into this image: the process is the jar, and `python -m chessapp.cli` does not import it. The older "COPY main.py / gunicorn" note is about the removed Python image.
+
 ### 2026-10-15 — Java `POST /analyse` does not run inside the current image
 
 - **Assumed:** once `chessServer` exposes `/analyse`, compose-smoke and the README curl can move from Python `:8081` to Java `:8080`.

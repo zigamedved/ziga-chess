@@ -1,4 +1,4 @@
-# One-command local stack (no Mongo).
+# One process: JVM on 8081 runs the feature CLI, then Lucene.
 # Prerequisites:
 #   1. cp .env.example .env   # set AUTH_USERNAME / AUTH_PASSWORD
 #   2. git lfs pull && make index-sample   # or make index
@@ -9,37 +9,14 @@
 #     -d '{"FEN":"r4rk1/4Rppp/p1p5/P1p5/8/3P2P1/1PP2P1P/R5K1 b - - 0 25"}' \
 #     http://127.0.0.1:8081/analyse
 #
-# Optional APP_PREFIX (e.g. /v1/chess): must match for both services. Healthchecks
-# still use unprefixed /ping (both servers register it). The Python→Java hop uses
-# JAVA_SERVICE_URL with the same prefix. Leave APP_PREFIX empty for local defaults.
+# Optional APP_PREFIX (e.g. /v1/chess) is applied to /analyse and /position.
+# Healthchecks stay on unprefixed /ping. Leave APP_PREFIX empty for local defaults.
 
 services:
-  java-server:
+  chess:
     build:
-      context: ./java-server
-      args:
-        PREFIX: ${APP_PREFIX:-}
-    ports:
-      - "8080:8080"
-    environment:
-      AUTH_USERNAME: ${AUTH_USERNAME:?Set AUTH_USERNAME in .env}
-      AUTH_PASSWORD: ${AUTH_PASSWORD:?Set AUTH_PASSWORD in .env}
-      LUCENE_INDEX_DIR: /app/indexedFiles
-      LUCENE_TOP_K: ${LUCENE_TOP_K:-20}
-      APP_PREFIX: ${APP_PREFIX:-}
-    volumes:
-      - ./java-server/indexedFiles:/app/indexedFiles:ro
-    healthcheck:
-      # Unprefixed /ping is always registered (even when APP_PREFIX is set).
-      test: ["CMD", "curl", "-fsS", "http://127.0.0.1:8080/ping"]
-      interval: 5s
-      timeout: 3s
-      retries: 12
-      start_period: 20s
-
-  python-server:
-    build:
-      context: ./python-server
+      context: .
+      dockerfile: Dockerfile
       args:
         PREFIX: ${APP_PREFIX:-}
     ports:
@@ -47,19 +24,18 @@ services:
     environment:
       AUTH_USERNAME: ${AUTH_USERNAME:?Set AUTH_USERNAME in .env}
       AUTH_PASSWORD: ${AUTH_PASSWORD:?Set AUTH_PASSWORD in .env}
-      # Include APP_PREFIX so /position resolves when a URL prefix is configured.
-      JAVA_SERVICE_URL: http://java-server:8080${APP_PREFIX:-}/position
-      STOCKFISH_PATH: /app/engine/stockfish
+      LUCENE_INDEX_DIR: /app/indexedFiles
+      LUCENE_TOP_K: ${LUCENE_TOP_K:-20}
       APP_PREFIX: ${APP_PREFIX:-}
-      CACHE_MAX_ENTRIES: ${CACHE_MAX_ENTRIES:-256}
-      CACHE_TTL_SECONDS: ${CACHE_TTL_SECONDS:-3600}
-      STOCKFISH_LOCK_TIMEOUT_SECONDS: ${STOCKFISH_LOCK_TIMEOUT_SECONDS:-0}
-    depends_on:
-      java-server:
-        condition: service_healthy
+      PORT: "8081"
+      CHESSAPP_DIR: /app/python-server
+      STOCKFISH_PATH: /app/python-server/engine/stockfish
+    volumes:
+      - ./java-server/indexedFiles:/app/indexedFiles:ro
     healthcheck:
+      # Unprefixed /ping is always registered (even when APP_PREFIX is set).
       test: ["CMD", "curl", "-fsS", "http://127.0.0.1:8081/ping"]
       interval: 5s
       timeout: 3s
       retries: 12
-      start_period: 30s
+      start_period: 25s
