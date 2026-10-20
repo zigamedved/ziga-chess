@@ -19,6 +19,13 @@ Date is the day the mistake was found, not the day the code was first written.
 
 ## CI and runtime
 
+### 2026-10-20 — `public.ecr.aws` pull quota fails compose-smoke
+
+- **Assumed:** `public.ecr.aws/docker/library/...` is a safe mirror of Docker Hub for GitHub Actions, and a 429 is a one-off.
+- **Actually:** the error is `429 Too Many Requests` / `toomanyrequests: Data limit exceeded` while resolving the image manifest. It happened on PR #30 and again on the merged PR #31. The build never started. A retry in the same job does not help once the quota is spent.
+- **Broke:** `compose-smoke` on PR #31. `test` was green.
+- **Do this:** pull the same tags from `docker.io/library/...` (`maven:3.9-amazoncorretto-17`, `python:3.9-slim-bookworm`). Keep the Bookworm pin. Do not point the image back at `public.ecr.aws`.
+
 ### 2026-10-18 — `python:3.9-slim` no longer has OpenJDK 17
 
 - **Assumed:** `python:3.9-slim` is still Debian Bookworm, so `apt-get install openjdk-17-jre-headless` works in the combined image.
