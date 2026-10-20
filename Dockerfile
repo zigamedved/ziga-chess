@@ -40,7 +40,7 @@ RUN set -eux; \
 COPY python-server/requirements.txt /app/python-server/
 RUN pip install --no-cache-dir -r /app/python-server/requirements.txt
 
-COPY python-server/main.py /app/python-server/
+# chessapp.cli does not import main.py. Flask stays on the host for tests.
 COPY python-server/chessapp /app/python-server/chessapp
 COPY --from=build /src/java-server/target/my-maven-docker-project.jar /app/app.jar
 

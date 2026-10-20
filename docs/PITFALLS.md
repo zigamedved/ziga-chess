@@ -31,7 +31,7 @@ Date is the day the mistake was found, not the day the code was first written.
 - **Assumed:** `POST /analyse` can stay a Python container that HTTP-calls Java on 8080, or the smoke curl can move to `:8080` once the JVM exposes `/analyse`.
 - **Actually:** compose builds the root `Dockerfile`. That image is a JRE plus `python3`, `chessapp`, and Stockfish. The JVM listens on 8081 (`PORT`), sets `CHESSAPP_DIR=/app/python-server`, and runs `python -m chessapp.cli`. There is no second service and no `JAVA_SERVICE_URL`.
 - **Broke:** nothing in this slice. Pointing smoke at `:8080`, or shipping a JRE-only image, fails the CLI or the healthcheck.
-- **Do this:** keep one compose service. Curl `http://127.0.0.1:8081/ping` and `:8081/analyse`. `APP_PREFIX` prefixes `/analyse` and `/position` only. Healthchecks stay on unprefixed `/ping`. The Stockfish binary is `/app/python-server/engine/stockfish`, not a Python package.
+- **Do this:** keep one compose service. Curl `http://127.0.0.1:8081/ping` and `:8081/analyse`. `APP_PREFIX` prefixes `/analyse` and `/position` only. Healthchecks stay on unprefixed `/ping`. The Stockfish binary is `/app/python-server/engine/stockfish`, not a Python package. Do not `COPY` `main.py` into this image: the process is the jar, and `python -m chessapp.cli` does not import it. The older "COPY main.py / gunicorn" note is about the removed Python image.
 
 ### 2026-10-15 — Java `POST /analyse` does not run inside the current image
 
