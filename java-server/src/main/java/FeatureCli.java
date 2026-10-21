@@ -24,12 +24,20 @@ public final class FeatureCli {
         public final String features;
         public final String pv1;
         public final String pv2;
+        public final int engineDepth;
+        public final int limitDepth;
 
         Result(String fen, String features, String pv1, String pv2) {
+            this(fen, features, pv1, pv2, 12, 8);
+        }
+
+        Result(String fen, String features, String pv1, String pv2, int engineDepth, int limitDepth) {
             this.fen = fen;
             this.features = features;
             this.pv1 = pv1;
             this.pv2 = pv2;
+            this.engineDepth = engineDepth;
+            this.limitDepth = limitDepth;
         }
     }
 
@@ -98,7 +106,20 @@ public final class FeatureCli {
                 stringField(obj, "fen"),
                 obj.get("features").getAsString(),
                 stringField(obj, "pv1"),
-                stringField(obj, "pv2"));
+                stringField(obj, "pv2"),
+                intField(obj, "engineDepth", 12),
+                intField(obj, "limitDepth", 8));
+    }
+
+    private static int intField(JsonObject obj, String name, int fallback) {
+        if (!obj.has(name) || obj.get(name).isJsonNull() || !obj.get(name).isJsonPrimitive()) {
+            return fallback;
+        }
+        try {
+            return obj.get(name).getAsInt();
+        } catch (NumberFormatException | ClassCastException ex) {
+            return fallback;
+        }
     }
 
     private static String stringField(JsonObject obj, String name) {

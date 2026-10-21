@@ -44,13 +44,15 @@ def resolve_stockfish_path() -> str:
     return "engine/stockfish"
 
 
+ENGINE_DEPTH = 12
+LIMIT_DEPTH = 8
+
 stockfish = Stockfish(
     path=resolve_stockfish_path(),
-    depth=12,
+    depth=ENGINE_DEPTH,
     parameters={"Threads": 1, "Hash": 64},
 )
 stockfish.set_elo_rating(2500)
-LIMIT_DEPTH = 8
 
 # One engine process. Overlapping /analyse calls that need it get 503
 # instead of interleaving UCI commands. Cached FENs do not take the lock.
