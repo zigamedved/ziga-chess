@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Similar rook endgames</title>
+  <link rel="stylesheet" href="app.css">
+</head>
+<body>
+  <header class="top">
+    <div>
+      <p class="eyebrow">ziga-chess</p>
+      <h1>Similar rook endgames</h1>
+    </div>
+    <button id="analyse" class="primary" type="button">Analyse</button>
+  </header>
+
+  <p id="status" class="status" role="status"></p>
+
+  <main class="layout">
+    <section class="hero" aria-label="Position">
+      <div class="board-wrap">
+        <div id="board" class="board" role="img" aria-label="Chessboard"></div>
+        <p id="board-caption" class="caption">Starting position</p>
+        <div class="stepper">
+          <button type="button" id="main-start" aria-label="First position">|&lt;</button>
+          <button type="button" id="main-prev" aria-label="Previous move">&lt;</button>
+          <button type="button" id="main-next" aria-label="Next move">&gt;</button>
+          <button type="button" id="main-end" aria-label="Last position">&gt;|</button>
+        </div>
+      </div>
+      <label class="field">
+        <span>FEN</span>
+        <textarea id="fen" rows="3" spellcheck="false">r4rk1/4Rppp/p1p5/P1p5/8/3P2P1/1PP2P1P/R5K1 b - - 0 25</textarea>
+      </label>
+      <label class="field">
+        <span>PGN snippet</span>
+        <textarea id="pgn" rows="4" spellcheck="false" placeholder="Paste a game or a line with a FEN header"></textarea>
+      </label>
+      <button id="load-pgn" type="button" class="secondary">Load FEN from PGN</button>
+    </section>
+
+    <section class="side">
+      <details class="auth">
+        <summary>Connection</summary>
+        <label class="field">Username <input id="user" autocomplete="username"></label>
+        <label class="field">Password <input id="pass" type="password" autocomplete="current-password"></label>
+        <p class="hint">Saved in this browser only. Sent as Basic auth to <code>/analyse</code>.</p>
+      </details>
+
+      <div class="lines">
+        <h2>Lines</h2>
+        <div class="pv-tabs">
+          <button type="button" id="show-pv1" class="secondary">PV1</button>
+          <button type="button" id="show-pv2" class="secondary">PV2</button>
+        </div>
+        <ol id="moves" class="moves"></ol>
+      </div>
+
+      <div class="games">
+        <h2>Similar games</h2>
+        <ul id="game-list" class="game-list"></ul>
+        <div id="similar-panel" class="similar hidden">
+          <h3 id="similar-title"></h3>
+          <div id="similar-board" class="board" role="img" aria-label="Similar game"></div>
+          <div class="stepper">
+            <button type="button" id="sim-start" aria-label="Similar game start">|&lt;</button>
+            <button type="button" id="sim-prev" aria-label="Similar game previous">&lt;</button>
+            <button type="button" id="sim-next" aria-label="Similar game next">&gt;</button>
+            <button type="button" id="sim-end" aria-label="Similar game end">&gt;|</button>
+          </div>
+          <p id="similar-meta" class="caption"></p>
+        </div>
+      </div>
+    </section>
+  </main>
+  <script type="module" src="app.js"></script>
+</body>
+</html>

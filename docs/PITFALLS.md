@@ -19,6 +19,13 @@ Date is the day the mistake was found, not the day the code was first written.
 
 ## CI and runtime
 
+### 2026-10-21 — the board is files inside the one JVM, not a second server
+
+- **Assumed:** a chessboard UI needs nginx, a Vite dev server, or another compose service.
+- **Actually:** `chessServer` serves `src/main/resources/web` on `GET /`. `/analyse`, `/position`, and `/ping` stay on their own contexts. The image only needs the jar.
+- **Broke:** nothing yet. A second service would split auth and the port again.
+- **Do this:** add pages under `java-server/src/main/resources/web`. Do not add a compose service for the UI.
+
 ### 2026-10-21 — `.gitignore` does not untrack `java-server/target/*.class`
 
 - **Assumed:** adding `java-server/target/` to `.gitignore` removes `chessServer.class` and its inner classes from the repo.

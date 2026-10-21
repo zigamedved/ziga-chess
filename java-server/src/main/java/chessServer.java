@@ -37,6 +37,7 @@ public class chessServer {
         server.createContext(envValue + "/position", new FenParser());
         server.createContext(envValue + "/analyse", new AnalyseHandler());
         server.createContext("/ping", new PingHandler());
+        server.createContext("/", new StaticFiles());
         if (!envValue.isEmpty()) {
             server.createContext(envValue + "/ping", new PingHandler());
         }
