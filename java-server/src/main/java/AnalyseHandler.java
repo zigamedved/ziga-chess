@@ -9,11 +9,13 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 /**
  * {@code POST /analyse} on the JVM: one auth check, feature CLI, in-process Lucene.
- * Compose still serves clients from Python until the hop is removed.
+ * Default body is JSON ({@link AnalyseResponse}). {@code Accept: text/plain}
+ * returns the thesis plain-text body.
  */
 public class AnalyseHandler implements HttpHandler {
     private static final int MAX_BODY_BYTES = 64 * 1024;
@@ -47,6 +49,7 @@ public class AnalyseHandler implements HttpHandler {
             return;
         }
 
+        long started = System.nanoTime();
         final FeatureCli.Result extracted;
         try {
             extracted = features.extract(fen);
@@ -68,9 +71,18 @@ public class AnalyseHandler implements HttpHandler {
             return;
         }
 
-        String body = AnalyseText.format(extracted.pv1, extracted.pv2, hits);
+        long tookMs = Math.max(0L, (System.nanoTime() - started) / 1_000_000L);
+        final String body;
+        final String contentType;
+        if (wantsPlainText(t)) {
+            body = AnalyseText.format(extracted.pv1, extracted.pv2, hits);
+            contentType = "text/plain; charset=utf-8";
+        } else {
+            body = AnalyseResponse.toJson(fen, extracted, hits, tookMs);
+            contentType = "application/json; charset=utf-8";
+        }
         byte[] bytes = body.getBytes(StandardCharsets.UTF_8);
-        t.getResponseHeaders().set("Content-Type", "text/plain; charset=utf-8");
+        t.getResponseHeaders().set("Content-Type", contentType);
         t.sendResponseHeaders(200, bytes.length);
         OutputStream os = t.getResponseBody();
         os.write(bytes);
@@ -101,5 +113,15 @@ public class AnalyseHandler implements HttpHandler {
             throw new FenParser.BadRequestException("FEN is required (string)");
         }
         return fen;
+    }
+
+    /** Thesis clients send Accept text/plain. A wildcard Accept stays on JSON. */
+    static boolean wantsPlainText(HttpExchange t) {
+        String accept = t.getRequestHeaders().getFirst("Accept");
+        if (accept == null || accept.trim().isEmpty()) {
+            return false;
+        }
+        String lower = accept.toLowerCase(Locale.ROOT);
+        return lower.contains("text/plain") && !lower.contains("application/json");
     }
 }

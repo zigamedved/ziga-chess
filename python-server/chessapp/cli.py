@@ -5,8 +5,8 @@ Run from ``python-server``::
     python -m chessapp.cli 'FEN'
     echo 'FEN' | python -m chessapp.cli
 
-Stdout is one JSON object: ``fen``, ``features`` (the string ``POST /position``
-sends today), ``pv1`` and ``pv2`` (the same text HTTP puts under those labels).
+Stdout is one JSON object: ``fen``, ``features``, ``pv1``, ``pv2``,
+``engineDepth``, and ``limitDepth``.
 
 This module must not import ``chessapp.api``. The API process requires
 ``AUTH_*``; the CLI is a subprocess and does not.
@@ -47,6 +47,8 @@ def main(argv=None) -> int:
             "features": features,
             "pv1": format_pv(pgn1),
             "pv2": format_pv(pgn2),
+            "engineDepth": engine.ENGINE_DEPTH,
+            "limitDepth": engine.LIMIT_DEPTH,
         },
         sys.stdout,
     )

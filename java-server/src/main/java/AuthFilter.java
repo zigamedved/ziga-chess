@@ -63,8 +63,7 @@ public class AuthFilter {
 
     static void sendUnauthorized(HttpExchange t) throws IOException {
         t.getResponseHeaders().set("WWW-Authenticate", "Basic realm=\"ziga-chess\"");
-        t.sendResponseHeaders(401, -1);
-        t.close();
+        FenParser.sendJsonError(t, 401, "Unauthorized", "unauthorized");
     }
 
     private static boolean isBlank(String value) {

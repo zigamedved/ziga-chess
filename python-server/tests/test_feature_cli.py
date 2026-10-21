@@ -15,6 +15,9 @@ def test_cli_prints_features_and_pvs(app_module, capsys):
     assert payload["features"] == GOLDEN_ANALYSE_FEATURE_STRING
     assert "Kh8" in payload["pv1"]
     assert "Rfe8" in payload["pv2"]
+    from chessapp import engine
+    assert payload["engineDepth"] == engine.ENGINE_DEPTH
+    assert payload["limitDepth"] == engine.LIMIT_DEPTH
 
 
 def test_cli_reads_fen_from_stdin(app_module, capsys, monkeypatch):

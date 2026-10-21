@@ -442,6 +442,7 @@ public class ChessServerTest {
         missingAuth.setRequestBody("{\"FEN\":\"8/8/8/8/8/8/8/8 w - - 0 1\"}");
         handler.handle(missingAuth);
         assertEquals(401, missingAuth.statusCode);
+        assertTrue(missingAuth.responseBody.toString("UTF-8").contains("unauthorized"));
 
         FakeExchange missingFen = new FakeExchange();
         missingFen.requestHeaders.add("Authorization", basicAuth("test-user", "test-password"));
@@ -464,14 +465,33 @@ public class ChessServerTest {
         handler.handle(ex);
 
         assertEquals(200, ex.statusCode);
-        assertTrue(ex.responseHeaders.getFirst("Content-Type").startsWith("text/plain"));
+        assertTrue(ex.responseHeaders.getFirst("Content-Type").startsWith("application/json"));
         String body = ex.responseBody.toString("UTF-8");
-        assertTrue(body.contains("PV1: \npv-one"));
-        assertTrue(body.contains("PV2: \npv-two"));
-        assertTrue(body.contains("Game#fixture.txt"), body);
-        assertTrue(body.contains("Similar games:"));
-        String game = body.substring(body.indexOf("Game #0"));
-        assertFieldOrder(game, "name:", "endgameFEN:", "White:", "Black:", "Result:", "PGN:", "PV1:", "PV2:", "score:");
+        com.google.gson.JsonObject json = new com.google.gson.JsonParser().parse(body).getAsJsonObject();
+        assertEquals("r4rk1/4Rppp/p1p5/P1p5/8/3P2P1/1PP2P1P/R5K1 b - - 0 25", json.get("fen").getAsString());
+        assertEquals(1, json.getAsJsonArray("principalVariations").get(0).getAsJsonObject().get("id").getAsInt());
+        assertEquals("pv-one", json.getAsJsonArray("principalVariations").get(0).getAsJsonObject().get("pgn").getAsString());
+        assertEquals("pv-two", json.getAsJsonArray("principalVariations").get(1).getAsJsonObject().get("pgn").getAsString());
+        com.google.gson.JsonObject game = json.getAsJsonArray("similarGames").get(0).getAsJsonObject();
+        assertEquals(0, game.get("rank").getAsInt());
+        assertEquals("Game#fixture.txt", game.get("name").getAsString());
+        assertTrue(game.get("score").isJsonPrimitive() && game.get("score").getAsJsonPrimitive().isNumber());
+        assertTrue(json.getAsJsonObject("meta").get("tookMs").getAsLong() >= 0);
+        assertEquals(12, json.getAsJsonObject("meta").get("engineDepth").getAsInt());
+        assertEquals(8, json.getAsJsonObject("meta").get("limitDepth").getAsInt());
+
+        FakeExchange plain = new FakeExchange();
+        plain.requestHeaders.add("Authorization", basicAuth("test-user", "test-password"));
+        plain.requestHeaders.add("Accept", "text/plain");
+        plain.setRequestBody("{\"FEN\":\"r4rk1/4Rppp/p1p5/P1p5/8/3P2P1/1PP2P1P/R5K1 b - - 0 25\"}");
+        handler.handle(plain);
+        assertEquals(200, plain.statusCode);
+        assertTrue(plain.responseHeaders.getFirst("Content-Type").startsWith("text/plain"));
+        String text = plain.responseBody.toString("UTF-8");
+        assertTrue(text.contains("PV1: \npv-one"));
+        assertTrue(text.contains("PV2: \npv-two"));
+        String plainGame = text.substring(text.indexOf("Game #0"));
+        assertFieldOrder(plainGame, "name:", "endgameFEN:", "White:", "Black:", "Result:", "PGN:", "PV1:", "PV2:", "score:");
     }
 
     @Test

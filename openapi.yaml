@@ -1,0 +1,146 @@
+openapi: 3.0.3
+info:
+  title: ziga-chess analyse
+  version: "1.0.0"
+  description: >
+    Public API of the single JVM on port 8081. POST /analyse returns this
+    document by default. Accept text/plain returns the previous thesis body.
+    APP_PREFIX, when set, is prepended to /analyse and /position. GET /ping
+    stays unprefixed.
+servers:
+  - url: http://127.0.0.1:8081
+paths:
+  /analyse:
+    post:
+      operationId: analyse
+      security:
+        - basicAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AnalyseRequest"
+      responses:
+        "200":
+          description: Similar games and the two principal variations.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AnalyseResponse"
+            text/plain:
+              schema:
+                type: string
+                description: Legacy body. Send Accept text/plain.
+        "400":
+          description: Missing or invalid FEN.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "401":
+          description: Missing or wrong Basic credentials.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "500":
+          description: Feature CLI or Lucene failed.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+  /ping:
+    get:
+      operationId: ping
+      security: []
+      responses:
+        "200":
+          description: Process is up.
+          content:
+            text/plain:
+              schema:
+                type: string
+                example: pong
+components:
+  securitySchemes:
+    basicAuth:
+      type: http
+      scheme: basic
+  schemas:
+    AnalyseRequest:
+      type: object
+      required: [FEN]
+      properties:
+        FEN:
+          type: string
+    AnalyseResponse:
+      type: object
+      required: [fen, principalVariations, similarGames, meta]
+      properties:
+        fen:
+          type: string
+        principalVariations:
+          type: array
+          items:
+            $ref: "#/components/schemas/PrincipalVariation"
+        similarGames:
+          type: array
+          items:
+            $ref: "#/components/schemas/SimilarGame"
+        meta:
+          $ref: "#/components/schemas/AnalyseMeta"
+    PrincipalVariation:
+      type: object
+      required: [id, pgn]
+      properties:
+        id:
+          type: integer
+        pgn:
+          type: string
+    SimilarGame:
+      type: object
+      required: [rank, name, white, black, result, endgameFen, pgn, pv1, pv2, score]
+      properties:
+        rank:
+          type: integer
+        name:
+          type: string
+        white:
+          type: string
+        black:
+          type: string
+        result:
+          type: string
+        endgameFen:
+          type: string
+        pgn:
+          type: string
+        pv1:
+          type: string
+        pv2:
+          type: string
+        score:
+          type: number
+    AnalyseMeta:
+      type: object
+      required: [engineDepth, limitDepth, tookMs]
+      properties:
+        engineDepth:
+          type: integer
+          description: Stockfish search depth reported by the feature CLI.
+        limitDepth:
+          type: integer
+          description: Variation-tree depth reported by the feature CLI.
+        tookMs:
+          type: integer
+          description: Milliseconds spent in the feature CLI and the Lucene search.
+    Error:
+      type: object
+      required: [error, code]
+      properties:
+        error:
+          type: string
+        code:
+          type: string
+          enum: [bad_request, invalid_fen, unauthorized, error]
