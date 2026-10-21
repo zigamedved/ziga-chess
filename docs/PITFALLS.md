@@ -19,6 +19,13 @@ Date is the day the mistake was found, not the day the code was first written.
 
 ## CI and runtime
 
+### 2026-10-21 — `.gitignore` does not untrack `java-server/target/*.class`
+
+- **Assumed:** adding `java-server/target/` to `.gitignore` removes `chessServer.class` and its inner classes from the repo.
+- **Actually:** those four files were committed first. Git keeps tracking them. Their bytes are the pre-split `chessServer`, so an incremental `mvn test` can load that class when the `.class` file is newer than `chessServer.java` and fail with `NoSuchMethodError` for `parsePort`.
+- **Broke:** a local `mvn test` on the hygiene branch, before `mvn clean`. CI was fine because it compiles from source into an empty `target/`.
+- **Do this:** `git rm --cached` the tracked class files (done on the hygiene PR). Do not `git add -f` them. If tests fail with `NoSuchMethodError` on `chessServer`, run `mvn clean test`. A full clone still downloads old Lucene segments and Stockfish binaries from history; do not rewrite that history unless the owner asks. `git clone --depth 1` is the small tree.
+
 ### 2026-10-20 — `public.ecr.aws` pull quota fails compose-smoke
 
 - **Assumed:** `public.ecr.aws/docker/library/...` is a safe mirror of Docker Hub for GitHub Actions, and a 429 is a one-off.

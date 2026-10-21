@@ -2,14 +2,27 @@
 .env
 *.env.local
 
+# Build output. A file committed before this ignore stays tracked until
+# `git rm --cached`. Do not git add -f these paths.
+*.class
+java-server/target/
+**/write.lock
+
 # Built Lucene index (reproduce with `make index`)
 java-server/indexedFiles/
-java-server/target/
 
 # Python local env / caches
-python-server/.venv/
+.venv/
+venv/
 __pycache__/
+*.pyc
+.pytest_cache/
+python-server/.venv/
 python-server/.pytest_cache/
+
+# Stockfish binaries. The image and scripts/download_stockfish.sh download them.
+python-server/engine/*
+!python-server/engine/.gitkeep
 
 # Index build intermediates (default make index output lives under /tmp)
 ziga-chess-lucene-docs.ndjson
