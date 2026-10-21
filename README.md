@@ -6,6 +6,8 @@ Bachelor thesis system for **similar rook-endgame retrieval**: given a FEN, extr
 
 **Wrong assumptions that already broke CI or a local run:** see **[docs/PITFALLS.md](docs/PITFALLS.md)**. Add an entry when you hit a new one.
 
+**Clone and LFS:** [CONTRIBUTING.md](CONTRIBUTING.md). `games/games.json.zip` is Git LFS (`git lfs install && git lfs pull`). Stockfish and the Lucene index are not in the tree.
+
 ## Architecture overview
 
 ```mermaid

@@ -15,4 +15,4 @@ Highest-cost repeats:
 - `python-server/engine/` is the Stockfish binary, not a Python package. The image must `COPY` `chessapp` and install the binary beside it.
 - Patch the module that looks the name up (`chessapp.*`), not a re-export on `main`. Unload `chessapp*` before a re-import.
 - `gh pr view` / `gh issue view` need `--json`. Pytest can segfault in the sandbox; re-run it outside before calling it red.
-- Do not commit `java-server/target` class files. They are gitignored and still tracked.
+- Do not commit `java-server/target` class files. They are gitignored. `git add -f` would track them again. `.gitignore` does not untrack a file that is already committed.
