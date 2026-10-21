@@ -1,6 +1,6 @@
 # One image: Lucene on the JVM, features and Stockfish via python -m chessapp.cli.
 # Build context is the repo root (compose).
-FROM public.ecr.aws/docker/library/maven:3.9-amazoncorretto-17 AS build
+FROM docker.io/library/maven:3.9-amazoncorretto-17 AS build
 
 WORKDIR /src/java-server
 COPY java-server/pom.xml .
@@ -8,7 +8,7 @@ COPY java-server/src ./src
 RUN mvn -q -DskipTests package
 
 # Bookworm still ships OpenJDK 17. The floating 3.9-slim tag moved to Trixie, which does not.
-FROM public.ecr.aws/docker/library/python:3.9-slim-bookworm
+FROM docker.io/library/python:3.9-slim-bookworm
 
 ENV DEBIAN_FRONTEND=noninteractive
 RUN apt-get update && apt-get install -y --no-install-recommends \

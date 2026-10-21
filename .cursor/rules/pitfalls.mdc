@@ -10,7 +10,7 @@ alwaysApply: true
 Highest-cost repeats:
 
 - Compose `:?` vars (`AUTH_USERNAME`, `AUTH_PASSWORD`) are required for `docker compose down` too. Write `.env` once per CI job. An indented YAML heredoc leaves leading spaces in that file.
-- The public server is one image on port 8081 (JRE, `python3`, `chessapp`, Stockfish). `CHESSAPP_DIR` is the directory that contains the `chessapp` package. Do not add a second compose service or point smoke at `:8080`. Pin `python:3.9-slim-bookworm`; the floating `3.9-slim` tag is Trixie and has no OpenJDK 17.
+- The public server is one image on port 8081 (JRE, `python3`, `chessapp`, Stockfish). `CHESSAPP_DIR` is the directory that contains the `chessapp` package. Do not add a second compose service or point smoke at `:8080`. Pin `python:3.9-slim-bookworm`; the floating `3.9-slim` tag is Trixie and has no OpenJDK 17. Pull base images from `docker.io/library`, not `public.ecr.aws` (pull quota returns 429).
 - `APP_PREFIX` prefixes `/analyse` and `/position` on that one process. Healthchecks stay on unprefixed `/ping`.
 - `python-server/engine/` is the Stockfish binary, not a Python package. The image must `COPY` `chessapp` and install the binary beside it.
 - Patch the module that looks the name up (`chessapp.*`), not a re-export on `main`. Unload `chessapp*` before a re-import.
