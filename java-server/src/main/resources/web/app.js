@@ -1,6 +1,7 @@
 import { Chess } from "./vendor/chess.js";
 
 const SAMPLE = "r4rk1/4Rppp/p1p5/P1p5/8/3P2P1/1PP2P1P/R5K1 b - - 0 25";
+const apiPrefix = (document.querySelector('meta[name="app-prefix"]').content || "").replace(/\/$/, "");
 const PIECES = {
   P: "♙", N: "♘", B: "♗", R: "♖", Q: "♕", K: "♔",
   p: "♟", n: "♞", b: "♝", r: "♜", q: "♛", k: "♚",
@@ -21,6 +22,7 @@ const similarMeta = document.querySelector("#similar-meta");
 const main = { fens: [SAMPLE], sans: [], marks: [null], index: 0, label: "Starting position" };
 const similar = { fens: [], sans: [], marks: [], index: 0 };
 
+// Credentials stay in localStorage as plain text. Game names and moves are set with textContent.
 userInput.value = localStorage.getItem("ziga-chess-user") || "";
 passInput.value = localStorage.getItem("ziga-chess-pass") || "";
 
@@ -247,11 +249,11 @@ analyseBtn.addEventListener("click", async () => {
   analyseBtn.disabled = true;
   setStatus("Analysing…", false);
   try {
-    const response = await fetch("analyse", {
+    const response = await fetch(apiPrefix + "/analyse", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        "Authorization": "Basic " + btoa(user + ":" + pass),
+        "Authorization": basicAuthHeader(user, pass),
       },
       body: JSON.stringify({ FEN: fen }),
     });
@@ -271,5 +273,14 @@ analyseBtn.addEventListener("click", async () => {
     analyseBtn.disabled = false;
   }
 });
+
+function basicAuthHeader(user, pass) {
+  const bytes = new TextEncoder().encode(user + ":" + pass);
+  let binary = "";
+  for (const byte of bytes) {
+    binary += String.fromCharCode(byte);
+  }
+  return "Basic " + btoa(binary);
+}
 
 showMain();

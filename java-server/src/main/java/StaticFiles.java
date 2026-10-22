@@ -4,6 +4,7 @@ import com.sun.net.httpserver.HttpHandler;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.nio.charset.StandardCharsets;
 
 /** GET / and the chessboard page. API routes stay on their own contexts. */
 public final class StaticFiles implements HttpHandler {
@@ -27,6 +28,11 @@ public final class StaticFiles implements HttpHandler {
             exchange.close();
             return;
         }
+        if ("/web/index.html".equals(resource)) {
+            String html = new String(body, StandardCharsets.UTF_8);
+            html = html.replace("__APP_PREFIX__", htmlEscape(appPrefix()));
+            body = html.getBytes(StandardCharsets.UTF_8);
+        }
         exchange.getResponseHeaders().set("Content-Type", contentType(resource));
         exchange.sendResponseHeaders(200, "HEAD".equals(method) ? -1 : body.length);
         if (!"HEAD".equals(method)) {
@@ -36,6 +42,38 @@ public final class StaticFiles implements HttpHandler {
         } else {
             exchange.close();
         }
+    }
+
+    /** {@code chess.appPrefix} in tests, otherwise {@code APP_PREFIX}. Empty when unset or not a path. */
+    static String appPrefix() {
+        String raw = System.getProperty("chess.appPrefix");
+        if (raw == null) {
+            raw = System.getenv("APP_PREFIX");
+        }
+        if (raw == null) {
+            return "";
+        }
+        raw = raw.trim();
+        if (raw.isEmpty()) {
+            return "";
+        }
+        if (!raw.startsWith("/")) {
+            raw = "/" + raw;
+        }
+        while (raw.endsWith("/")) {
+            raw = raw.substring(0, raw.length() - 1);
+        }
+        if (raw.contains("..") || !raw.matches("/[A-Za-z0-9._~/-]+")) {
+            return "";
+        }
+        return raw;
+    }
+
+    private static String htmlEscape(String value) {
+        return value.replace("&", "&amp;")
+                .replace("<", "&lt;")
+                .replace(">", "&gt;")
+                .replace("\"", "&quot;");
     }
 
     static String resourceFor(String path) {

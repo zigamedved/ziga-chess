@@ -59,11 +59,13 @@ public class ChessServerTest {
         System.clearProperty("chess.featureCli");
         System.clearProperty("chess.featurePython");
         System.clearProperty("chess.port");
+        System.clearProperty("chess.appPrefix");
         AuthFilter.configureAuth(null, null);
     }
 
     @Test
     void staticFiles_servesTheBoardPage() throws Exception {
+        System.setProperty("chess.appPrefix", "");
         StaticFiles handler = new StaticFiles();
         FakeExchange page = new FakeExchange();
         page.setRequestMethod("GET");
@@ -72,6 +74,14 @@ public class ChessServerTest {
         assertEquals(200, page.statusCode);
         assertTrue(page.responseHeaders.getFirst("Content-Type").startsWith("text/html"));
         assertTrue(page.responseBody.toString("UTF-8").contains("Analyse"));
+        assertTrue(page.responseBody.toString("UTF-8").contains("content=\"\""));
+
+        System.setProperty("chess.appPrefix", "/v1/chess");
+        FakeExchange prefixed = new FakeExchange();
+        prefixed.setRequestMethod("GET");
+        prefixed.setRequestUri("/");
+        handler.handle(prefixed);
+        assertTrue(prefixed.responseBody.toString("UTF-8").contains("content=\"/v1/chess\""));
 
         FakeExchange script = new FakeExchange();
         script.setRequestMethod("GET");
