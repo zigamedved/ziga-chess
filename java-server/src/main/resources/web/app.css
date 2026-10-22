@@ -1,0 +1,159 @@
+:root {
+  color-scheme: light;
+  --ink: #1c1915;
+  --muted: #5c564c;
+  --paper: #f6f1e8;
+  --card: #fffdf8;
+  --line: #e4d9c8;
+  --accent: #1f4d3a;
+  --accent-ink: #f6f1e8;
+  --light: #f0d9b5;
+  --dark: #b58863;
+  --mark: rgba(246, 210, 74, 0.55);
+  font-family: "Iowan Old Style", Palatino, "Palatino Linotype", Georgia, serif;
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  background: var(--paper);
+  color: var(--ink);
+}
+
+.top {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  gap: 16px;
+  padding: 24px 24px 8px;
+}
+
+.eyebrow {
+  margin: 0;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  font-size: 0.75rem;
+  color: var(--muted);
+  font-family: "Avenir Next", "Segoe UI", sans-serif;
+}
+
+h1, h2, h3 { font-weight: 600; margin: 0; }
+h1 { font-size: 1.8rem; }
+h2 { font-size: 1.1rem; margin-bottom: 8px; }
+
+.primary, .secondary, .stepper button, .moves button, .game-list button {
+  font-family: "Avenir Next", "Segoe UI", sans-serif;
+  border-radius: 999px;
+  border: 1px solid var(--line);
+  background: var(--card);
+  color: var(--ink);
+  padding: 8px 14px;
+  cursor: pointer;
+}
+
+.primary {
+  background: var(--accent);
+  color: var(--accent-ink);
+  border-color: var(--accent);
+  font-size: 1rem;
+  padding: 12px 22px;
+}
+
+button:disabled { opacity: 0.55; cursor: wait; }
+
+.status {
+  min-height: 1.4rem;
+  margin: 0 24px 8px;
+  color: var(--muted);
+  font-family: "Avenir Next", "Segoe UI", sans-serif;
+}
+
+.status.error { color: #8a2b2b; }
+
+.layout {
+  display: grid;
+  grid-template-columns: minmax(280px, 460px) minmax(280px, 1fr);
+  gap: 28px;
+  padding: 8px 24px 40px;
+  align-items: start;
+}
+
+.field, .auth, .lines, .games {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 16px;
+}
+
+.field span, .auth label { font-family: "Avenir Next", "Segoe UI", sans-serif; font-size: 0.85rem; }
+
+textarea, input {
+  width: 100%;
+  font: 0.95rem/1.4 ui-monospace, "SFMono-Regular", Menlo, monospace;
+  padding: 8px 10px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--card);
+  color: var(--ink);
+}
+
+.board-wrap, .similar { display: flex; flex-direction: column; gap: 8px; }
+
+.board {
+  display: grid;
+  grid-template-columns: repeat(8, 1fr);
+  width: min(100%, 460px);
+  aspect-ratio: 1;
+  border-radius: 6px;
+  overflow: hidden;
+  box-shadow: 0 10px 30px rgba(40, 28, 12, 0.12);
+}
+
+.sq {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: clamp(1.4rem, 4vw, 2.5rem);
+  line-height: 1;
+  user-select: none;
+}
+
+.sq.light { background: var(--light); }
+.sq.dark { background: var(--dark); }
+.sq.mark { box-shadow: inset 0 0 0 4px var(--mark); }
+
+.caption, .hint {
+  margin: 0;
+  color: var(--muted);
+  font-family: "Avenir Next", "Segoe UI", sans-serif;
+  font-size: 0.85rem;
+}
+
+.stepper, .pv-tabs { display: flex; gap: 8px; flex-wrap: wrap; }
+
+.moves, .game-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.game-list { flex-direction: column; }
+
+.game-list button, .moves button { text-align: left; }
+
+.game-list button.active, .moves button.active, .pv-tabs button.active {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.hidden { display: none; }
+
+@media (max-width: 800px) {
+  .top { align-items: stretch; flex-direction: column; }
+  .layout { grid-template-columns: 1fr; padding: 8px 16px 32px; }
+  .board { width: 100%; }
+}

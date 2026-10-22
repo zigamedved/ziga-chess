@@ -59,7 +59,42 @@ public class ChessServerTest {
         System.clearProperty("chess.featureCli");
         System.clearProperty("chess.featurePython");
         System.clearProperty("chess.port");
+        System.clearProperty("chess.appPrefix");
         AuthFilter.configureAuth(null, null);
+    }
+
+    @Test
+    void staticFiles_servesTheBoardPage() throws Exception {
+        System.setProperty("chess.appPrefix", "");
+        StaticFiles handler = new StaticFiles();
+        FakeExchange page = new FakeExchange();
+        page.setRequestMethod("GET");
+        page.setRequestUri("/");
+        handler.handle(page);
+        assertEquals(200, page.statusCode);
+        assertTrue(page.responseHeaders.getFirst("Content-Type").startsWith("text/html"));
+        assertTrue(page.responseBody.toString("UTF-8").contains("Analyse"));
+        assertTrue(page.responseBody.toString("UTF-8").contains("content=\"\""));
+
+        System.setProperty("chess.appPrefix", "/v1/chess");
+        FakeExchange prefixed = new FakeExchange();
+        prefixed.setRequestMethod("GET");
+        prefixed.setRequestUri("/");
+        handler.handle(prefixed);
+        assertTrue(prefixed.responseBody.toString("UTF-8").contains("content=\"/v1/chess\""));
+
+        FakeExchange script = new FakeExchange();
+        script.setRequestMethod("GET");
+        script.setRequestUri("/vendor/chess.js");
+        handler.handle(script);
+        assertEquals(200, script.statusCode);
+        assertTrue(script.responseHeaders.getFirst("Content-Type").startsWith("text/javascript"));
+
+        FakeExchange escaped = new FakeExchange();
+        escaped.setRequestMethod("GET");
+        escaped.setRequestUri("/vendor/../app.js");
+        handler.handle(escaped);
+        assertEquals(404, escaped.statusCode);
     }
 
     @Test
@@ -573,6 +608,16 @@ public class ChessServerTest {
         private final ByteArrayOutputStream responseBody = new ByteArrayOutputStream();
         private byte[] requestBodyBytes = new byte[0];
         private int statusCode = -1;
+        private String requestMethod = "POST";
+        private URI requestUri = URI.create("/position");
+
+        void setRequestMethod(String requestMethod) {
+            this.requestMethod = requestMethod;
+        }
+
+        void setRequestUri(String requestUri) {
+            this.requestUri = URI.create(requestUri);
+        }
 
         void setRequestBody(String body) {
             this.requestBodyBytes = body.getBytes(StandardCharsets.UTF_8);
@@ -590,12 +635,12 @@ public class ChessServerTest {
 
         @Override
         public URI getRequestURI() {
-            return URI.create("/position");
+            return requestUri;
         }
 
         @Override
         public String getRequestMethod() {
-            return "POST";
+            return requestMethod;
         }
 
         @Override
