@@ -74,7 +74,7 @@ sequenceDiagram
 
 Auth is checked once, on the JVM. The image contains the JRE, `chessapp`, and the Stockfish binary. `CHESSAPP_DIR` is the directory that holds the `chessapp` package. `POST /position` is still registered on the same port for a raw feature string; the client path is `POST /analyse`.
 
-The default `/analyse` body is JSON (`openapi.yaml`). `Accept: text/plain` returns the thesis text. Errors are JSON objects with `error` and `code`. `GET /` serves the board from the same process.
+The default `/analyse` body is JSON (`openapi.yaml`), including `similarPgn` for the current similar-game set. `Accept: text/plain` returns the thesis text. Errors are JSON objects with `error` and `code`. `GET /` serves the board from the same process. `?fen=` on that page opens a shared position.
 
 Each `/analyse` starts a new CLI process, so the Flask LRU and the `engine_busy` lock do not apply to compose. They still apply if you run `main:app` yourself.
 

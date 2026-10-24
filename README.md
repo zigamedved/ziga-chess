@@ -125,6 +125,10 @@ Listens on port 8081 (`PORT` overrides). The same process serves the board at `/
 
 Open `http://127.0.0.1:8081/`, enter the Basic auth user and password under Connection, and press Analyse. The sample FEN is filled in. `PV1` / `PV2` step on the main board. A similar game opens on the second board at its endgame position and steps that game's first line, not the full PGN. Credentials stay in the browser's local storage.
 
+A shared position is `/?fen=` plus the FEN, URL-encoded (`/` as `%2F`, spaces as `%20`). Copy link writes that URL. An invalid `fen` parameter leaves the sample position and shows an error.
+
+Download PGN saves the `similarPgn` field: one game per similar hit, separated by a blank line. Movetext-only games gain `[Event]`, `[White]`, `[Black]`, `[Result]`, `[FEN]`, and `[SetUp "1"]`. A stored PGN that already starts with `[` is copied through.
+
 ![Board with the sample FEN](docs/ui/board.png)
 
 ![Analyse result with a similar game](docs/ui/analyse.png)

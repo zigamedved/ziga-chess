@@ -31,6 +31,7 @@ public final class AnalyseResponse {
             rank++;
         }
         root.put("similarGames", games);
+        root.put("similarPgn", SimilarPgn.format(games));
 
         Map<String, Object> meta = new LinkedHashMap<>();
         meta.put("engineDepth", extracted.engineDepth);

@@ -150,6 +150,16 @@ textarea, input {
   color: var(--accent);
 }
 
+.actions, .section-head {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.section-head { justify-content: space-between; margin-bottom: 8px; }
+.section-head h2 { margin: 0; }
+
 .hidden { display: none; }
 
 @media (max-width: 800px) {
