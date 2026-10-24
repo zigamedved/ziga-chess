@@ -19,6 +19,13 @@ Date is the day the mistake was found, not the day the code was first written.
 
 ## CI and runtime
 
+### 2026-10-22 — a healthy container can still be the pre-board jar
+
+- **Assumed:** starting compose after the board commit serves `GET /` from the current tree.
+- **Actually:** the image jar had no `StaticFiles` and no `web/`. `GET /` was the JDK page `404 No context found for request`. `GET /ping` still returned `pong`, and the healthcheck only curls `/ping`.
+- **Broke:** `http://127.0.0.1:8081/` locally, while the container was Up (healthy).
+- **Do this:** if `/ping` is `pong` and `/` is that 404, rebuild so `COPY java-server/src` runs again (`docker compose up --build`). A cached Maven stage from before the board stays healthy and still has no page.
+
 ### 2026-10-21 — the board is files inside the one JVM, not a second server
 
 - **Assumed:** a chessboard UI needs nginx, a Vite dev server, or another compose service.
@@ -190,4 +197,4 @@ Date is the day the mistake was found, not the day the code was first written.
 - Game metadata is Lucene stored fields. There is no Mongo round-trip to restore.
 - Stockfish is not in git. The image and `scripts/download_stockfish.sh` download it.
 - `games/games.json.zip` is Git LFS. `make index` needs `git lfs pull`.
-- Product issues stay deferred until the owner says otherwise. Open tech work is finished or explicitly skipped before starting a product issue.
+- Product issues #17–#23 are the open track, one issue per PR. The owner started it after #35 merged.

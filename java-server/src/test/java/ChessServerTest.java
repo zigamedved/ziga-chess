@@ -466,6 +466,28 @@ public class ChessServerTest {
     }
 
     @Test
+    void similarPgn_wrapsMovetextAndKeepsHeadedGames() {
+        Map<String, Object> movetext = new java.util.LinkedHashMap<>();
+        movetext.put("name", "Game \"one\"");
+        movetext.put("white", "A");
+        movetext.put("black", "B");
+        movetext.put("result", "1-0");
+        movetext.put("endgameFen", "8/8/8/8/8/8/4k3/4K3 w - - 0 1");
+        movetext.put("pgn", "1. e4 1-0");
+
+        Map<String, Object> headed = new java.util.LinkedHashMap<>();
+        headed.put("pgn", "[Event \"already\"]\n\n1. d4 1-0");
+
+        Map<String, Object> empty = new java.util.LinkedHashMap<>();
+        empty.put("pgn", "  ");
+
+        String pgn = SimilarPgn.format(java.util.List.of(movetext, empty, headed));
+        assertTrue(pgn.startsWith("[Event \"Game \\\"one\\\"\"]\n[White \"A\"]\n"));
+        assertTrue(pgn.contains("[SetUp \"1\"]\n\n1. e4 1-0\n\n[Event \"already\"]"));
+        assertTrue(pgn.endsWith("1. d4 1-0\n"));
+    }
+
+    @Test
     void analyseHandler_requiresAuthAndFen(@TempDir Path tempDir) throws Exception {
         buildFixtureIndex(tempDir);
         System.setProperty("chess.indexDir", tempDir.toString());
@@ -514,6 +536,10 @@ public class ChessServerTest {
         assertTrue(json.getAsJsonObject("meta").get("tookMs").getAsLong() >= 0);
         assertEquals(12, json.getAsJsonObject("meta").get("engineDepth").getAsInt());
         assertEquals(8, json.getAsJsonObject("meta").get("limitDepth").getAsInt());
+        String similarPgn = json.get("similarPgn").getAsString();
+        assertTrue(similarPgn.contains("[White \"Fixture, White\"]"));
+        assertTrue(similarPgn.contains("[FEN \"r4rk1/4Rppp/p1p5/P1p5/8/3P2P1/1PP2P1P/R5K1 b - - 0 25\"]"));
+        assertTrue(similarPgn.contains("1. e4 e5 1-0"));
 
         FakeExchange plain = new FakeExchange();
         plain.requestHeaders.add("Authorization", basicAuth("test-user", "test-password"));

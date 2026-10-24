@@ -11,6 +11,7 @@ const fenInput = document.querySelector("#fen");
 const pgnInput = document.querySelector("#pgn");
 const statusEl = document.querySelector("#status");
 const analyseBtn = document.querySelector("#analyse");
+const downloadBtn = document.querySelector("#download-pgn");
 const userInput = document.querySelector("#user");
 const passInput = document.querySelector("#pass");
 const movesEl = document.querySelector("#moves");
@@ -222,22 +223,61 @@ for (const [id, delta] of [["sim-start", -999], ["sim-prev", -1], ["sim-next", 1
   });
 }
 
-fenInput.addEventListener("change", () => {
-  const fen = fenInput.value.trim();
+function placeFen(fen, label) {
   const chess = new Chess();
   if (!chess.validate_fen(fen).valid) {
-    setStatus("That FEN could not be placed on the board.", true);
-    return;
+    return false;
   }
   chess.load(fen);
-  main.fens = [chess.fen()];
+  const placed = chess.fen();
+  fenInput.value = placed;
+  main.fens = [placed];
   main.sans = [];
   main.marks = [null];
   main.index = 0;
-  main.label = "Starting position";
+  main.label = label;
   showMain();
   renderMoves();
+  return true;
+}
+
+fenInput.addEventListener("change", () => {
+  if (!placeFen(fenInput.value.trim(), "Starting position")) {
+    setStatus("That FEN could not be placed on the board.", true);
+    return;
+  }
   setStatus("", false);
+});
+
+document.querySelector("#copy-link").addEventListener("click", async () => {
+  const fen = fenInput.value.trim();
+  if (!new Chess().validate_fen(fen).valid) {
+    setStatus("That FEN could not be placed on the board.", true);
+    return;
+  }
+  const url = new URL(window.location.href);
+  url.searchParams.set("fen", fen);
+  history.replaceState(null, "", url);
+  try {
+    await navigator.clipboard.writeText(url.toString());
+    setStatus("Link copied.", false);
+  } catch (err) {
+    setStatus(url.toString(), false);
+  }
+});
+
+downloadBtn.addEventListener("click", () => {
+  const text = (window.__lastAnalyse && window.__lastAnalyse.similarPgn) || "";
+  if (!text.trim()) {
+    setStatus("No similar games to download.", true);
+    return;
+  }
+  const file = new Blob([text], { type: "application/x-chess-pgn" });
+  const link = document.createElement("a");
+  link.href = URL.createObjectURL(file);
+  link.download = "similar-games.pgn";
+  link.click();
+  URL.revokeObjectURL(link.href);
 });
 
 analyseBtn.addEventListener("click", async () => {
@@ -247,6 +287,7 @@ analyseBtn.addEventListener("click", async () => {
   localStorage.setItem("ziga-chess-user", user);
   localStorage.setItem("ziga-chess-pass", pass);
   analyseBtn.disabled = true;
+  downloadBtn.disabled = true;
   setStatus("Analysing…", false);
   try {
     const response = await fetch(apiPrefix + "/analyse", {
@@ -265,6 +306,7 @@ analyseBtn.addEventListener("click", async () => {
     window.__lastAnalyse = payload;
     selectLine("PV1", payload.principalVariations[0].pgn);
     renderGames(payload.similarGames || []);
+    downloadBtn.disabled = !(payload.similarPgn && payload.similarPgn.trim());
     const ms = payload.meta && payload.meta.tookMs;
     setStatus("Done in " + ms + " ms.", false);
   } catch (err) {
@@ -283,4 +325,8 @@ function basicAuthHeader(user, pass) {
   return "Basic " + btoa(binary);
 }
 
+const linked = new URLSearchParams(window.location.search).get("fen");
+if (linked && !placeFen(linked, "Shared position")) {
+  setStatus("The fen link is not a valid position.", true);
+}
 showMain();

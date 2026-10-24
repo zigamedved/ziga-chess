@@ -1,7 +1,7 @@
 openapi: 3.0.3
 info:
   title: ziga-chess analyse
-  version: "1.0.0"
+  version: "1.1.0"
   description: >
     Public API of the single JVM on port 8081. POST /analyse returns this
     document by default. Accept text/plain returns the previous thesis body.
@@ -76,7 +76,7 @@ components:
           type: string
     AnalyseResponse:
       type: object
-      required: [fen, principalVariations, similarGames, meta]
+      required: [fen, principalVariations, similarGames, similarPgn, meta]
       properties:
         fen:
           type: string
@@ -88,6 +88,13 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/SimilarGame"
+        similarPgn:
+          type: string
+          description: >
+            Multi-game PGN of similarGames, in rank order. A stored movetext
+            gains Event, White, Black, Result, and FEN headers. A game whose
+            PGN already starts with "[" is copied through. Games are separated
+            by a blank line.
         meta:
           $ref: "#/components/schemas/AnalyseMeta"
     PrincipalVariation:
