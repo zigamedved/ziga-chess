@@ -61,6 +61,9 @@ public final class AnalyseResponse {
         row.put("pv2", text(hit, "PV2"));
         Object score = hit.get("score");
         row.put("score", score instanceof Number ? score : 0);
+        if (hit.get("explanation") instanceof Map) {
+            row.put("explanation", hit.get("explanation"));
+        }
         return row;
     }
 

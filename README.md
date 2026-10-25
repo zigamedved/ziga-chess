@@ -129,6 +129,8 @@ A shared position is `/?fen=` plus the FEN, URL-encoded (`/` as `%2F`, spaces as
 
 Download PGN saves the `similarPgn` field: one game per similar hit, separated by a blank line. Movetext-only games gain `[Event]`, `[White]`, `[Black]`, `[Result]`, `[FEN]`, and `[SetUp "1"]`. A stored PGN that already starts with `[` is copied through.
 
+Each similar game includes `explanation`: a BM25 score for `static`, `other`, and `dynamic`, plus up to five matched tokens. The board lists those tokens under the game. `Accept: text/plain` leaves the explanation out so the thesis body stays the stored fields.
+
 ![Board with the sample FEN](docs/ui/board.png)
 
 ![Analyse result with a similar game](docs/ui/analyse.png)

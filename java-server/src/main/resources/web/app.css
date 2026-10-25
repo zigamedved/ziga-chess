@@ -145,6 +145,13 @@ textarea, input {
 
 .game-list button, .moves button { text-align: left; }
 
+.why {
+  margin: 2px 0 10px;
+  color: var(--muted);
+  font-size: 0.85rem;
+  font-family: "Avenir Next", "Segoe UI", sans-serif;
+}
+
 .game-list button.active, .moves button.active, .pv-tabs button.active {
   border-color: var(--accent);
   color: var(--accent);
