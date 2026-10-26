@@ -103,8 +103,10 @@ textarea, input {
 .board {
   display: grid;
   grid-template-columns: repeat(8, 1fr);
+  grid-template-rows: repeat(8, minmax(0, 1fr));
   width: min(100%, 460px);
   aspect-ratio: 1;
+  container-type: inline-size;
   border-radius: 6px;
   overflow: hidden;
   box-shadow: 0 10px 30px rgba(40, 28, 12, 0.12);
@@ -114,7 +116,10 @@ textarea, input {
   display: flex;
   align-items: center;
   justify-content: center;
+  min-width: 0;
+  min-height: 0;
   font-size: clamp(1.4rem, 4vw, 2.5rem);
+  font-size: calc(100cqi / 8 * 0.72);
   line-height: 1;
   user-select: none;
 }
