@@ -8,7 +8,6 @@ const PIECES = {
 };
 
 const fenInput = document.querySelector("#fen");
-const pgnInput = document.querySelector("#pgn");
 const statusEl = document.querySelector("#status");
 const analyseBtn = document.querySelector("#analyse");
 const downloadBtn = document.querySelector("#download-pgn");
@@ -16,12 +15,11 @@ const userInput = document.querySelector("#user");
 const passInput = document.querySelector("#pass");
 const movesEl = document.querySelector("#moves");
 const gameList = document.querySelector("#game-list");
-const similarPanel = document.querySelector("#similar-panel");
-const similarTitle = document.querySelector("#similar-title");
-const similarMeta = document.querySelector("#similar-meta");
+const reviewEl = document.querySelector("#review");
+const reviewName = document.querySelector("#review-name");
 
 const main = { fens: [SAMPLE], sans: [], marks: [null], index: 0, label: "Starting position" };
-const similar = { fens: [], sans: [], marks: [], index: 0 };
+let bestLine = null;
 
 // Credentials stay in localStorage as plain text. Game names and moves are set with textContent.
 userInput.value = localStorage.getItem("ziga-chess-user") || "";
@@ -50,38 +48,56 @@ function paint(el, fen, mark) {
       }
       continue;
     }
-    el.append(square(file, rank, PIECES[symbol] || "", mark));
+    el.append(square(file, rank, symbol, mark));
     file += 1;
   }
   el.setAttribute("aria-label", fen);
 }
 
-function square(file, rank, glyph, mark) {
+function square(file, rank, symbol, mark) {
   const name = "abcdefgh"[file] + rank;
   const node = document.createElement("div");
   const light = (file + rank) % 2 === 1;
   node.className = "sq " + (light ? "light" : "dark");
+  if (symbol) {
+    node.classList.add(symbol === symbol.toUpperCase() ? "w" : "b");
+    node.textContent = PIECES[symbol] || "";
+  }
   if (mark && (mark.from === name || mark.to === name)) {
     node.classList.add("mark");
   }
-  node.textContent = glyph;
   return node;
+}
+
+function showArrow(mark) {
+  const svg = document.querySelector("#arrow");
+  const line = document.querySelector("#arrow-line");
+  if (!mark) {
+    svg.classList.add("hidden");
+    return;
+  }
+  const point = (squareName) => [
+    "abcdefgh".indexOf(squareName[0]) + 0.5,
+    8.5 - Number(squareName[1]),
+  ];
+  const [x1, y1] = point(mark.from);
+  const [x2, y2] = point(mark.to);
+  line.setAttribute("x1", x1);
+  line.setAttribute("y1", y1);
+  line.setAttribute("x2", x2);
+  line.setAttribute("y2", y2);
+  svg.classList.remove("hidden");
 }
 
 function showMain() {
   const fen = main.fens[main.index] || SAMPLE;
-  paint(document.querySelector("#board"), fen, main.marks[main.index]);
+  const mark = main.marks[main.index];
+  paint(document.querySelector("#board"), fen, mark);
+  showArrow(mark);
   const move = main.sans[main.index - 1];
   document.querySelector("#board-caption").textContent = move
     ? main.label + " · " + move
     : main.label;
-}
-
-function showSimilar() {
-  if (!similar.fens.length) {
-    return;
-  }
-  paint(document.querySelector("#similar-board"), similar.fens[similar.index], similar.marks[similar.index]);
 }
 
 function lineFromPgn(pgn, fallbackFen) {
@@ -139,7 +155,9 @@ function step(line, delta, render) {
 }
 
 function selectLine(which, pgn) {
-  const line = lineFromPgn(pgn, fenInput.value.trim() || SAMPLE);
+  bestLine = null;
+  reviewEl.classList.add("hidden");
+  const line = lineFromPgn(pgn, currentFen());
   main.fens = line.fens;
   main.sans = line.sans;
   main.marks = line.marks;
@@ -151,20 +169,52 @@ function selectLine(which, pgn) {
   document.querySelector("#show-pv2").classList.toggle("active", which === "PV2");
 }
 
+function rememberBest() {
+  if (bestLine) {
+    return;
+  }
+  bestLine = {
+    fens: main.fens.slice(),
+    sans: main.sans.slice(),
+    marks: main.marks.slice(),
+    index: main.index,
+    label: main.label,
+  };
+}
+
 function selectGame(game, button) {
-  const fen = game.endgameFen || fenInput.value.trim();
+  rememberBest();
+  const fen = game.endgameFen || currentFen();
   const line = lineFromPgn(game.pv1 || "", fen);
-  similar.fens = line.fens.length ? line.fens : [fen];
-  similar.sans = line.sans;
-  similar.marks = line.marks.length ? line.marks : [null];
-  similar.index = 0;
-  similarTitle.textContent = game.white + " – " + game.black;
-  const why = whyText(game);
-  similarMeta.textContent = game.result + " · score " + game.score + (why ? " · " + why : "");
-  similarPanel.classList.remove("hidden");
-  showSimilar();
+  main.fens = line.fens.length ? line.fens : [fen];
+  main.sans = line.sans;
+  main.marks = line.marks.length ? line.marks : [null];
+  main.index = line.sans.length ? 1 : 0;
+  main.label = game.white + " – " + game.black;
+  reviewName.textContent = main.label;
+  reviewEl.classList.remove("hidden");
+  showMain();
+  renderMoves();
   for (const node of gameList.querySelectorAll("button")) {
     node.classList.toggle("active", node === button);
+  }
+}
+
+function restoreBest() {
+  if (!bestLine) {
+    return;
+  }
+  main.fens = bestLine.fens;
+  main.sans = bestLine.sans;
+  main.marks = bestLine.marks;
+  main.index = bestLine.index;
+  main.label = bestLine.label;
+  bestLine = null;
+  reviewEl.classList.add("hidden");
+  showMain();
+  renderMoves();
+  for (const node of gameList.querySelectorAll("button")) {
+    node.classList.remove("active");
   }
 }
 
@@ -176,9 +226,41 @@ function whyText(game) {
   return tokens.map((token) => token.field + ":" + token.token).join("  ");
 }
 
+function matchPercent(game, games) {
+  const top = Math.max(...games.map((row) => Number(row.score) || 0), 0);
+  if (top <= 0) {
+    return 0;
+  }
+  return Math.round(((Number(game.score) || 0) / top) * 100);
+}
+
+function renderMeter(games) {
+  let white = 0;
+  let draw = 0;
+  let black = 0;
+  for (const game of games) {
+    if (game.result === "1-0") white += 1;
+    else if (game.result === "0-1") black += 1;
+    else if (game.result === "1/2-1/2") draw += 1;
+  }
+  const total = white + draw + black;
+  const caption = document.querySelector("#meter-caption");
+  const set = (id, count) => {
+    document.querySelector(id).style.flex = String(total ? count : 0);
+  };
+  set("#meter-white", white);
+  set("#meter-draw", draw);
+  set("#meter-black", black);
+  caption.textContent = total
+    ? white + " · " + draw + " · " + black
+    : "Results";
+}
+
 function renderGames(games) {
   gameList.replaceChildren();
-  similarPanel.classList.add("hidden");
+  reviewEl.classList.add("hidden");
+  bestLine = null;
+  renderMeter(games);
   if (!games.length) {
     const empty = document.createElement("li");
     empty.textContent = "No similar games in this index.";
@@ -189,37 +271,36 @@ function renderGames(games) {
     const item = document.createElement("li");
     const button = document.createElement("button");
     button.type = "button";
-    button.textContent = "#" + game.rank + "  " + game.white + " – " + game.black + "  " + game.score;
-    button.addEventListener("click", () => selectGame(game, button));
-    item.append(button);
+    const thumb = document.createElement("div");
+    thumb.className = "board thumb";
+    thumb.setAttribute("aria-hidden", "true");
+    const copy = document.createElement("span");
+    copy.className = "game-copy";
+    const title = document.createElement("strong");
+    title.textContent = game.white + " – " + game.black;
+    const meta = document.createElement("span");
+    const pct = matchPercent(game, games);
+    meta.textContent = (game.result || "—") + " · " + pct + "% match";
+    const bar = document.createElement("span");
+    bar.className = "match";
+    const fill = document.createElement("span");
+    fill.style.width = pct + "%";
+    bar.append(fill);
+    copy.append(title, meta, bar);
     const why = whyText(game);
     if (why) {
-      const note = document.createElement("p");
+      const note = document.createElement("span");
       note.className = "why";
       note.textContent = why;
-      item.append(note);
+      copy.append(note);
     }
+    button.append(thumb, copy);
+    button.addEventListener("click", () => selectGame(game, button));
+    item.append(button);
     gameList.append(item);
+    paint(thumb, game.endgameFen || currentFen(), null);
   });
 }
-
-document.querySelector("#load-pgn").addEventListener("click", () => {
-  const line = lineFromPgn(pgnInput.value, fenInput.value.trim() || SAMPLE);
-  const header = line.fens[0];
-  if (!pgnInput.value.trim() || header === (fenInput.value.trim() || SAMPLE) && !line.sans.length) {
-    setStatus("Could not read a position from that PGN.", true);
-    return;
-  }
-  fenInput.value = header;
-  main.fens = [header];
-  main.sans = [];
-  main.marks = [null];
-  main.index = 0;
-  main.label = "Loaded from PGN";
-  showMain();
-  renderMoves();
-  setStatus("FEN loaded from the PGN header, or from the position after the moves.", false);
-});
 
 document.querySelector("#show-pv1").addEventListener("click", () => {
   if (window.__lastAnalyse) selectLine("PV1", window.__lastAnalyse.principalVariations[0].pgn);
@@ -233,10 +314,34 @@ for (const [id, delta] of [["main-start", -999], ["main-prev", -1], ["main-next"
     step(main, delta, () => { showMain(); renderMoves(); });
   });
 }
-for (const [id, delta] of [["sim-start", -999], ["sim-prev", -1], ["sim-next", 1], ["sim-end", 999]]) {
-  document.querySelector("#" + id).addEventListener("click", () => {
-    step(similar, delta, showSimilar);
-  });
+document.querySelector("#back-line").addEventListener("click", restoreBest);
+
+function currentFen() {
+  return positionFromInput(fenInput.value) || SAMPLE;
+}
+
+function positionFromInput(raw) {
+  const text = (raw || "").trim();
+  if (!text) {
+    return null;
+  }
+  const chess = new Chess();
+  if (chess.validate_fen(text).valid) {
+    chess.load(text);
+    return chess.fen();
+  }
+  try {
+    const probe = new Chess();
+    const loaded = probe.load_pgn(text, { sloppy: true });
+    const fen = probe.fen();
+    const start = new Chess().fen();
+    if (loaded || (probe.validate_fen(fen).valid && fen !== start)) {
+      return fen;
+    }
+  } catch (err) {
+    return null;
+  }
+  return null;
 }
 
 function placeFen(fen, label) {
@@ -258,15 +363,17 @@ function placeFen(fen, label) {
 }
 
 fenInput.addEventListener("change", () => {
-  if (!placeFen(fenInput.value.trim(), "Starting position")) {
-    setStatus("That FEN could not be placed on the board.", true);
+  const fen = positionFromInput(fenInput.value);
+  if (!fen) {
+    setStatus("That text is not a FEN or a PGN.", true);
     return;
   }
+  placeFen(fen, "Position");
   setStatus("", false);
 });
 
 document.querySelector("#copy-link").addEventListener("click", async () => {
-  const fen = fenInput.value.trim();
+  const fen = currentFen();
   if (!new Chess().validate_fen(fen).valid) {
     setStatus("That FEN could not be placed on the board.", true);
     return;
@@ -297,7 +404,12 @@ downloadBtn.addEventListener("click", () => {
 });
 
 analyseBtn.addEventListener("click", async () => {
-  const fen = fenInput.value.trim();
+  const fen = positionFromInput(fenInput.value);
+  if (!fen) {
+    setStatus("Enter a FEN or a PGN first.", true);
+    return;
+  }
+  fenInput.value = fen;
   const user = userInput.value;
   const pass = passInput.value;
   localStorage.setItem("ziga-chess-user", user);
