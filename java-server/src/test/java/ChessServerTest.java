@@ -243,6 +243,33 @@ public class ChessServerTest {
         assertEquals("Fixture, White", hit.get("White"));
         assertEquals("Fixture, Black", hit.get("Black"));
         assertTrue(((Number) hit.get("score")).floatValue() > 0f);
+        assertMatchedTokens(hit, "Kg1", "static");
+        assertMatchedTokens(hit, "Dpc", "other");
+        @SuppressWarnings("unchecked")
+        Map<String, Object> explanation = (Map<String, Object>) hit.get("explanation");
+        assertFieldScore(explanation, "dynamic", 0d);
+    }
+
+    @Test
+    void matchExplanation_sumsWeightNodesAndIgnoresBreakdown() {
+        org.apache.lucene.search.Explanation explanation = org.apache.lucene.search.Explanation.match(
+                1.7f,
+                "sum of:",
+                org.apache.lucene.search.Explanation.match(
+                        1.0f,
+                        "weight(static:Kg1 in 0) [BM25Similarity], result of:",
+                        org.apache.lucene.search.Explanation.match(0.4f, "score(freq=1.0), computed as boost * idf * tf")),
+                org.apache.lucene.search.Explanation.match(0.5f, "weight(other:Dpc in 0) [BM25Similarity], result of:"),
+                org.apache.lucene.search.Explanation.match(0.2f, "weight(static:Re7 in 0) [BM25Similarity], result of:"));
+
+        Map<String, Object> parsed = MatchExplanation.from(explanation);
+        assertFieldScore(parsed, "static", 1.2d);
+        assertFieldScore(parsed, "other", 0.5d);
+        assertFieldScore(parsed, "dynamic", 0d);
+        @SuppressWarnings("unchecked")
+        List<Map<String, Object>> tokens = (List<Map<String, Object>>) parsed.get("tokens");
+        assertEquals("Kg1", tokens.get(0).get("token"));
+        assertEquals(3, tokens.size());
     }
 
     @Test
@@ -540,6 +567,7 @@ public class ChessServerTest {
         assertTrue(similarPgn.contains("[White \"Fixture, White\"]"));
         assertTrue(similarPgn.contains("[FEN \"r4rk1/4Rppp/p1p5/P1p5/8/3P2P1/1PP2P1P/R5K1 b - - 0 25\"]"));
         assertTrue(similarPgn.contains("1. e4 e5 1-0"));
+        assertTrue(game.getAsJsonObject("explanation").getAsJsonArray("tokens").size() > 0);
 
         FakeExchange plain = new FakeExchange();
         plain.requestHeaders.add("Authorization", basicAuth("test-user", "test-password"));
@@ -553,6 +581,7 @@ public class ChessServerTest {
         assertTrue(text.contains("PV2: \npv-two"));
         String plainGame = text.substring(text.indexOf("Game #0"));
         assertFieldOrder(plainGame, "name:", "endgameFEN:", "White:", "Black:", "Result:", "PGN:", "PV1:", "PV2:", "score:");
+        assertFalse(plainGame.contains("explanation"));
     }
 
     @Test
@@ -587,6 +616,31 @@ public class ChessServerTest {
         assertEquals("Kg1 Re7 Dpc", result.features);
         assertEquals("pv-one", result.pv1);
         assertEquals("pv-two", result.pv2);
+    }
+
+    @SuppressWarnings("unchecked")
+    private static void assertMatchedTokens(Map<String, Object> hit, String token, String field) {
+        Map<String, Object> explanation = (Map<String, Object>) hit.get("explanation");
+        List<Map<String, Object>> tokens = (List<Map<String, Object>>) explanation.get("tokens");
+        boolean found = false;
+        for (Map<String, Object> row : tokens) {
+            if (token.equals(row.get("token")) && field.equals(row.get("field"))) {
+                found = true;
+            }
+        }
+        assertTrue(found, "tokens=" + tokens);
+    }
+
+    @SuppressWarnings("unchecked")
+    private static void assertFieldScore(Map<String, Object> explanation, String field, double expected) {
+        List<Map<String, Object>> fields = (List<Map<String, Object>>) explanation.get("fields");
+        for (Map<String, Object> row : fields) {
+            if (field.equals(row.get("field"))) {
+                assertEquals(expected, ((Number) row.get("score")).doubleValue(), 0.0001d);
+                return;
+            }
+        }
+        assertTrue(false, "missing field " + field);
     }
 
     private static void assertFieldOrder(String body, String... labels) {

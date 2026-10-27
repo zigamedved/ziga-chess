@@ -85,7 +85,8 @@ public class LuceneSearchService {
         IndexSearcher searcher = searcherManager.acquire();
         try {
             String escapedText = escapeCharacters(input);
-            TopDocs foundDocs = searchInContent(escapedText, searcher, topK());
+            Query query = parseQuery(escapedText);
+            TopDocs foundDocs = searcher.search(query, topK());
 
             List<Map<String, Object>> result = new ArrayList<>();
             for (ScoreDoc sd : foundDocs.scoreDocs) {
@@ -101,6 +102,7 @@ public class LuceneSearchService {
                 row.put("PV1", nullToEmpty(d.get("PV1")));
                 row.put("PV2", nullToEmpty(d.get("PV2")));
                 row.put("score", sd.score);
+                row.put("explanation", MatchExplanation.forDoc(searcher, query, sd.doc));
                 result.add(row);
             }
             return result;
@@ -195,8 +197,7 @@ public class LuceneSearchService {
         return value == null ? "" : value;
     }
 
-    private static TopDocs searchInContent(String textToFind, IndexSearcher searcher, int limit)
-            throws Exception {
+    private static Query parseQuery(String textToFind) throws Exception {
         MyAnalyzer analyzer = new MyAnalyzer();
         String[] fields = { "static", "other", "dynamic" };
         Map<String, Float> boosts = new HashMap<>();
@@ -204,8 +205,7 @@ public class LuceneSearchService {
         boosts.put("other", 1.0f);
         boosts.put("dynamic", 1.0f);
         MultiFieldQueryParser queryParser = new MultiFieldQueryParser(fields, analyzer, boosts);
-        Query query = queryParser.parse(textToFind);
-        return searcher.search(query, limit);
+        return queryParser.parse(textToFind);
     }
 
     static final class Bm25SearcherFactory extends SearcherFactory {

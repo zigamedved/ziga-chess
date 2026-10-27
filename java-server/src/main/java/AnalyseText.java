@@ -23,6 +23,9 @@ public final class AnalyseText {
             StringBuilder fields = new StringBuilder();
             boolean first = true;
             for (Map.Entry<String, Object> entry : game.entrySet()) {
+                if ("explanation".equals(entry.getKey())) {
+                    continue;
+                }
                 if (!first) {
                     fields.append('\n');
                 }

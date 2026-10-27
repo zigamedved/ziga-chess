@@ -1,7 +1,7 @@
 openapi: 3.0.3
 info:
   title: ziga-chess analyse
-  version: "1.1.0"
+  version: "1.2.0"
   description: >
     Public API of the single JVM on port 8081. POST /analyse returns this
     document by default. Accept text/plain returns the previous thesis body.
@@ -107,7 +107,7 @@ components:
           type: string
     SimilarGame:
       type: object
-      required: [rank, name, white, black, result, endgameFen, pgn, pv1, pv2, score]
+      required: [rank, name, white, black, result, endgameFen, pgn, pv1, pv2, score, explanation]
       properties:
         rank:
           type: integer
@@ -129,6 +129,39 @@ components:
           type: string
         score:
           type: number
+        explanation:
+          $ref: "#/components/schemas/MatchExplanation"
+    MatchExplanation:
+      type: object
+      required: [fields, tokens]
+      description: >
+        Why this game matched. Field scores sum the BM25 weight of matched
+        tokens in static, other, and dynamic. tokens lists at most five,
+        highest score first.
+      properties:
+        fields:
+          type: array
+          items:
+            type: object
+            required: [field, score]
+            properties:
+              field:
+                type: string
+                enum: [static, other, dynamic]
+              score:
+                type: number
+        tokens:
+          type: array
+          items:
+            type: object
+            required: [field, token, score]
+            properties:
+              field:
+                type: string
+              token:
+                type: string
+              score:
+                type: number
     AnalyseMeta:
       type: object
       required: [engineDepth, limitDepth, tookMs]

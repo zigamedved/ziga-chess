@@ -19,6 +19,13 @@ Date is the day the mistake was found, not the day the code was first written.
 
 ## CI and runtime
 
+### 2026-10-26 — board rows follow the piece glyph, not the square
+
+- **Assumed:** a square grid with eight `1fr` columns and `aspect-ratio: 1` makes every rank the same height.
+- **Actually:** row tracks were `auto`. A rank whose glyphs are short (pawns only, rank 5 in the sample) keeps a smaller min-content height, so that rank looks squashed. Ranks with a rook or king stay taller.
+- **Broke:** the board on `GET /`. The fourth rank from the top was shorter than the others.
+- **Do this:** set `grid-template-rows: repeat(8, minmax(0, 1fr))` and `min-height: 0` on `.sq`. Size the glyph with `calc(100cqi / 8 * 0.72)` on `.sq`, and put `container-type: inline-size` on `.board`. A query on the square itself reads the viewport, not the square.
+
 ### 2026-10-22 — a healthy container can still be the pre-board jar
 
 - **Assumed:** starting compose after the board commit serves `GET /` from the current tree.

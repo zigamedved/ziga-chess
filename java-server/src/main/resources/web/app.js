@@ -159,12 +159,21 @@ function selectGame(game, button) {
   similar.marks = line.marks.length ? line.marks : [null];
   similar.index = 0;
   similarTitle.textContent = game.white + " – " + game.black;
-  similarMeta.textContent = game.result + " · score " + game.score;
+  const why = whyText(game);
+  similarMeta.textContent = game.result + " · score " + game.score + (why ? " · " + why : "");
   similarPanel.classList.remove("hidden");
   showSimilar();
   for (const node of gameList.querySelectorAll("button")) {
     node.classList.toggle("active", node === button);
   }
+}
+
+function whyText(game) {
+  const tokens = game.explanation && game.explanation.tokens;
+  if (!tokens || !tokens.length) {
+    return "";
+  }
+  return tokens.map((token) => token.field + ":" + token.token).join("  ");
 }
 
 function renderGames(games) {
@@ -183,6 +192,13 @@ function renderGames(games) {
     button.textContent = "#" + game.rank + "  " + game.white + " – " + game.black + "  " + game.score;
     button.addEventListener("click", () => selectGame(game, button));
     item.append(button);
+    const why = whyText(game);
+    if (why) {
+      const note = document.createElement("p");
+      note.className = "why";
+      note.textContent = why;
+      item.append(note);
+    }
     gameList.append(item);
   });
 }
