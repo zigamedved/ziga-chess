@@ -19,6 +19,13 @@ Date is the day the mistake was found, not the day the code was first written.
 
 ## CI and runtime
 
+### 2026-10-27 — a nowrap history row widens the phone layout
+
+- **Assumed:** `grid-template-columns: 1fr` under 1100px keeps the dashboard inside the viewport.
+- **Actually:** a grid item's default `min-width` is `auto`, so it uses the row's min-content. A history FEN with `white-space: nowrap` is wider than a phone. The page scrolls sideways and the board grows with it.
+- **Broke:** the board at a 390px layout width. `scrollWidth` was larger than the viewport.
+- **Do this:** set `min-width: 0` on `.dashboard > *` and on the history and game buttons. Keep the ellipsis on the FEN.
+
 ### 2026-10-26 — board rows follow the piece glyph, not the square
 
 - **Assumed:** a square grid with eight `1fr` columns and `aspect-ratio: 1` makes every rank the same height.

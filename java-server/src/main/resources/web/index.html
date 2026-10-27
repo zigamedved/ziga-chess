@@ -11,72 +11,84 @@
   <header class="top">
     <div>
       <p class="eyebrow">ziga-chess</p>
-      <h1>Similar rook endgames</h1>
+      <h1>Rook endgame studio</h1>
     </div>
-    <button id="analyse" class="primary" type="button">Analyse</button>
+    <p id="status" class="status" role="status"></p>
   </header>
 
-  <p id="status" class="status" role="status"></p>
-
-  <main class="layout">
-    <section class="hero" aria-label="Position">
-      <div class="board-wrap">
-        <div id="board" class="board" role="img" aria-label="Chessboard"></div>
-        <p id="board-caption" class="caption">Starting position</p>
-        <div class="stepper">
-          <button type="button" id="main-start" aria-label="First position">|&lt;</button>
-          <button type="button" id="main-prev" aria-label="Previous move">&lt;</button>
-          <button type="button" id="main-next" aria-label="Next move">&gt;</button>
-          <button type="button" id="main-end" aria-label="Last position">&gt;|</button>
+  <main class="dashboard">
+    <section class="glass panel" aria-label="Controls">
+      <div class="profile">
+        <span id="avatar" class="avatar" aria-hidden="true">?</span>
+        <div>
+          <strong id="who">Not signed in</strong>
+          <p id="who-hint" class="hint">Add a username. Analyse sends it as Basic auth.</p>
         </div>
       </div>
-      <label class="field">
-        <span>FEN</span>
-        <textarea id="fen" rows="3" spellcheck="false">r4rk1/4Rppp/p1p5/P1p5/8/3P2P1/1PP2P1P/R5K1 b - - 0 25</textarea>
-      </label>
-      <div class="actions">
-        <button id="copy-link" type="button" class="secondary">Copy link</button>
+
+      <div class="card">
+        <label class="field">
+          <span>Position</span>
+          <textarea id="fen" rows="6" spellcheck="false" placeholder="Paste your FEN or PGN here...">r4rk1/4Rppp/p1p5/P1p5/8/3P2P1/1PP2P1P/R5K1 b - - 0 25</textarea>
+        </label>
+        <button id="analyse" class="primary" type="button">Analyze Game</button>
+        <div class="actions">
+          <button id="copy-link" type="button" class="ghost">Copy link</button>
+          <button id="download-pgn" type="button" class="ghost" disabled>Download PGN</button>
+        </div>
+        <div class="auth">
+          <label class="field">Username <input id="user" autocomplete="username"></label>
+          <label class="field">Password <input id="pass" type="password" autocomplete="current-password"></label>
+        </div>
       </div>
-      <label class="field">
-        <span>PGN snippet</span>
-        <textarea id="pgn" rows="4" spellcheck="false" placeholder="Paste a game or a line with a FEN header"></textarea>
-      </label>
-      <button id="load-pgn" type="button" class="secondary">Load FEN from PGN</button>
+
+      <div class="section-head">
+        <h2>Analyzed Games History &amp; Review</h2>
+        <p class="hint">Similar games from the last analysis. The percent is match strength, not an engine score.</p>
+      </div>
+      <ul id="history-list" class="history"></ul>
+      <ul id="game-list" class="game-list"></ul>
     </section>
 
-    <section class="side">
-      <details class="auth">
-        <summary>Connection</summary>
-        <label class="field">Username <input id="user" autocomplete="username"></label>
-        <label class="field">Password <input id="pass" type="password" autocomplete="current-password"></label>
-        <p class="hint">Saved in this browser only. Sent as Basic auth when you press Analyse.</p>
-      </details>
-
-      <div class="lines">
-        <h2>Lines</h2>
-        <div class="pv-tabs">
-          <button type="button" id="show-pv1" class="secondary">PV1</button>
-          <button type="button" id="show-pv2" class="secondary">PV2</button>
+    <section class="glass stage" aria-label="Board">
+      <div class="meter-wrap">
+        <div id="meter" class="meter" role="img" aria-label="White wins, draws, and black wins among suggested games">
+          <span id="meter-white"></span>
+          <span id="meter-draw"></span>
+          <span id="meter-black"></span>
         </div>
-        <ol id="moves" class="moves"></ol>
+        <p id="meter-caption" class="caption">Results</p>
       </div>
-
-      <div class="games">
-        <div class="section-head">
-          <h2>Similar games</h2>
-          <button id="download-pgn" type="button" class="secondary" disabled>Download PGN</button>
+      <div class="board-col">
+        <div id="review" class="review hidden">
+          <span id="review-name"></span>
+          <button id="back-line" type="button" class="ghost">Back to best line</button>
         </div>
-        <ul id="game-list" class="game-list"></ul>
-        <div id="similar-panel" class="similar hidden">
-          <h3 id="similar-title"></h3>
-          <div id="similar-board" class="board" role="img" aria-label="Similar game"></div>
-          <div class="stepper">
-            <button type="button" id="sim-start" aria-label="Similar game start">|&lt;</button>
-            <button type="button" id="sim-prev" aria-label="Similar game previous">&lt;</button>
-            <button type="button" id="sim-next" aria-label="Similar game next">&gt;</button>
-            <button type="button" id="sim-end" aria-label="Similar game end">&gt;|</button>
+        <div class="board-frame">
+          <div id="board" class="board" role="img" aria-label="Chessboard"></div>
+          <svg id="arrow" class="arrow hidden" viewBox="0 0 8 8" preserveAspectRatio="none" aria-hidden="true">
+            <defs>
+              <marker id="arrow-head" markerWidth="3" markerHeight="3" refX="1.2" refY="1.5" orient="auto">
+                <path d="M0,0 L3,1.5 L0,3 z" fill="#7ab6ff" />
+              </marker>
+            </defs>
+            <line id="arrow-line" stroke="#7ab6ff" stroke-width="0.22" stroke-linecap="round" marker-end="url(#arrow-head)" />
+          </svg>
+        </div>
+        <p id="board-caption" class="caption">Starting position</p>
+        <div class="lines">
+          <h2>Engine lines</h2>
+          <div class="pv-tabs">
+            <button type="button" id="show-pv1" class="ghost line-badge"><span class="kicker">PV1</span><span id="pv1-text">—</span></button>
+            <button type="button" id="show-pv2" class="ghost line-badge"><span class="kicker">PV2</span><span id="pv2-text">—</span></button>
           </div>
-          <p id="similar-meta" class="caption"></p>
+          <ol id="moves" class="moves"></ol>
+          <div class="stepper">
+            <button type="button" id="main-start" aria-label="First position">|&lt;</button>
+            <button type="button" id="main-prev" aria-label="Previous move">&lt;</button>
+            <button type="button" id="main-next" aria-label="Next move">&gt;</button>
+            <button type="button" id="main-end" aria-label="Last position">&gt;|</button>
+          </div>
         </div>
       </div>
     </section>

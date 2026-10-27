@@ -73,7 +73,7 @@ public class ChessServerTest {
         handler.handle(page);
         assertEquals(200, page.statusCode);
         assertTrue(page.responseHeaders.getFirst("Content-Type").startsWith("text/html"));
-        assertTrue(page.responseBody.toString("UTF-8").contains("Analyse"));
+        assertTrue(page.responseBody.toString("UTF-8").contains("Analyze Game"));
         assertTrue(page.responseBody.toString("UTF-8").contains("content=\"\""));
 
         System.setProperty("chess.appPrefix", "/v1/chess");
