@@ -17,6 +17,8 @@ const movesEl = document.querySelector("#moves");
 const gameList = document.querySelector("#game-list");
 const reviewEl = document.querySelector("#review");
 const reviewName = document.querySelector("#review-name");
+const historyList = document.querySelector("#history-list");
+const HISTORY_KEY = "ziga-chess-history";
 
 const main = { fens: [SAMPLE], sans: [], marks: [null], index: 0, label: "Starting position" };
 let bestLine = null;
@@ -24,10 +26,93 @@ let bestLine = null;
 // Credentials stay in localStorage as plain text. Game names and moves are set with textContent.
 userInput.value = localStorage.getItem("ziga-chess-user") || "";
 passInput.value = localStorage.getItem("ziga-chess-pass") || "";
+userInput.addEventListener("input", renderProfile);
+renderProfile();
 
 function setStatus(text, isError) {
   statusEl.textContent = text;
   statusEl.classList.toggle("error", Boolean(isError));
+}
+
+function renderProfile() {
+  const name = userInput.value.trim();
+  document.querySelector("#avatar").textContent = name ? name.slice(0, 1).toUpperCase() : "?";
+  document.querySelector("#who").textContent = name ? name : "Not signed in";
+  document.querySelector("#who-hint").textContent = name
+    ? "Saved in this browser. Analyse sends it as Basic auth."
+    : "Add a username. Analyse sends it as Basic auth.";
+}
+
+function formatLine(sans, fen) {
+  if (!sans.length) {
+    return "";
+  }
+  const parts = (fen || "").split(" ");
+  let number = Number(parts[5]) || 1;
+  let blackToMove = parts[1] === "b";
+  const out = [];
+  for (const san of sans) {
+    if (blackToMove) {
+      out.push(number + "... " + san);
+      blackToMove = false;
+      number += 1;
+    } else {
+      out.push(number + ". " + san);
+      blackToMove = true;
+    }
+  }
+  return out.join(" ");
+}
+
+function describeLine(pgn, fallback) {
+  const line = lineFromPgn(pgn || "", fallback);
+  return formatLine(line.sans, line.fens[0] || fallback);
+}
+
+function showEngineLines(payload) {
+  const fen = currentFen();
+  const lines = (payload && payload.principalVariations) || [];
+  document.querySelector("#pv1-text").textContent = lines[0] ? (describeLine(lines[0].pgn, fen) || "—") : "—";
+  document.querySelector("#pv2-text").textContent = lines[1] ? (describeLine(lines[1].pgn, fen) || "—") : "—";
+}
+
+function readHistory() {
+  try {
+    const rows = JSON.parse(localStorage.getItem(HISTORY_KEY) || "[]");
+    return Array.isArray(rows) ? rows : [];
+  } catch (err) {
+    return [];
+  }
+}
+
+function rememberAnalysis(fen) {
+  const next = [{ fen, at: Date.now() }, ...readHistory().filter((row) => row.fen !== fen)].slice(0, 6);
+  localStorage.setItem(HISTORY_KEY, JSON.stringify(next));
+  renderHistory();
+}
+
+function renderHistory() {
+  historyList.replaceChildren();
+  for (const row of readHistory()) {
+    const item = document.createElement("li");
+    const button = document.createElement("button");
+    button.type = "button";
+    const copy = document.createElement("span");
+    copy.className = "game-copy";
+    const when = document.createElement("strong");
+    when.textContent = new Date(row.at).toLocaleString();
+    const fen = document.createElement("span");
+    fen.textContent = row.fen;
+    copy.append(when, fen);
+    button.append(copy);
+    button.addEventListener("click", () => {
+      if (placeFen(row.fen, "Recent position")) {
+        setStatus("", false);
+      }
+    });
+    item.append(button);
+    historyList.append(item);
+  }
 }
 
 function paint(el, fen, mark) {
@@ -432,7 +517,9 @@ analyseBtn.addEventListener("click", async () => {
       return;
     }
     window.__lastAnalyse = payload;
+    showEngineLines(payload);
     selectLine("PV1", payload.principalVariations[0].pgn);
+    rememberAnalysis(fen);
     renderGames(payload.similarGames || []);
     downloadBtn.disabled = !(payload.similarPgn && payload.similarPgn.trim());
     const ms = payload.meta && payload.meta.tookMs;
@@ -457,4 +544,5 @@ const linked = new URLSearchParams(window.location.search).get("fen");
 if (linked && !placeFen(linked, "Shared position")) {
   setStatus("The fen link is not a valid position.", true);
 }
+renderHistory();
 showMain();
