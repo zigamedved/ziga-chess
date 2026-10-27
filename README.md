@@ -123,7 +123,7 @@ java -jar java-server/target/my-maven-docker-project.jar
 
 Listens on port 8081 (`PORT` overrides). The same process serves the board at `/`.
 
-Open `http://127.0.0.1:8081/`, enter the Basic auth user and password under Connection, and press Analyse. The sample FEN is filled in. `PV1` / `PV2` step on the main board. A similar game opens on the second board at its endgame position and steps that game's first line, not the full PGN. Credentials stay in the browser's local storage.
+Open `http://127.0.0.1:8081/`. The page is two columns. The left column shows the saved username, a box for a FEN or a PGN, and Analyze Game. Enter the Basic auth user and password in that card. The sample FEN is filled in. The right column is the board. The current move is a blue arrow. Engine lines under the board are `PV1` and `PV2`. Suggested games sit in Analyzed Games History & Review: a thumbnail, the players, the result, and a match percent against the strongest hit in that response (a BM25 score, not a win probability or a date). Recent positions from this browser are listed there too. The bar beside the board counts `1-0`, draws, and `0-1` in the suggested games. It is not an engine evaluation. Credentials and the recent-position list stay in the browser's local storage.
 
 A shared position is `/?fen=` plus the FEN, URL-encoded (`/` as `%2F`, spaces as `%20`). Copy link writes that URL. An invalid `fen` parameter leaves the sample position and shows an error.
 
