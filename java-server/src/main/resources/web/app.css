@@ -95,7 +95,10 @@ h2 { font-size: 0.95rem; }
   font-size: 0.8rem;
 }
 
-textarea, input {
+.filters { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.filters .span { grid-column: 1 / -1; }
+
+textarea, input, select {
   width: 100%;
   font: 0.92rem/1.45 ui-monospace, "SFMono-Regular", Menlo, monospace;
   padding: 12px 14px;
@@ -106,7 +109,7 @@ textarea, input {
   transition: border-color 160ms ease;
 }
 
-textarea:hover, input:hover, textarea:focus, input:focus {
+textarea:hover, input:hover, select:hover, textarea:focus, input:focus, select:focus {
   border-color: rgba(122, 182, 255, 0.45);
   outline: none;
 }

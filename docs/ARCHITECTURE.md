@@ -49,7 +49,8 @@ flowchart LR
 | Role | Fields |
 |------|--------|
 | Search (tokenized) | `static`, `other`, `dynamic` |
-| Stored metadata (for the API response) | `name`, `White`, `Black`, `Result`, `PGN`, `PV1`, `PV2`, `endgameFEN` |
+| Stored metadata (for the API response) | `name`, `White`, `Black`, `Result`, `WhiteElo`, `BlackElo`, `PGN`, `PV1`, `PV2`, `endgameFEN` |
+| Filters | `Result` is a `StringField`. `elo` is an `IntPoint`: the average of the ratings present |
 
 If you add games: append JSON lines to the corpus, refresh the zip, run `make index` again (full rebuild today), restart the Java server. The running process keeps one `SearcherManager` and calls `maybeRefresh()` on each search, so an in-place commit is picked up. `make index` opens the index with `OpenMode.CREATE` (it wipes the directory), so restart Java after a full rebuild.
 
@@ -74,7 +75,7 @@ sequenceDiagram
 
 Auth is checked once, on the JVM. The image contains the JRE, `chessapp`, and the Stockfish binary. `CHESSAPP_DIR` is the directory that holds the `chessapp` package. `POST /position` is still registered on the same port for a raw feature string; the client path is `POST /analyse`.
 
-The default `/analyse` body is JSON (`openapi.yaml`), including `similarPgn` for the current similar-game set and an `explanation` of the matched feature tokens on each hit. `Accept: text/plain` returns the thesis text. Errors are JSON objects with `error` and `code`. `GET /` serves the board from the same process. `?fen=` on that page opens a shared position.
+The default `/analyse` body is JSON (`openapi.yaml`), including `similarPgn` for the current similar-game set and an `explanation` of the matched feature tokens on each hit. Optional `result`, `minElo`, and `maxElo` are Lucene filters on that same BM25 query. An empty filter leaves the query unchanged. `Accept: text/plain` returns the thesis text. Errors are JSON objects with `error` and `code`. `GET /` serves the board from the same process. `?fen=` on that page opens a shared position.
 
 Each `/analyse` starts a new CLI process, so the Flask LRU and the `engine_busy` lock do not apply to compose. They still apply if you run `main:app` yourself.
 

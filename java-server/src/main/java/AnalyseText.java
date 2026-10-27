@@ -23,7 +23,9 @@ public final class AnalyseText {
             StringBuilder fields = new StringBuilder();
             boolean first = true;
             for (Map.Entry<String, Object> entry : game.entrySet()) {
-                if ("explanation".equals(entry.getKey())) {
+                if ("explanation".equals(entry.getKey())
+                        || "WhiteElo".equals(entry.getKey())
+                        || "BlackElo".equals(entry.getKey())) {
                     continue;
                 }
                 if (!first) {

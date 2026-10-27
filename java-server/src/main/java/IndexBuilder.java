@@ -6,6 +6,7 @@ import org.apache.lucene.analysis.Tokenizer;
 import org.apache.lucene.analysis.core.WhitespaceTokenizer;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field;
+import org.apache.lucene.document.IntPoint;
 import org.apache.lucene.document.StoredField;
 import org.apache.lucene.document.StringField;
 import org.apache.lucene.document.TextField;
@@ -29,7 +30,8 @@ import java.nio.file.Paths;
  * </pre>
  *
  * Indexed (tokenized) fields: static, other, dynamic (WhitespaceTokenizer, same as search).
- * Stored metadata: name, White, Black, Result, PGN, PV1, PV2, endgameFEN.
+ * Stored metadata: name, White, Black, Result, WhiteElo, BlackElo, PGN, PV1, PV2, endgameFEN.
+ * {@code Result} is indexed for an exact filter. {@code elo} is an IntPoint, the average of the ratings present.
  */
 public class IndexBuilder {
     public static class WhitespaceAnalyzer extends Analyzer {
@@ -117,7 +119,15 @@ public class IndexBuilder {
         doc.add(new StringField("name", name, Field.Store.YES));
         doc.add(new StoredField("White", text(obj, "White")));
         doc.add(new StoredField("Black", text(obj, "Black")));
-        doc.add(new StoredField("Result", text(obj, "Result")));
+        doc.add(new StringField("Result", text(obj, "Result"), Field.Store.YES));
+        String whiteElo = text(obj, "WhiteElo");
+        String blackElo = text(obj, "BlackElo");
+        doc.add(new StoredField("WhiteElo", whiteElo));
+        doc.add(new StoredField("BlackElo", blackElo));
+        Integer elo = EloRating.average(whiteElo, blackElo);
+        if (elo != null) {
+            doc.add(new IntPoint("elo", elo));
+        }
         doc.add(new StoredField("PGN", text(obj, "PGN")));
         doc.add(new StoredField("PV1", text(obj, "PV1")));
         doc.add(new StoredField("PV2", text(obj, "PV2")));
