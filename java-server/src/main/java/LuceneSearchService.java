@@ -2,13 +2,18 @@ import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.analysis.Tokenizer;
 import org.apache.lucene.analysis.core.WhitespaceTokenizer;
 import org.apache.lucene.document.Document;
+import org.apache.lucene.document.IntPoint;
 import org.apache.lucene.index.IndexReader;
+import org.apache.lucene.index.Term;
 import org.apache.lucene.queryparser.classic.MultiFieldQueryParser;
+import org.apache.lucene.search.BooleanClause;
+import org.apache.lucene.search.BooleanQuery;
 import org.apache.lucene.search.IndexSearcher;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.ScoreDoc;
 import org.apache.lucene.search.SearcherFactory;
 import org.apache.lucene.search.SearcherManager;
+import org.apache.lucene.search.TermQuery;
 import org.apache.lucene.search.TopDocs;
 import org.apache.lucene.search.similarities.BM25Similarity;
 import org.apache.lucene.store.Directory;
@@ -80,13 +85,24 @@ public class LuceneSearchService {
      * (no Mongo round-trip). Reuses the process-wide {@link SearcherManager}.
      */
     public static List<Map<String, Object>> searchSimilar(String input) throws Exception {
+        return searchSimilar(input, SearchFilter.none());
+    }
+
+    /**
+     * BM25 search over static/other/dynamic. A non-empty {@code filter} is a Lucene
+     * filter on the same query, so the top-K are the top matches that pass it.
+     * Explanations stay on the unfiltered text query.
+     */
+    public static List<Map<String, Object>> searchSimilar(String input, SearchFilter filter) throws Exception {
         ensureSearcher();
         searcherManager.maybeRefresh();
         IndexSearcher searcher = searcherManager.acquire();
         try {
             String escapedText = escapeCharacters(input);
-            Query query = parseQuery(escapedText);
-            TopDocs foundDocs = searcher.search(query, topK());
+            Query textQuery = parseQuery(escapedText);
+            SearchFilter applied = filter == null ? SearchFilter.none() : filter;
+            Query searched = applied.isEmpty() ? textQuery : withFilter(textQuery, applied);
+            TopDocs foundDocs = searcher.search(searched, topK());
 
             List<Map<String, Object>> result = new ArrayList<>();
             for (ScoreDoc sd : foundDocs.scoreDocs) {
@@ -98,17 +114,33 @@ public class LuceneSearchService {
                 row.put("White", nullToEmpty(d.get("White")));
                 row.put("Black", nullToEmpty(d.get("Black")));
                 row.put("Result", nullToEmpty(d.get("Result")));
+                row.put("WhiteElo", nullToEmpty(d.get("WhiteElo")));
+                row.put("BlackElo", nullToEmpty(d.get("BlackElo")));
                 row.put("PGN", nullToEmpty(d.get("PGN")));
                 row.put("PV1", nullToEmpty(d.get("PV1")));
                 row.put("PV2", nullToEmpty(d.get("PV2")));
                 row.put("score", sd.score);
-                row.put("explanation", MatchExplanation.forDoc(searcher, query, sd.doc));
+                row.put("explanation", MatchExplanation.forDoc(searcher, textQuery, sd.doc));
                 result.add(row);
             }
             return result;
         } finally {
             searcherManager.release(searcher);
         }
+    }
+
+    private static Query withFilter(Query textQuery, SearchFilter filter) {
+        BooleanQuery.Builder builder = new BooleanQuery.Builder();
+        builder.add(textQuery, BooleanClause.Occur.MUST);
+        if (filter.result != null) {
+            builder.add(new TermQuery(new Term("Result", filter.result)), BooleanClause.Occur.FILTER);
+        }
+        if (filter.minElo != null || filter.maxElo != null) {
+            int min = filter.minElo == null ? 0 : filter.minElo;
+            int max = filter.maxElo == null ? Integer.MAX_VALUE : filter.maxElo;
+            builder.add(IntPoint.newRangeQuery("elo", min, max), BooleanClause.Occur.FILTER);
+        }
+        return builder.build();
     }
 
     /** @deprecated Prefer {@link #searchSimilar(String)}; kept for older unit tests. */

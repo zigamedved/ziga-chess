@@ -3,7 +3,7 @@
 Stream games/games.json.zip → NDJSON Lucene docs with feature fields.
 
 Each output line is a JSON object:
-  name, White, Black, Result, PGN, PV1, PV2, endgameFEN, static, other, dynamic
+  name, White, Black, Result, WhiteElo, BlackElo, PGN, PV1, PV2, endgameFEN, static, other, dynamic
 
 Feature extraction matches python-server/main.py (static / more→other / dynamic from PV1+PV2).
 Stockfish is not required — PV moves come from the stored PV strings.
@@ -146,6 +146,8 @@ def main(argv: list[str] | None = None) -> int:
                 "White": game.get("White", ""),
                 "Black": game.get("Black", ""),
                 "Result": game.get("Result", ""),
+                "WhiteElo": game.get("WhiteElo", ""),
+                "BlackElo": game.get("BlackElo", ""),
                 "PGN": game.get("PGN", ""),
                 "PV1": game.get("PV1", ""),
                 "PV2": game.get("PV2", ""),

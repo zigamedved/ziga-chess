@@ -31,6 +31,19 @@
           <span>Position</span>
           <textarea id="fen" rows="6" spellcheck="false" placeholder="Paste your FEN or PGN here...">r4rk1/4Rppp/p1p5/P1p5/8/3P2P1/1PP2P1P/R5K1 b - - 0 25</textarea>
         </label>
+        <div class="filters">
+          <label class="field span">Result
+            <select id="result">
+              <option value="">Any</option>
+              <option value="1-0">1-0</option>
+              <option value="1/2-1/2">1/2-1/2</option>
+              <option value="0-1">0-1</option>
+            </select>
+          </label>
+          <label class="field">Min Elo <input id="min-elo" inputmode="numeric" placeholder="2000"></label>
+          <label class="field">Max Elo <input id="max-elo" inputmode="numeric" placeholder="2800"></label>
+        </div>
+        <p class="hint">Elo is the average of the ratings stored on the game. A game with no rating is left out when a bound is set.</p>
         <button id="analyse" class="primary" type="button">Analyze Game</button>
         <div class="actions">
           <button id="copy-link" type="button" class="ghost">Copy link</button>

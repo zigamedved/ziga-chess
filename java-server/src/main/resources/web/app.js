@@ -365,7 +365,10 @@ function renderGames(games) {
     title.textContent = game.white + " – " + game.black;
     const meta = document.createElement("span");
     const pct = matchPercent(game, games);
-    meta.textContent = (game.result || "—") + " · " + pct + "% match";
+    const ratings = [game.whiteElo, game.blackElo].filter(Boolean).join("/");
+    meta.textContent = (game.result || "—")
+      + (ratings ? " · " + ratings : "")
+      + " · " + pct + "% match";
     const bar = document.createElement("span");
     bar.className = "match";
     const fill = document.createElement("span");
@@ -495,6 +498,11 @@ analyseBtn.addEventListener("click", async () => {
     return;
   }
   fenInput.value = fen;
+  const filter = analyseFilter();
+  if (filter.error) {
+    setStatus(filter.error, true);
+    return;
+  }
   const user = userInput.value;
   const pass = passInput.value;
   localStorage.setItem("ziga-chess-user", user);
@@ -509,7 +517,7 @@ analyseBtn.addEventListener("click", async () => {
         "Content-Type": "application/json",
         "Authorization": basicAuthHeader(user, pass),
       },
-      body: JSON.stringify({ FEN: fen }),
+      body: JSON.stringify(filter.body),
     });
     const payload = await response.json();
     if (!response.ok) {
@@ -530,6 +538,40 @@ analyseBtn.addEventListener("click", async () => {
     analyseBtn.disabled = false;
   }
 });
+
+function analyseFilter() {
+  const body = { FEN: fenInput.value.trim() };
+  const result = document.querySelector("#result").value;
+  if (result) {
+    body.result = result;
+  }
+  const minElo = eloBound("#min-elo");
+  const maxElo = eloBound("#max-elo");
+  if (minElo === false || maxElo === false) {
+    return { error: "Elo bounds must be non-negative integers." };
+  }
+  if (minElo != null && maxElo != null && minElo > maxElo) {
+    return { error: "Min Elo is greater than max Elo." };
+  }
+  if (minElo != null) {
+    body.minElo = minElo;
+  }
+  if (maxElo != null) {
+    body.maxElo = maxElo;
+  }
+  return { body: body };
+}
+
+function eloBound(id) {
+  const raw = document.querySelector(id).value.trim();
+  if (!raw) {
+    return null;
+  }
+  if (!/^[0-9]+$/.test(raw)) {
+    return false;
+  }
+  return Number(raw);
+}
 
 function basicAuthHeader(user, pass) {
   const bytes = new TextEncoder().encode(user + ":" + pass);

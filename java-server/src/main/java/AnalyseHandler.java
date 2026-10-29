@@ -41,13 +41,14 @@ public class AnalyseHandler implements HttpHandler {
             return;
         }
 
-        final String fen;
+        final RequestedAnalyse request;
         try {
-            fen = readFen(t);
+            request = readRequest(t);
         } catch (FenParser.BadRequestException e) {
             FenParser.sendJsonError(t, 400, e.getMessage());
             return;
         }
+        final String fen = request.fen;
 
         long started = System.nanoTime();
         final FeatureCli.Result extracted;
@@ -64,7 +65,7 @@ public class AnalyseHandler implements HttpHandler {
 
         final List<Map<String, Object>> hits;
         try {
-            hits = LuceneSearchService.searchSimilar(extracted.features);
+            hits = LuceneSearchService.searchSimilar(extracted.features, request.filter);
         } catch (Exception e) {
             e.printStackTrace();
             FenParser.sendJsonError(t, 500, "Lucene search failed");
@@ -89,7 +90,17 @@ public class AnalyseHandler implements HttpHandler {
         os.close();
     }
 
-    static String readFen(HttpExchange t) throws IOException, FenParser.BadRequestException {
+    static final class RequestedAnalyse {
+        final String fen;
+        final SearchFilter filter;
+
+        RequestedAnalyse(String fen, SearchFilter filter) {
+            this.fen = fen;
+            this.filter = filter;
+        }
+    }
+
+    static RequestedAnalyse readRequest(HttpExchange t) throws IOException, FenParser.BadRequestException {
         byte[] raw = FenParser.readLimited(t.getRequestBody(), MAX_BODY_BYTES);
         String text = new String(raw, StandardCharsets.UTF_8).trim();
         if (text.isEmpty()) {
@@ -112,7 +123,7 @@ public class AnalyseHandler implements HttpHandler {
         if (fen.isEmpty()) {
             throw new FenParser.BadRequestException("FEN is required (string)");
         }
-        return fen;
+        return new RequestedAnalyse(fen, SearchFilter.from(obj));
     }
 
     /** Thesis clients send Accept text/plain. A wildcard Accept stays on JSON. */

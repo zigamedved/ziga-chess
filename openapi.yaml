@@ -1,7 +1,7 @@
 openapi: 3.0.3
 info:
   title: ziga-chess analyse
-  version: "1.2.0"
+  version: "1.3.0"
   description: >
     Public API of the single JVM on port 8081. POST /analyse returns this
     document by default. Accept text/plain returns the previous thesis body.
@@ -74,6 +74,23 @@ components:
       properties:
         FEN:
           type: string
+        result:
+          type: string
+          enum: ["1-0", "0-1", "1/2-1/2"]
+          description: >
+            Keep similar games with this result. Omit it to leave ranking unchanged.
+            The index must store Result as an indexed field (`make index` after this schema).
+        minElo:
+          type: integer
+          minimum: 0
+          description: >
+            Keep games whose Elo is at least this value. Elo is the average of
+            WhiteElo and BlackElo when both parse, otherwise the one rating present.
+            Games with no rating are left out.
+        maxElo:
+          type: integer
+          minimum: 0
+          description: Keep games whose Elo is at most this value. Same average as minElo.
     AnalyseResponse:
       type: object
       required: [fen, principalVariations, similarGames, similarPgn, meta]
@@ -119,6 +136,12 @@ components:
           type: string
         result:
           type: string
+        whiteElo:
+          type: string
+          description: White's rating from the corpus, when the game stored one.
+        blackElo:
+          type: string
+          description: Black's rating from the corpus, when the game stored one.
         endgameFen:
           type: string
         pgn:

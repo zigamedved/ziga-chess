@@ -55,6 +55,14 @@ public final class AnalyseResponse {
         row.put("white", text(hit, "White"));
         row.put("black", text(hit, "Black"));
         row.put("result", text(hit, "Result"));
+        String whiteElo = text(hit, "WhiteElo");
+        String blackElo = text(hit, "BlackElo");
+        if (!whiteElo.isEmpty()) {
+            row.put("whiteElo", whiteElo);
+        }
+        if (!blackElo.isEmpty()) {
+            row.put("blackElo", blackElo);
+        }
         row.put("endgameFen", text(hit, "endgameFEN"));
         row.put("pgn", text(hit, "PGN"));
         row.put("pv1", text(hit, "PV1"));

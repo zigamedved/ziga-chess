@@ -19,6 +19,13 @@ Date is the day the mistake was found, not the day the code was first written.
 
 ## CI and runtime
 
+### 2026-10-27 — a stored Result cannot be a Lucene filter
+
+- **Assumed:** `StoredField("Result")` is enough to filter similar games by result, and Elo can be filtered from the same stored string.
+- **Actually:** stored fields are not indexed. A `TermQuery` on `Result` matches nothing until the field is a `StringField`. An Elo bound needs an `IntPoint` named `elo`. An index built before that returns no hits for those filters.
+- **Broke:** would have been an empty similar-game list after a result filter on the current corpus.
+- **Do this:** index `Result` with `StringField` and `elo` with `IntPoint`. Run `make index` after the schema change. Leave the filter off when the request omits it, so the BM25 query stays the same.
+
 ### 2026-10-27 — a nowrap history row widens the phone layout
 
 - **Assumed:** `grid-template-columns: 1fr` under 1100px keeps the dashboard inside the viewport.

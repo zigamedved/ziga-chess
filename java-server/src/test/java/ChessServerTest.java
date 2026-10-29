@@ -33,6 +33,7 @@ import java.net.URI;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.Base64;
 import java.util.List;
 import java.util.Map;
@@ -418,6 +419,116 @@ public class ChessServerTest {
         assertEquals("W", hits.get(0).get("White"));
     }
 
+    @Test
+    void searchSimilar_emptyFilterKeepsRankAndBoundsDropGames(@TempDir Path tempDir) throws Exception {
+        try (FSDirectory directory = FSDirectory.open(tempDir);
+             IndexWriter writer = new IndexWriter(
+                     directory,
+                     new IndexWriterConfig(new LuceneSearchService.MyAnalyzer()))) {
+            writer.addDocument(IndexBuilder.toDocument(doc(
+                    "Game#high.txt", "0-1", "2700", "2700", "Kg1 Re7 Dpc")));
+            writer.addDocument(IndexBuilder.toDocument(doc(
+                    "Game#low.txt", "1-0", "2000", "1800", "Kg1")));
+            writer.addDocument(IndexBuilder.toDocument(doc(
+                    "Game#none.txt", "1-0", "", "", "Kg1")));
+            writer.commit();
+        }
+        System.setProperty("chess.indexDir", tempDir.toString());
+
+        List<Map<String, Object>> open = LuceneSearchService.searchSimilar("Kg1 Re7");
+        List<Map<String, Object>> same = LuceneSearchService.searchSimilar("Kg1 Re7", SearchFilter.none());
+        assertEquals(namesOf(open), namesOf(same));
+        assertEquals("Game#high.txt", open.get(0).get("name"));
+        assertEquals(3, open.size());
+
+        List<Map<String, Object>> whiteWins = LuceneSearchService.searchSimilar(
+                "Kg1", SearchFilter.from(jsonObj("{\"result\":\"1-0\"}")));
+        assertEquals(2, whiteWins.size());
+        assertTrue(namesOf(whiteWins).contains("Game#low.txt"));
+        assertTrue(namesOf(whiteWins).contains("Game#none.txt"));
+        assertFalse(namesOf(whiteWins).contains("Game#high.txt"));
+
+        List<Map<String, Object>> strong = LuceneSearchService.searchSimilar(
+                "Kg1", SearchFilter.from(jsonObj("{\"minElo\":2500}")));
+        assertEquals(List.of("Game#high.txt"), namesOf(strong));
+        assertEquals("2700", strong.get(0).get("WhiteElo"));
+
+        List<Map<String, Object>> low = LuceneSearchService.searchSimilar(
+                "Kg1", SearchFilter.from(jsonObj("{\"maxElo\":1900}")));
+        assertEquals(List.of("Game#low.txt"), namesOf(low));
+
+        List<Map<String, Object>> rated = LuceneSearchService.searchSimilar(
+                "Kg1", SearchFilter.from(jsonObj("{\"minElo\":0}")));
+        assertEquals(2, rated.size());
+        assertFalse(namesOf(rated).contains("Game#none.txt"));
+    }
+
+    @Test
+    void analyseHandler_appliesResultAndRejectsABadEloBound(@TempDir Path tempDir) throws Exception {
+        buildFixtureIndex(tempDir);
+        System.setProperty("chess.indexDir", tempDir.toString());
+        AnalyseHandler handler = new AnalyseHandler(fen ->
+                new FeatureCli.Result(fen, "Kg1 Re7 Dpc", "pv-one", "pv-two"));
+        String fen = "r4rk1/4Rppp/p1p5/P1p5/8/3P2P1/1PP2P1P/R5K1 b - - 0 25";
+
+        FakeExchange wins = authorised("{\"FEN\":\"" + fen + "\",\"result\":\"1-0\"}");
+        handler.handle(wins);
+        assertEquals(200, wins.statusCode);
+        com.google.gson.JsonObject winJson = new com.google.gson.JsonParser()
+                .parse(wins.responseBody.toString("UTF-8")).getAsJsonObject();
+        assertEquals(1, winJson.getAsJsonArray("similarGames").size());
+        assertEquals("Game#fixture.txt", winJson.getAsJsonArray("similarGames").get(0).getAsJsonObject().get("name").getAsString());
+
+        FakeExchange losses = authorised("{\"FEN\":\"" + fen + "\",\"result\":\"0-1\"}");
+        handler.handle(losses);
+        assertEquals(200, losses.statusCode);
+        com.google.gson.JsonObject lossJson = new com.google.gson.JsonParser()
+                .parse(losses.responseBody.toString("UTF-8")).getAsJsonObject();
+        assertEquals(0, lossJson.getAsJsonArray("similarGames").size());
+
+        FakeExchange unrated = authorised("{\"FEN\":\"" + fen + "\",\"minElo\":2000}");
+        handler.handle(unrated);
+        assertEquals(200, unrated.statusCode);
+        assertTrue(unrated.responseBody.toString("UTF-8").contains("\"similarGames\":[]"));
+
+        FakeExchange badResult = authorised("{\"FEN\":\"" + fen + "\",\"result\":\"mate\"}");
+        handler.handle(badResult);
+        assertEquals(400, badResult.statusCode);
+        assertTrue(badResult.responseBody.toString("UTF-8").contains("bad_request"));
+
+        FakeExchange badRange = authorised("{\"FEN\":\"" + fen + "\",\"minElo\":2400,\"maxElo\":2000}");
+        handler.handle(badRange);
+        assertEquals(400, badRange.statusCode);
+        assertTrue(badRange.responseBody.toString("UTF-8").contains("minElo is greater than maxElo"));
+    }
+
+    private static FakeExchange authorised(String body) {
+        FakeExchange exchange = new FakeExchange();
+        exchange.requestHeaders.add("Authorization", basicAuth("test-user", "test-password"));
+        exchange.setRequestBody(body);
+        return exchange;
+    }
+
+    private static com.google.gson.JsonObject jsonObj(String text) {
+        return new com.google.gson.JsonParser().parse(text).getAsJsonObject();
+    }
+
+    private static com.google.gson.JsonObject doc(String name, String result, String whiteElo, String blackElo, String features) {
+        return jsonObj("{\"name\":\"" + name + "\",\"White\":\"W\",\"Black\":\"B\",\"Result\":\"" + result
+                + "\",\"WhiteElo\":\"" + whiteElo + "\",\"BlackElo\":\"" + blackElo
+                + "\",\"PGN\":\"1. e4\",\"PV1\":\"\",\"PV2\":\"\","
+                + "\"endgameFEN\":\"8/8/8/8/8/8/4k3/4K3 w - - 0 1\","
+                + "\"static\":\"" + features + "\",\"other\":\"\",\"dynamic\":\"\"}");
+    }
+
+    private static List<String> namesOf(List<Map<String, Object>> hits) {
+        List<String> names = new ArrayList<>();
+        for (Map<String, Object> hit : hits) {
+            names.add(String.valueOf(hit.get("name")));
+        }
+        return names;
+    }
+
     private static long timeOpenReaderPerQuery(Path indexDir, int queries) throws IOException {
         long start = System.nanoTime();
         for (int i = 0; i < queries; i++) {
@@ -670,7 +781,7 @@ public class ChessServerTest {
             doc.add(new StringField("name", "Game#fixture.txt", Field.Store.YES));
             doc.add(new StoredField("White", "Fixture, White"));
             doc.add(new StoredField("Black", "Fixture, Black"));
-            doc.add(new StoredField("Result", "1-0"));
+            doc.add(new StringField("Result", "1-0", Field.Store.YES));
             doc.add(new StoredField("PGN", "1. e4 e5 1-0"));
             doc.add(new StoredField("PV1", "pv1"));
             doc.add(new StoredField("PV2", "pv2"));
