@@ -75,7 +75,7 @@ sequenceDiagram
 
 Auth is checked once, on the JVM. The image contains the JRE, `chessapp`, and the Stockfish binary. `CHESSAPP_DIR` is the directory that holds the `chessapp` package. `POST /position` is still registered on the same port for a raw feature string; the client path is `POST /analyse`.
 
-The default `/analyse` body is JSON (`openapi.yaml`), including `similarPgn` for the current similar-game set and an `explanation` of the matched feature tokens on each hit. Optional `result`, `minElo`, and `maxElo` are Lucene filters on that same BM25 query. An empty filter leaves the query unchanged. `Accept: text/plain` returns the thesis text. Errors are JSON objects with `error` and `code`. `GET /` serves the board from the same process. `?fen=` on that page opens a shared position.
+The default `/analyse` body is JSON (`openapi.yaml`), including `similarPgn` for the current similar-game set and an `explanation` of the matched feature tokens on each hit. Optional `result`, `minElo`, and `maxElo` are Lucene filters on that same BM25 query. An empty filter leaves the query unchanged. A `PGN` body is resolved to the first rook endgame on the main line before that search. The rule lives in `chessapp.endgame`. `Accept: text/plain` returns the thesis text. Errors are JSON objects with `error` and `code`. `GET /` serves the board from the same process. `?fen=` on that page opens a shared position.
 
 Each `/analyse` starts a new CLI process, so the Flask LRU and the `engine_busy` lock do not apply to compose. They still apply if you run `main:app` yourself.
 

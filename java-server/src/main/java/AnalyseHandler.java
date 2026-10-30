@@ -48,7 +48,28 @@ public class AnalyseHandler implements HttpHandler {
             FenParser.sendJsonError(t, 400, e.getMessage());
             return;
         }
-        final String fen = request.fen;
+        final String fen;
+        final Integer endgamePly;
+        if (request.pgn != null) {
+            try {
+                EndgameCli.Result found = EndgameCli.run(request.pgn);
+                fen = found.fen;
+                endgamePly = found.ply;
+            } catch (EndgameCli.InvalidPgnException e) {
+                FenParser.sendJsonError(t, 400, e.getMessage(), "invalid_pgn");
+                return;
+            } catch (EndgameCli.NoEndgameException e) {
+                FenParser.sendJsonError(t, 400, e.getMessage(), "no_endgame");
+                return;
+            } catch (Exception e) {
+                e.printStackTrace();
+                FenParser.sendJsonError(t, 500, "Endgame CLI failed");
+                return;
+            }
+        } else {
+            fen = request.fen;
+            endgamePly = null;
+        }
 
         long started = System.nanoTime();
         final FeatureCli.Result extracted;
@@ -79,7 +100,7 @@ public class AnalyseHandler implements HttpHandler {
             body = AnalyseText.format(extracted.pv1, extracted.pv2, hits);
             contentType = "text/plain; charset=utf-8";
         } else {
-            body = AnalyseResponse.toJson(fen, extracted, hits, tookMs);
+            body = AnalyseResponse.toJson(fen, extracted, hits, tookMs, endgamePly);
             contentType = "application/json; charset=utf-8";
         }
         byte[] bytes = body.getBytes(StandardCharsets.UTF_8);
@@ -92,10 +113,12 @@ public class AnalyseHandler implements HttpHandler {
 
     static final class RequestedAnalyse {
         final String fen;
+        final String pgn;
         final SearchFilter filter;
 
-        RequestedAnalyse(String fen, SearchFilter filter) {
+        RequestedAnalyse(String fen, String pgn, SearchFilter filter) {
             this.fen = fen;
+            this.pgn = pgn;
             this.filter = filter;
         }
     }
@@ -116,14 +139,27 @@ public class AnalyseHandler implements HttpHandler {
             throw new FenParser.BadRequestException("FEN is required (string)");
         }
         JsonObject obj = parsed.getAsJsonObject();
-        if (!obj.has("FEN") || !obj.get("FEN").isJsonPrimitive() || !obj.get("FEN").getAsJsonPrimitive().isString()) {
-            throw new FenParser.BadRequestException("FEN is required (string)");
+        String fen = optionalText(obj, "FEN");
+        String pgn = optionalText(obj, "PGN");
+        if (fen != null) {
+            return new RequestedAnalyse(fen, null, SearchFilter.from(obj));
         }
-        String fen = obj.get("FEN").getAsString().trim();
-        if (fen.isEmpty()) {
-            throw new FenParser.BadRequestException("FEN is required (string)");
+        if (pgn != null) {
+            return new RequestedAnalyse(null, pgn, SearchFilter.from(obj));
         }
-        return new RequestedAnalyse(fen, SearchFilter.from(obj));
+        throw new FenParser.BadRequestException("FEN is required (string)");
+    }
+
+    /** Blank and missing fields are absent. A non-string value is a bad request. */
+    private static String optionalText(JsonObject obj, String name) throws FenParser.BadRequestException {
+        if (!obj.has(name) || obj.get(name).isJsonNull()) {
+            return null;
+        }
+        if (!obj.get(name).isJsonPrimitive() || !obj.get(name).getAsJsonPrimitive().isString()) {
+            throw new FenParser.BadRequestException(name + " is required (string)");
+        }
+        String value = obj.get(name).getAsString().trim();
+        return value.isEmpty() ? null : value;
     }
 
     /** Thesis clients send Accept text/plain. A wildcard Accept stays on JSON. */

@@ -131,6 +131,8 @@ Download PGN saves the `similarPgn` field: one game per similar hit, separated b
 
 Each similar game includes `explanation`: a BM25 score for `static`, `other`, and `dynamic`, plus up to five matched tokens. The board lists those tokens under the game. `Accept: text/plain` leaves the explanation out so the thesis body stays the stored fields.
 
+A PGN is sent as `{"PGN":"..."}` when the box is not a FEN. The server walks the main line and analyses the first rook endgame: a legal position of kings, rooks, and pawns with at least one rook. The response `fen` is that position, and `endgamePly` is its half-move index (`0` is the start). A game that never reaches one returns `no_endgame`. A FEN request is unchanged and omits `endgamePly`.
+
 The same JSON body can filter the similar games. `result` is `1-0`, `0-1`, or `1/2-1/2`. `minElo` and `maxElo` bound the game's Elo: the average of `WhiteElo` and `BlackElo` when both are present, otherwise the one rating that is present. A game with no rating is left out when either bound is set. Omitting the fields leaves the BM25 ranking unchanged. Example: `{"FEN":"...","result":"1-0","minElo":2200}`. The board sends the same fields from the Result and Elo inputs. An index built before these fields were indexed needs `make index` again; until then a result or Elo filter matches nothing.
 
 ![Board with the sample FEN](docs/ui/board.png)

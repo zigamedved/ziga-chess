@@ -59,6 +59,8 @@ public class ChessServerTest {
         System.clearProperty("chess.topK");
         System.clearProperty("chess.featureCli");
         System.clearProperty("chess.featurePython");
+        System.clearProperty("chess.endgameCli");
+        System.clearProperty("chess.endgamePython");
         System.clearProperty("chess.port");
         System.clearProperty("chess.appPrefix");
         AuthFilter.configureAuth(null, null);
@@ -706,6 +708,49 @@ public class ChessServerTest {
         handler.handle(ex);
         assertEquals(400, ex.statusCode);
         assertTrue(ex.responseBody.toString("UTF-8").contains("invalid_fen"));
+    }
+
+    @Test
+    void analyseHandler_pgnUsesDetectedEndgameFen(@TempDir Path tempDir) throws Exception {
+        buildFixtureIndex(tempDir);
+        System.setProperty("chess.indexDir", tempDir.toString());
+        Path script = tempDir.resolve("fake_endgame.py");
+        Files.writeString(script, ""
+                + "import json, sys\n"
+                + "text = sys.stdin.read()\n"
+                + "if \"BAD\" in text:\n"
+                + "    sys.stderr.write(\"Invalid PGN\\n\")\n"
+                + "    sys.exit(2)\n"
+                + "if \"OPENING\" in text:\n"
+                + "    sys.stderr.write(\"No rook endgame in this game\\n\")\n"
+                + "    sys.exit(3)\n"
+                + "json.dump({\"fen\": \"8/8/8/8/8/8/4k3/4K3 w - - 0 1\", \"ply\": 1}, sys.stdout)\n");
+        System.setProperty("chess.endgameCli", script.toString());
+        java.util.List<String> seen = new java.util.ArrayList<>();
+        AnalyseHandler handler = new AnalyseHandler(fen -> {
+            seen.add(fen);
+            return new FeatureCli.Result(fen, "Kg1 Re7 Dpc", "pv-one", "pv-two");
+        });
+
+        FakeExchange ok = authorised("{\"PGN\":\"1. Rxa2\"}");
+        handler.handle(ok);
+        assertEquals(200, ok.statusCode);
+        com.google.gson.JsonObject json = new com.google.gson.JsonParser()
+                .parse(ok.responseBody.toString("UTF-8")).getAsJsonObject();
+        assertEquals("8/8/8/8/8/8/4k3/4K3 w - - 0 1", json.get("fen").getAsString());
+        assertEquals(1, json.get("endgamePly").getAsInt());
+        assertEquals("8/8/8/8/8/8/4k3/4K3 w - - 0 1", seen.get(0));
+        assertEquals(1, json.getAsJsonArray("similarGames").size());
+
+        FakeExchange bad = authorised("{\"PGN\":\"BAD\"}");
+        handler.handle(bad);
+        assertEquals(400, bad.statusCode);
+        assertTrue(bad.responseBody.toString("UTF-8").contains("invalid_pgn"));
+
+        FakeExchange none = authorised("{\"PGN\":\"OPENING\"}");
+        handler.handle(none);
+        assertEquals(400, none.statusCode);
+        assertTrue(none.responseBody.toString("UTF-8").contains("no_endgame"));
     }
 
     @Test
