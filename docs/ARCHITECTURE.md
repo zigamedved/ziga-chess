@@ -52,7 +52,7 @@ flowchart LR
 | Stored metadata (for the API response) | `name`, `White`, `Black`, `Result`, `WhiteElo`, `BlackElo`, `PGN`, `PV1`, `PV2`, `endgameFEN` |
 | Filters | `Result` is a `StringField`. `elo` is an `IntPoint`: the average of the ratings present |
 
-If you add games: append JSON lines to the corpus, refresh the zip, run `make index` again (full rebuild today), restart the Java server. The running process keeps one `SearcherManager` and calls `maybeRefresh()` on each search, so an in-place commit is picked up. `make index` opens the index with `OpenMode.CREATE` (it wipes the directory), so restart Java after a full rebuild.
+`make index-update GAMES=docs.ndjson` adds those documents and replaces any document with the same `name`. The running process calls `maybeRefresh()` on each search, so that in-place commit is picked up. `make index` opens the index with `OpenMode.CREATE` (it wipes the directory), so restart Java after a full rebuild. A feature-schema change still needs the full rebuild.
 
 ### 2. Online: analyse a position
 
