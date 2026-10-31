@@ -422,6 +422,41 @@ public class ChessServerTest {
     }
 
     @Test
+    void indexBuilder_updateAddsAndReplacesWithoutDroppingOthers(@TempDir Path tempDir) throws Exception {
+        Path index = tempDir.resolve("index");
+        Path original = tempDir.resolve("original.ndjson");
+        Files.writeString(original, docLine("Game#a.txt", "W", "Ke1 ke8"));
+        assertEquals(1, IndexBuilder.buildIndex(original, index));
+
+        System.setProperty("chess.indexDir", index.toString());
+        assertEquals("W", LuceneSearchService.searchSimilar("Ke1").get(0).get("White"));
+
+        Path extra = tempDir.resolve("extra.ndjson");
+        Files.writeString(extra, docLine("Game#a.txt", "Changed", "Ke1 ke8")
+                + docLine("Game#b.txt", "New", "onlytoken"));
+        assertEquals(2, IndexBuilder.updateIndex(extra, index));
+
+        List<Map<String, Object>> kept = LuceneSearchService.searchSimilar("Ke1");
+        assertEquals(1, kept.size());
+        assertEquals("Changed", kept.get(0).get("White"));
+        List<Map<String, Object>> added = LuceneSearchService.searchSimilar("onlytoken");
+        assertEquals(1, added.size());
+        assertEquals("Game#b.txt", added.get(0).get("name"));
+
+        LuceneSearchService.closeSearchResources();
+        assertEquals(1, IndexBuilder.buildIndex(original, index));
+        assertTrue(LuceneSearchService.searchSimilar("onlytoken").isEmpty());
+        assertEquals("W", LuceneSearchService.searchSimilar("Ke1").get(0).get("White"));
+    }
+
+    private static String docLine(String name, String white, String features) {
+        return "{\"name\":\"" + name + "\",\"White\":\"" + white + "\",\"Black\":\"B\",\"Result\":\"1-0\","
+                + "\"PGN\":\"1. e4\",\"PV1\":\"\",\"PV2\":\"\","
+                + "\"endgameFEN\":\"4k3/8/8/8/8/8/8/4K3 w - - 0 1\","
+                + "\"static\":\"" + features + "\",\"other\":\"\",\"dynamic\":\"\"}\n";
+    }
+
+    @Test
     void searchSimilar_emptyFilterKeepsRankAndBoundsDropGames(@TempDir Path tempDir) throws Exception {
         try (FSDirectory directory = FSDirectory.open(tempDir);
              IndexWriter writer = new IndexWriter(

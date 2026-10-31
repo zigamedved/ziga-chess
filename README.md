@@ -51,7 +51,10 @@ git lfs pull
 make index-sample          # ~100 games, quick local smoke
 make index                 # full corpus (~900k games; tens of minutes)
 # or: make index INDEX_LIMIT=1000 INDEX_DIR=java-server/indexedFiles
+make index-update GAMES=/tmp/new-docs.ndjson
 ```
+
+`make index` wipes the index and writes it again. Restart the Java server after that. `make index-update` reads only `GAMES`, which is NDJSON in the same shape as `scripts/prepare_lucene_docs.py` output. A line whose `name` is already indexed replaces that game. A new `name` is added. The rest of the index stays, so the work follows the size of `GAMES`. The running server picks the commit up on the next search. A feature-schema change (new indexed fields) still needs `make index`.
 
 Pipeline: `scripts/prepare_lucene_docs.py` (static/other/dynamic features + metadata) → `IndexBuilder` (Lucene 8.11). Game metadata (`White`, `Black`, `PGN`, …) is stored **in Lucene** — MongoDB is no longer used.
 
