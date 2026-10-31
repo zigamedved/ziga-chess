@@ -16,8 +16,20 @@ public final class AnalyseResponse {
     }
 
     public static String toJson(String fen, FeatureCli.Result extracted, List<Map<String, Object>> hits, long tookMs) {
+        return toJson(fen, extracted, hits, tookMs, null);
+    }
+
+    public static String toJson(
+            String fen,
+            FeatureCli.Result extracted,
+            List<Map<String, Object>> hits,
+            long tookMs,
+            Integer endgamePly) {
         Map<String, Object> root = new LinkedHashMap<>();
         root.put("fen", fen);
+        if (endgamePly != null) {
+            root.put("endgamePly", endgamePly);
+        }
 
         List<Map<String, Object>> variations = new ArrayList<>();
         variations.add(variation(1, extracted.pv1));

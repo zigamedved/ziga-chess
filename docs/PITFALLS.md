@@ -19,6 +19,13 @@ Date is the day the mistake was found, not the day the code was first written.
 
 ## CI and runtime
 
+### 2026-10-30 — reading a CLI's stdout before closing its stdin deadlocks
+
+- **Assumed:** `FeatureCli`'s pattern (start the process, then `readAllBytes` on stdout) works when the PGN is passed on stdin.
+- **Actually:** the child waits until stdin closes, and the parent waits on stdout. `POST /analyse` hangs until the CLI timeout.
+- **Broke:** would hang a PGN analyse request.
+- **Do this:** write the PGN, close the child's stdin, then read stdout. `EndgameCli` does that. Do not copy the FEN argv pattern for a multi-line PGN.
+
 ### 2026-10-27 — a stored Result cannot be a Lucene filter
 
 - **Assumed:** `StoredField("Result")` is enough to filter similar games by result, and Elo can be filtered from the same stored string.

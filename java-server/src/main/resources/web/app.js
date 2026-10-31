@@ -492,13 +492,21 @@ downloadBtn.addEventListener("click", () => {
 });
 
 analyseBtn.addEventListener("click", async () => {
-  const fen = positionFromInput(fenInput.value);
-  if (!fen) {
+  const raw = fenInput.value.trim();
+  if (!raw) {
     setStatus("Enter a FEN or a PGN first.", true);
     return;
   }
-  fenInput.value = fen;
-  const filter = analyseFilter();
+  const probe = new Chess();
+  let body;
+  if (probe.validate_fen(raw).valid) {
+    probe.load(raw);
+    fenInput.value = probe.fen();
+    body = { FEN: probe.fen() };
+  } else {
+    body = { PGN: raw };
+  }
+  const filter = analyseFilter(body);
   if (filter.error) {
     setStatus(filter.error, true);
     return;
@@ -525,13 +533,19 @@ analyseBtn.addEventListener("click", async () => {
       return;
     }
     window.__lastAnalyse = payload;
+    if (payload.fen && probe.validate_fen(payload.fen).valid) {
+      placeFen(payload.fen, payload.endgamePly == null ? "Position" : "Rook endgame");
+    }
     showEngineLines(payload);
     selectLine("PV1", payload.principalVariations[0].pgn);
-    rememberAnalysis(fen);
+    rememberAnalysis(payload.fen || fenInput.value);
     renderGames(payload.similarGames || []);
     downloadBtn.disabled = !(payload.similarPgn && payload.similarPgn.trim());
     const ms = payload.meta && payload.meta.tookMs;
-    setStatus("Done in " + ms + " ms.", false);
+    const plyNote = typeof payload.endgamePly === "number"
+      ? "Rook endgame at ply " + payload.endgamePly + ". "
+      : "";
+    setStatus(plyNote + "Done in " + ms + " ms.", false);
   } catch (err) {
     setStatus("The analyse request failed.", true);
   } finally {
@@ -539,8 +553,7 @@ analyseBtn.addEventListener("click", async () => {
   }
 });
 
-function analyseFilter() {
-  const body = { FEN: fenInput.value.trim() };
+function analyseFilter(body) {
   const result = document.querySelector("#result").value;
   if (result) {
     body.result = result;
