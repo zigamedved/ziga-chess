@@ -1,12 +1,12 @@
 openapi: 3.0.3
 info:
   title: ziga-chess analyse
-  version: "1.4.0"
+  version: "1.5.0"
   description: >
     Public API of the single JVM on port 8081. POST /analyse returns this
     document by default. Accept text/plain returns the previous thesis body.
-    APP_PREFIX, when set, is prepended to /analyse and /position. GET /ping
-    stays unprefixed.
+    APP_PREFIX, when set, is prepended to /analyse, /position, and /quiz.
+    GET /ping stays unprefixed.
 servers:
   - url: http://127.0.0.1:8081
 paths:
@@ -50,6 +50,64 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Error"
+  /quiz:
+    get:
+      operationId: listQuiz
+      security:
+        - basicAuth: []
+      responses:
+        "200":
+          description: Positions in the Dvoretsky quiz set. Solutions are omitted.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/QuizPosition"
+        "401":
+          description: Missing or wrong Basic credentials.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+    post:
+      operationId: answerQuiz
+      security:
+        - basicAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/QuizAnswer"
+      responses:
+        "200":
+          description: >
+            Whether the move matches the stored solution. The solution is
+            included only when the move is correct or showSolution is true.
+            Similar games are POST /analyse on the returned fen.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/QuizResult"
+        "400":
+          description: Missing id, or neither a move nor showSolution.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "401":
+          description: Missing or wrong Basic credentials.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "404":
+          description: Unknown quiz id.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
   /ping:
     get:
       operationId: ping
@@ -68,6 +126,47 @@ components:
       type: http
       scheme: basic
   schemas:
+    QuizPosition:
+      type: object
+      required: [id, title, fen]
+      properties:
+        id:
+          type: string
+        title:
+          type: string
+        fen:
+          type: string
+    QuizAnswer:
+      type: object
+      required: [id]
+      properties:
+        id:
+          type: string
+        san:
+          type: string
+          description: >
+            The guessed move in SAN. A leading move number such as 1. or 1...
+            is ignored. Compared with the first move of that position's PV1.
+        showSolution:
+          type: boolean
+          description: Return the solution without requiring a correct move.
+    QuizResult:
+      type: object
+      required: [id, title, fen, correct, revealed]
+      properties:
+        id:
+          type: string
+        title:
+          type: string
+        fen:
+          type: string
+        correct:
+          type: boolean
+        revealed:
+          type: boolean
+        solution:
+          type: string
+          description: Present only when revealed is true.
     AnalyseRequest:
       type: object
       description: Send FEN, or PGN when FEN is omitted.
@@ -219,4 +318,4 @@ components:
           type: string
         code:
           type: string
-          enum: [bad_request, invalid_fen, invalid_pgn, no_endgame, unauthorized, error]
+          enum: [bad_request, invalid_fen, invalid_pgn, no_endgame, not_found, unauthorized, error]

@@ -627,6 +627,65 @@ public class ChessServerTest {
     }
 
     @Test
+    void quizHandler_hidesSolutionUntilTheMoveOrAReveal() throws Exception {
+        QuizHandler handler = new QuizHandler();
+
+        FakeExchange missingAuth = new FakeExchange();
+        missingAuth.setRequestMethod("GET");
+        handler.handle(missingAuth);
+        assertEquals(401, missingAuth.statusCode);
+
+        FakeExchange list = authorised("");
+        list.setRequestMethod("GET");
+        handler.handle(list);
+        assertEquals(200, list.statusCode);
+        String listed = list.responseBody.toString("UTF-8");
+        assertTrue(listed.contains("\"id\":\"lucena\""));
+        assertTrue(listed.contains("4K3/4P1k1/8/8/8/8/r7/5R2 w - - 0 1"));
+        assertFalse(listed.contains("Rg1+"));
+        assertFalse(listed.contains("solution"));
+        assertEquals(5, new com.google.gson.JsonParser().parse(listed).getAsJsonArray().size());
+
+        FakeExchange numbered = authorised("{\"id\":\"lucena\",\"san\":\"1. Rg1+\"}");
+        handler.handle(numbered);
+        assertEquals(200, numbered.statusCode);
+        com.google.gson.JsonObject correct = new com.google.gson.JsonParser()
+                .parse(numbered.responseBody.toString("UTF-8")).getAsJsonObject();
+        assertTrue(correct.get("correct").getAsBoolean());
+        assertTrue(correct.get("revealed").getAsBoolean());
+        assertEquals("Rg1+", correct.get("solution").getAsString());
+
+        FakeExchange black = authorised("{\"id\":\"philidor-black\",\"san\":\"1... Rh1\"}");
+        handler.handle(black);
+        assertEquals(200, black.statusCode);
+        assertTrue(black.responseBody.toString("UTF-8").contains("\"correct\":true"));
+
+        FakeExchange wrong = authorised("{\"id\":\"lucena\",\"san\":\"Ke2\"}");
+        handler.handle(wrong);
+        assertEquals(200, wrong.statusCode);
+        String hidden = wrong.responseBody.toString("UTF-8");
+        assertTrue(hidden.contains("\"correct\":false"));
+        assertTrue(hidden.contains("\"revealed\":false"));
+        assertFalse(hidden.contains("Rg1+"));
+
+        FakeExchange reveal = authorised("{\"id\":\"shouldering\",\"showSolution\":true}");
+        handler.handle(reveal);
+        com.google.gson.JsonObject shown = new com.google.gson.JsonParser()
+                .parse(reveal.responseBody.toString("UTF-8")).getAsJsonObject();
+        assertFalse(shown.get("correct").getAsBoolean());
+        assertEquals("Kc5", shown.get("solution").getAsString());
+
+        FakeExchange unknown = authorised("{\"id\":\"missing\",\"showSolution\":true}");
+        handler.handle(unknown);
+        assertEquals(404, unknown.statusCode);
+        assertTrue(unknown.responseBody.toString("UTF-8").contains("not_found"));
+
+        FakeExchange empty = authorised("{}");
+        handler.handle(empty);
+        assertEquals(400, empty.statusCode);
+    }
+
+    @Test
     void analyseText_matchesPythonJoin() {
         Map<String, Object> game = new java.util.LinkedHashMap<>();
         game.put("name", "Game#fixture.txt");

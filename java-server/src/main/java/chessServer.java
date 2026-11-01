@@ -10,7 +10,7 @@ import java.nio.file.Paths;
 
 /**
  * Process entry. Wires {@link AuthFilter}, {@link FenParser}, {@link AnalyseHandler},
- * and {@link LuceneSearchService} onto the HTTP server.
+ * {@link QuizHandler}, and {@link LuceneSearchService} onto the HTTP server.
  */
 public class chessServer {
     public static void main(String[] args) throws IOException {
@@ -36,6 +36,7 @@ public class chessServer {
         HttpServer server = HttpServer.create(new InetSocketAddress(port), 0);
         server.createContext(envValue + "/position", new FenParser());
         server.createContext(envValue + "/analyse", new AnalyseHandler());
+        server.createContext(envValue + "/quiz", new QuizHandler());
         server.createContext("/ping", new PingHandler());
         server.createContext("/", new StaticFiles());
         if (!envValue.isEmpty()) {
