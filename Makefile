@@ -1,4 +1,4 @@
-.PHONY: test test-python test-java index index-sample package-java compose-up compose-down download-stockfish
+.PHONY: test test-python test-java index index-sample index-update package-java compose-up compose-down download-stockfish
 
 DOCS_NDJSON ?= /tmp/ziga-chess-lucene-docs.ndjson
 INDEX_DIR ?= java-server/indexedFiles
@@ -54,3 +54,12 @@ index: package-java
 	java -cp java-server/target/my-maven-docker-project.jar IndexBuilder \
 		--docs $(DOCS_NDJSON) --out $(INDEX_DIR)
 	@echo "Index ready at $(INDEX_DIR)"
+
+# Add or replace games. GAMES is NDJSON in the prepare_lucene_docs.py shape, not the zip.
+# A matching name replaces that document. Other documents stay.
+index-update: package-java
+	@test -n "$(GAMES)" || (echo "Usage: make index-update GAMES=docs.ndjson" && exit 1)
+	@test -f "$(GAMES)" || (echo "Missing $(GAMES)" && exit 1)
+	java -cp java-server/target/my-maven-docker-project.jar IndexBuilder \
+		--update --docs $(GAMES) --out $(INDEX_DIR)
+	@echo "Updated $(INDEX_DIR) from $(GAMES)"

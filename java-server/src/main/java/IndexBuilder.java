@@ -12,6 +12,7 @@ import org.apache.lucene.document.StringField;
 import org.apache.lucene.document.TextField;
 import org.apache.lucene.index.IndexWriter;
 import org.apache.lucene.index.IndexWriterConfig;
+import org.apache.lucene.index.Term;
 import org.apache.lucene.store.FSDirectory;
 
 import java.io.BufferedReader;
@@ -27,6 +28,8 @@ import java.nio.file.Paths;
  * <pre>
  *   java -cp target/my-maven-docker-project.jar IndexBuilder \
  *     --docs /tmp/docs.ndjson --out indexedFiles
+ *   java -cp target/my-maven-docker-project.jar IndexBuilder \
+ *     --update --docs /tmp/new-docs.ndjson --out indexedFiles
  * </pre>
  *
  * Indexed (tokenized) fields: static, other, dynamic (WhitespaceTokenizer, same as search).
@@ -45,11 +48,14 @@ public class IndexBuilder {
     public static void main(String[] args) throws Exception {
         Path docsPath = null;
         Path outPath = Paths.get("indexedFiles");
+        boolean update = false;
         for (int i = 0; i < args.length; i++) {
             if ("--docs".equals(args[i]) && i + 1 < args.length) {
                 docsPath = Paths.get(args[++i]);
             } else if ("--out".equals(args[i]) && i + 1 < args.length) {
                 outPath = Paths.get(args[++i]);
+            } else if ("--update".equals(args[i])) {
+                update = true;
             } else if ("--help".equals(args[i]) || "-h".equals(args[i])) {
                 printUsage();
                 return;
@@ -61,17 +67,34 @@ public class IndexBuilder {
         }
 
         Files.createDirectories(outPath);
-        long written = buildIndex(docsPath, outPath);
-        System.out.println("Indexed " + written + " docs into " + outPath.toAbsolutePath());
+        long written = update ? updateIndex(docsPath, outPath) : buildIndex(docsPath, outPath);
+        System.out.println((update ? "Updated " : "Indexed ") + written + " docs into " + outPath.toAbsolutePath());
     }
 
     private static void printUsage() {
-        System.out.println("Usage: IndexBuilder --docs docs.ndjson [--out indexedFiles]");
+        System.out.println("Usage: IndexBuilder [--update] --docs docs.ndjson [--out indexedFiles]");
     }
 
+    /** Wipes {@code outPath} and writes every document. Use this for a full rebuild. */
     static long buildIndex(Path docsPath, Path outPath) throws IOException {
+        return writeDocs(docsPath, outPath, IndexWriterConfig.OpenMode.CREATE, false);
+    }
+
+    /**
+     * Adds documents and replaces any existing document with the same {@code name}.
+     * Other documents stay. A feature-schema change still needs {@link #buildIndex}.
+     */
+    static long updateIndex(Path docsPath, Path outPath) throws IOException {
+        return writeDocs(docsPath, outPath, IndexWriterConfig.OpenMode.CREATE_OR_APPEND, true);
+    }
+
+    private static long writeDocs(
+            Path docsPath,
+            Path outPath,
+            IndexWriterConfig.OpenMode mode,
+            boolean replaceByName) throws IOException {
         IndexWriterConfig config = new IndexWriterConfig(new WhitespaceAnalyzer());
-        config.setOpenMode(IndexWriterConfig.OpenMode.CREATE);
+        config.setOpenMode(mode);
         long written = 0;
         try (FSDirectory directory = FSDirectory.open(outPath);
              IndexWriter writer = new IndexWriter(directory, config);
@@ -93,7 +116,11 @@ public class IndexBuilder {
                 if (doc == null) {
                     continue;
                 }
-                writer.addDocument(doc);
+                if (replaceByName) {
+                    writer.updateDocument(new Term("name", doc.get("name")), doc);
+                } else {
+                    writer.addDocument(doc);
+                }
                 written++;
                 if (written % 10000 == 0) {
                     System.out.println("... " + written + " indexed");

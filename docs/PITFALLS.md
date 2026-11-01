@@ -122,7 +122,7 @@ Date is the day the mistake was found, not the day the code was first written.
 - **Assumed:** a long-lived `SearcherManager` that calls `maybeRefresh()` will see a rebuilt index without restarting Java.
 - **Actually:** `IndexBuilder` opens with `OpenMode.CREATE`, which wipes the directory. `maybeRefresh()` sees an in-place commit. A full rebuild is a different event.
 - **Broke:** nothing in CI. The wrong assumption would have dropped the "restart Java after `make index`" step from the docs and left a running server on a deleted index.
-- **Do this:** restart Java after `make index` / `make index-sample`. Leave `maybeRefresh()` for commits into the same directory.
+- **Do this:** restart Java after `make index` / `make index-sample`. `make index-update` commits into the same directory, so `maybeRefresh()` on the next search sees the new games. Leave `maybeRefresh()` for those commits.
 
 ### 2026-10-12 — Linux arm64 Stockfish asset is the Android tarball
 
