@@ -101,7 +101,7 @@ docker compose up --build
 - Board: `http://127.0.0.1:8081/`
 - Analyse API: `http://127.0.0.1:8081/analyse`
 - Health: `GET /ping` on that same port (always unprefixed, even if `APP_PREFIX` is set)
-- Optional `APP_PREFIX` (e.g. `/v1/chess`) is applied to `/analyse` and `/position`. The board stays at `/` and calls that prefixed analyse URL. Leave `APP_PREFIX` empty for local defaults.
+- Optional `APP_PREFIX` (e.g. `/v1/chess`) is applied to `/analyse`, `/position`, and `/quiz`. The board stays at `/` and calls those prefixed URLs. Leave `APP_PREFIX` empty for local defaults.
 
 ```bash
 source .env
@@ -126,7 +126,7 @@ java -jar java-server/target/my-maven-docker-project.jar
 
 Listens on port 8081 (`PORT` overrides). The same process serves the board at `/`.
 
-Open `http://127.0.0.1:8081/`. The page is two columns. The left column shows the saved username, a box for a FEN or a PGN, and Analyze Game. Enter the Basic auth user and password in that card. The sample FEN is filled in. The right column is the board. The current move is a blue arrow. Engine lines under the board are `PV1` and `PV2`. Suggested games sit in Analyzed Games History & Review: a thumbnail, the players, the result, and a match percent against the strongest hit in that response (a BM25 score, not a win probability or a date). Recent positions from this browser are listed there too. The bar beside the board counts `1-0`, draws, and `0-1` in the suggested games. It is not an engine evaluation. Credentials and the recent-position list stay in the browser's local storage.
+Open `http://127.0.0.1:8081/`. The page is two columns. The left column shows the saved username, a box for a FEN or a PGN, and Analyze Game. Enter the Basic auth user and password in that card. The quiz under that card loads five rook endgames from the Dvoretsky set. Check move compares your SAN with the first move of that position's PV1. A correct move, or Show solution, then runs Analyze Game. Solved ids stay in this browser. The sample FEN is filled in. The right column is the board. The current move is a blue arrow. Engine lines under the board are `PV1` and `PV2`. Suggested games sit in Analyzed Games History & Review: a thumbnail, the players, the result, and a match percent against the strongest hit in that response (a BM25 score, not a win probability or a date). Recent positions from this browser are listed there too. The bar beside the board counts `1-0`, draws, and `0-1` in the suggested games. It is not an engine evaluation. Credentials and the recent-position list stay in the browser's local storage.
 
 A shared position is `/?fen=` plus the FEN, URL-encoded (`/` as `%2F`, spaces as `%20`). Copy link writes that URL. An invalid `fen` parameter leaves the sample position and shows an error.
 

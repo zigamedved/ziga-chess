@@ -494,6 +494,7 @@ downloadBtn.addEventListener("click", () => {
 analyseBtn.addEventListener("click", async () => {
   const raw = fenInput.value.trim();
   if (!raw) {
+    quizNote = "";
     setStatus("Enter a FEN or a PGN first.", true);
     return;
   }
@@ -508,6 +509,7 @@ analyseBtn.addEventListener("click", async () => {
   }
   const filter = analyseFilter(body);
   if (filter.error) {
+    quizNote = "";
     setStatus(filter.error, true);
     return;
   }
@@ -529,6 +531,7 @@ analyseBtn.addEventListener("click", async () => {
     });
     const payload = await response.json();
     if (!response.ok) {
+      quizNote = "";
       setStatus(payload.error || "Analyse failed.", true);
       return;
     }
@@ -545,8 +548,11 @@ analyseBtn.addEventListener("click", async () => {
     const plyNote = typeof payload.endgamePly === "number"
       ? "Rook endgame at ply " + payload.endgamePly + ". "
       : "";
-    setStatus(plyNote + "Done in " + ms + " ms.", false);
+    const note = quizNote;
+    quizNote = "";
+    setStatus((note ? note + " " : "") + plyNote + "Done in " + ms + " ms.", false);
   } catch (err) {
+    quizNote = "";
     setStatus("The analyse request failed.", true);
   } finally {
     analyseBtn.disabled = false;
@@ -593,6 +599,138 @@ function basicAuthHeader(user, pass) {
     binary += String.fromCharCode(byte);
   }
   return "Basic " + btoa(binary);
+}
+
+let quizPositions = [];
+let quizIndex = -1;
+let quizNote = "";
+const QUIZ_KEY = "ziga-chess-quiz";
+
+function readSolved() {
+  try {
+    const raw = JSON.parse(localStorage.getItem(QUIZ_KEY) || "[]");
+    return Array.isArray(raw) ? raw.filter((id) => typeof id === "string") : [];
+  } catch (err) {
+    return [];
+  }
+}
+
+function renderQuizProgress() {
+  const progress = document.querySelector("#quiz-progress");
+  if (!progress || !quizPositions.length) {
+    return;
+  }
+  const solved = new Set(readSolved());
+  const done = quizPositions.filter((row) => solved.has(row.id)).length;
+  progress.textContent = done + " of " + quizPositions.length + " solved on this browser.";
+}
+
+function markSolved(id) {
+  const ids = readSolved();
+  if (id && !ids.includes(id)) {
+    ids.push(id);
+    localStorage.setItem(QUIZ_KEY, JSON.stringify(ids));
+  }
+  renderQuizProgress();
+}
+
+document.querySelector("#quiz-next").addEventListener("click", async () => {
+  if (!quizPositions.length) {
+    try {
+      const response = await fetch(apiPrefix + "/quiz", {
+        headers: { Authorization: basicAuthHeader(userInput.value, passInput.value) },
+      });
+      const payload = await response.json();
+      if (!response.ok) {
+        setStatus(payload.error || "Quiz failed.", true);
+        return;
+      }
+      quizPositions = payload;
+      renderQuizProgress();
+    } catch (err) {
+      setStatus("The quiz request failed.", true);
+      return;
+    }
+  }
+  const solved = new Set(readSolved());
+  let next = -1;
+  for (let i = quizIndex + 1; i < quizPositions.length; i++) {
+    if (!solved.has(quizPositions[i].id)) {
+      next = i;
+      break;
+    }
+  }
+  if (next < 0) {
+    next = quizPositions.findIndex((row) => !solved.has(row.id));
+  }
+  if (next < 0) {
+    next = (quizIndex + 1) % quizPositions.length;
+  }
+  quizIndex = next;
+  const row = quizPositions[next];
+  document.querySelector("#quiz-title").textContent = row.title;
+  document.querySelector("#quiz-move").value = "";
+  quizNote = "";
+  placeFen(row.fen, row.title);
+  setStatus(row.title + ". Find the move.", false);
+});
+
+document.querySelector("#quiz-check").addEventListener("click", () => submitQuiz(false));
+document.querySelector("#quiz-solution").addEventListener("click", () => submitQuiz(true));
+
+async function submitQuiz(showSolution) {
+  if (quizIndex < 0 || !quizPositions[quizIndex]) {
+    setStatus("Load a quiz position first.", true);
+    return;
+  }
+  const row = quizPositions[quizIndex];
+  const san = document.querySelector("#quiz-move").value.trim();
+  if (!showSolution && !san) {
+    setStatus("Enter a move.", true);
+    return;
+  }
+  const body = { id: row.id };
+  if (showSolution) {
+    body.showSolution = true;
+  }
+  if (san) {
+    body.san = san;
+  }
+  localStorage.setItem("ziga-chess-user", userInput.value);
+  localStorage.setItem("ziga-chess-pass", passInput.value);
+  try {
+    const response = await fetch(apiPrefix + "/quiz", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: basicAuthHeader(userInput.value, passInput.value),
+      },
+      body: JSON.stringify(body),
+    });
+    const payload = await response.json();
+    if (!response.ok) {
+      setStatus(payload.error || "Quiz failed.", true);
+      return;
+    }
+    if (payload.revealed && payload.solution) {
+      document.querySelector("#quiz-move").value = payload.solution;
+    }
+    if (payload.correct) {
+      markSolved(row.id);
+      quizNote = "Correct, " + payload.solution + ".";
+    } else if (payload.revealed) {
+      quizNote = "Solution " + payload.solution + ".";
+    } else {
+      setStatus("Not that move.", true);
+      return;
+    }
+    if (payload.fen) {
+      placeFen(payload.fen, row.title);
+    }
+    analyseBtn.click();
+  } catch (err) {
+    setStatus("The quiz request failed.", true);
+  }
 }
 
 const linked = new URLSearchParams(window.location.search).get("fen");
