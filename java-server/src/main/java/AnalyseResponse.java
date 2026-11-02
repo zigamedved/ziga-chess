@@ -10,6 +10,9 @@ import java.util.Map;
  * {@code openapi.yaml}. Lucene stored names stay on the plain-text path.
  */
 public final class AnalyseResponse {
+    static final String OTHER_FAMILY_WARNING =
+            "Only rook and bishop endgames are supported. Similar games are a best effort from king, rook, bishop, and pawn features.";
+
     private static final Gson GSON = new Gson();
 
     private AnalyseResponse() {
@@ -29,6 +32,12 @@ public final class AnalyseResponse {
         root.put("fen", fen);
         if (endgamePly != null) {
             root.put("endgamePly", endgamePly);
+        }
+        if (extracted.family != null && !extracted.family.isEmpty()) {
+            root.put("endgameFamily", extracted.family);
+            if (!"rook".equals(extracted.family) && !"bishop".equals(extracted.family)) {
+                root.put("warning", OTHER_FAMILY_WARNING);
+            }
         }
 
         List<Map<String, Object>> variations = new ArrayList<>();
@@ -76,6 +85,10 @@ public final class AnalyseResponse {
             row.put("blackElo", blackElo);
         }
         row.put("endgameFen", text(hit, "endgameFEN"));
+        String family = text(hit, "endgameFamily");
+        if (!family.isEmpty()) {
+            row.put("endgameFamily", family);
+        }
         row.put("pgn", text(hit, "PGN"));
         row.put("pv1", text(hit, "PV1"));
         row.put("pv2", text(hit, "PV2"));

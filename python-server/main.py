@@ -14,6 +14,7 @@ from chessapp.engine import (
     stockfish_candidates,
 )
 from chessapp.features import (
+    endgame_family,
     find_square,
     get_doubled_pawns,
     get_dynamic_features,

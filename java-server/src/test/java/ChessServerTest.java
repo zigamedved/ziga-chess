@@ -686,6 +686,89 @@ public class ChessServerTest {
     }
 
     @Test
+    void analyseHandler_bishopFamilyRanksAndOtherMaterialWarns(@TempDir Path tempDir) throws Exception {
+        try (FSDirectory directory = FSDirectory.open(tempDir);
+             IndexWriter writer = new IndexWriter(
+                     directory,
+                     new IndexWriterConfig(new LuceneSearchService.MyAnalyzer()))) {
+            writer.addDocument(IndexBuilder.toDocument(familyDoc(
+                    "Game#bishop.txt",
+                    "bishop",
+                    "Ke1 ke8 B<Ke1 Bd2 bd4 K<Bd2 Bdark bdark sameB")));
+            writer.addDocument(IndexBuilder.toDocument(familyDoc(
+                    "Game#rook.txt",
+                    "rook",
+                    "Ke1 Ra1 Re7")));
+            writer.commit();
+        }
+        System.setProperty("chess.indexDir", tempDir.toString());
+
+        List<Map<String, Object>> ranked = LuceneSearchService.searchSimilar(
+                "Ke1 Bd2 sameB");
+        assertEquals("Game#bishop.txt", ranked.get(0).get("name"));
+        assertEquals("bishop", ranked.get(0).get("endgameFamily"));
+
+        List<Map<String, Object>> rooks = LuceneSearchService.searchSimilar(
+                "Ke1", SearchFilter.from(jsonObj("{\"family\":\"rook\"}")));
+        assertEquals(List.of("Game#rook.txt"), namesOf(rooks));
+
+        String bishopFen = "4k3/8/8/8/3b4/8/3B4/4K3 w - - 0 1";
+        String queenFen = "6k1/8/8/8/8/8/8/4QK2 w - - 0 1";
+        AnalyseHandler handler = new AnalyseHandler(fen -> {
+            if (fen.contains("Q")) {
+                return new FeatureCli.Result(fen, "Ke1", "pv-one", "pv-two", 12, 8, "other");
+            }
+            return new FeatureCli.Result(
+                    fen,
+                    "Ke1 ke8 B<Ke1 Bd2 bd4 K<Bd2 Bdark bdark sameB",
+                    "pv-one",
+                    "pv-two",
+                    12,
+                    8,
+                    "bishop");
+        });
+
+        FakeExchange bishop = authorised("{\"FEN\":\"" + bishopFen + "\"}");
+        handler.handle(bishop);
+        assertEquals(200, bishop.statusCode);
+        com.google.gson.JsonObject bishopJson = new com.google.gson.JsonParser()
+                .parse(bishop.responseBody.toString("UTF-8")).getAsJsonObject();
+        assertEquals("bishop", bishopJson.get("endgameFamily").getAsString());
+        assertFalse(bishopJson.has("warning"));
+        com.google.gson.JsonObject top = bishopJson.getAsJsonArray("similarGames").get(0).getAsJsonObject();
+        assertEquals("Game#bishop.txt", top.get("name").getAsString());
+        assertEquals("bishop", top.get("endgameFamily").getAsString());
+
+        FakeExchange queen = authorised("{\"FEN\":\"" + queenFen + "\"}");
+        handler.handle(queen);
+        assertEquals(200, queen.statusCode);
+        com.google.gson.JsonObject queenJson = new com.google.gson.JsonParser()
+                .parse(queen.responseBody.toString("UTF-8")).getAsJsonObject();
+        assertEquals("other", queenJson.get("endgameFamily").getAsString());
+        assertEquals(AnalyseResponse.OTHER_FAMILY_WARNING, queenJson.get("warning").getAsString());
+        assertTrue(queenJson.getAsJsonArray("similarGames").size() > 0);
+
+        FakeExchange plain = authorised("{\"FEN\":\"" + bishopFen + "\"}");
+        plain.requestHeaders.add("Accept", "text/plain");
+        handler.handle(plain);
+        assertEquals(200, plain.statusCode);
+        assertFalse(plain.responseBody.toString("UTF-8").contains("endgameFamily"));
+
+        FakeExchange badFamily = authorised("{\"FEN\":\"" + bishopFen + "\",\"family\":\"queen\"}");
+        handler.handle(badFamily);
+        assertEquals(400, badFamily.statusCode);
+        assertTrue(badFamily.responseBody.toString("UTF-8").contains("family must be rook or bishop"));
+    }
+
+    private static com.google.gson.JsonObject familyDoc(String name, String family, String features) {
+        return jsonObj("{\"name\":\"" + name + "\",\"White\":\"W\",\"Black\":\"B\",\"Result\":\"1-0\","
+                + "\"PGN\":\"1. e4\",\"PV1\":\"\",\"PV2\":\"\","
+                + "\"endgameFEN\":\"8/8/8/8/8/8/4k3/4K3 w - - 0 1\","
+                + "\"endgameFamily\":\"" + family + "\","
+                + "\"static\":\"" + features + "\",\"other\":\"\",\"dynamic\":\"\"}");
+    }
+
+    @Test
     void analyseText_matchesPythonJoin() {
         Map<String, Object> game = new java.util.LinkedHashMap<>();
         game.put("name", "Game#fixture.txt");

@@ -1,7 +1,7 @@
 openapi: 3.0.3
 info:
   title: ziga-chess analyse
-  version: "1.5.0"
+  version: "1.6.0"
   description: >
     Public API of the single JVM on port 8081. POST /analyse returns this
     document by default. Accept text/plain returns the previous thesis body.
@@ -197,6 +197,13 @@ components:
           type: integer
           minimum: 0
           description: Keep games whose Elo is at most this value. Same average as minElo.
+        family:
+          type: string
+          enum: [rook, bishop]
+          description: >
+            Keep similar games tagged with this endgame family. Omit it to leave
+            ranking unchanged. The tag is written by `make index`. An older index
+            has no `endgameFamily` field, so this filter matches nothing until then.
     AnalyseResponse:
       type: object
       required: [fen, principalVariations, similarGames, similarPgn, meta]
@@ -209,6 +216,16 @@ components:
           description: >
             Half-move index of fen on the PGN main line. 0 is the start position.
             Present only when the request was a PGN.
+        endgameFamily:
+          type: string
+          enum: [rook, bishop, other]
+          description: >
+            Material of the analysed position. Rook is kings, rooks, and pawns
+            with at least one rook. Bishop is kings, bishops, and pawns with at
+            least one bishop. Anything else is other.
+        warning:
+          type: string
+          description: Present when endgameFamily is other. The search still runs.
         principalVariations:
           type: array
           items:
@@ -256,6 +273,10 @@ components:
           description: Black's rating from the corpus, when the game stored one.
         endgameFen:
           type: string
+        endgameFamily:
+          type: string
+          enum: [rook, bishop, other]
+          description: Family stored on the indexed game. Absent on an index built before this field.
         pgn:
           type: string
         pv1:

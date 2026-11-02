@@ -11,19 +11,22 @@ final class SearchFilter {
     final String result;
     final Integer minElo;
     final Integer maxElo;
+    /** {@code rook} or {@code bishop}. Null leaves every family in the ranking. */
+    final String family;
 
-    private SearchFilter(String result, Integer minElo, Integer maxElo) {
+    private SearchFilter(String result, Integer minElo, Integer maxElo, String family) {
         this.result = result;
         this.minElo = minElo;
         this.maxElo = maxElo;
+        this.family = family;
     }
 
     static SearchFilter none() {
-        return new SearchFilter(null, null, null);
+        return new SearchFilter(null, null, null, null);
     }
 
     boolean isEmpty() {
-        return result == null && minElo == null && maxElo == null;
+        return result == null && minElo == null && maxElo == null && family == null;
     }
 
     static SearchFilter from(JsonObject obj) throws FenParser.BadRequestException {
@@ -33,7 +36,24 @@ final class SearchFilter {
         if (minElo != null && maxElo != null && minElo > maxElo) {
             throw new FenParser.BadRequestException("minElo is greater than maxElo");
         }
-        return new SearchFilter(result, minElo, maxElo);
+        return new SearchFilter(result, minElo, maxElo, readFamily(obj));
+    }
+
+    private static String readFamily(JsonObject obj) throws FenParser.BadRequestException {
+        if (!obj.has("family") || obj.get("family").isJsonNull()) {
+            return null;
+        }
+        if (!obj.get("family").isJsonPrimitive() || !obj.get("family").getAsJsonPrimitive().isString()) {
+            throw new FenParser.BadRequestException("family must be rook or bishop");
+        }
+        String family = obj.get("family").getAsString().trim();
+        if (family.isEmpty()) {
+            return null;
+        }
+        if (!"rook".equals(family) && !"bishop".equals(family)) {
+            throw new FenParser.BadRequestException("family must be rook or bishop");
+        }
+        return family;
     }
 
     private static String readResult(JsonObject obj) throws FenParser.BadRequestException {

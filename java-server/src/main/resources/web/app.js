@@ -537,7 +537,10 @@ analyseBtn.addEventListener("click", async () => {
     }
     window.__lastAnalyse = payload;
     if (payload.fen && probe.validate_fen(payload.fen).valid) {
-      placeFen(payload.fen, payload.endgamePly == null ? "Position" : "Rook endgame");
+      const label = payload.endgameFamily === "bishop"
+        ? "Bishop endgame"
+        : payload.endgamePly == null ? "Position" : "Rook endgame";
+      placeFen(payload.fen, label);
     }
     showEngineLines(payload);
     selectLine("PV1", payload.principalVariations[0].pgn);
@@ -550,7 +553,9 @@ analyseBtn.addEventListener("click", async () => {
       : "";
     const note = quizNote;
     quizNote = "";
-    setStatus((note ? note + " " : "") + plyNote + "Done in " + ms + " ms.", false);
+    const familyNote = payload.endgameFamily === "bishop" ? "Bishop endgame. " : "";
+    const warn = payload.warning ? payload.warning + " " : "";
+    setStatus((note ? note + " " : "") + warn + familyNote + plyNote + "Done in " + ms + " ms.", false);
   } catch (err) {
     quizNote = "";
     setStatus("The analyse request failed.", true);

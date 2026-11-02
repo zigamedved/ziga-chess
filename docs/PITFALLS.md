@@ -19,6 +19,13 @@ Date is the day the mistake was found, not the day the code was first written.
 
 ## CI and runtime
 
+### 2026-11-02 — python-chess 1.9 has no square_color
+
+- **Assumed:** `chess.square_color` is available in the venv that CI and the feature CLI use.
+- **Actually:** that helper is newer than python-chess 1.9.4. A light square is `(file + rank) % 2 == 1` (a1 is dark).
+- **Broke:** importing bishop color-complex tokens raised `AttributeError` before any test ran.
+- **Do this:** use the file-plus-rank check in `chessapp.features`. Do not call `chess.square_color`.
+
 ### 2026-10-30 — reading a CLI's stdout before closing its stdin deadlocks
 
 - **Assumed:** `FeatureCli`'s pattern (start the process, then `readAllBytes` on stdout) works when the PGN is passed on stdin.

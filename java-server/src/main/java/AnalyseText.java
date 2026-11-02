@@ -25,7 +25,8 @@ public final class AnalyseText {
             for (Map.Entry<String, Object> entry : game.entrySet()) {
                 if ("explanation".equals(entry.getKey())
                         || "WhiteElo".equals(entry.getKey())
-                        || "BlackElo".equals(entry.getKey())) {
+                        || "BlackElo".equals(entry.getKey())
+                        || "endgameFamily".equals(entry.getKey())) {
                     continue;
                 }
                 if (!first) {

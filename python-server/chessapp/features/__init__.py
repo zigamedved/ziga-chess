@@ -67,16 +67,73 @@ def get_static_features(fen):
     wk_sq = find_square('K', wk)
     bk_sq = find_square('k', bk)
 
-    return wp_sq + bp_sq + wr_sq + br_sq + wk_sq + bk_sq + wp_att + bp_att + wr_att + br_att + wk_att + bk_att + wp_def + bp_def + wr_def + br_def + wk_def + bk_def
+    # Bishops are appended so a rook endgame keeps the token sequence above.
+    wb = list(board.pieces(chess.BISHOP, chess.WHITE))
+    bb = list(board.pieces(chess.BISHOP, chess.BLACK))
+    wb_sq = find_square('B', wb)
+    bb_sq = find_square('b', bb)
+    wb_att = find_attackers('B', chess.BLACK, wb, board, '>')
+    wb_def = find_attackers('B', chess.WHITE, wb, board, '<')
+    bb_att = find_attackers('b', chess.WHITE, bb, board, '>')
+    bb_def = find_attackers('b', chess.BLACK, bb, board, '<')
+
+    return (wp_sq + bp_sq + wr_sq + br_sq + wk_sq + bk_sq
+            + wp_att + bp_att + wr_att + br_att + wk_att + bk_att
+            + wp_def + bp_def + wr_def + br_def + wk_def + bk_def
+            + wb_sq + bb_sq + wb_att + bb_att + wb_def + bb_def)
+
+
+def endgame_family(fen):
+    """``rook`` or ``bishop`` when the position is only that material, else ``other``.
+
+    Kings are always allowed. Pawns are allowed in both supported families.
+    A queen, a knight, or rooks mixed with bishops is ``other``.
+    """
+    board = chess.Board(fen)
+    kinds = {piece.piece_type for piece in board.piece_map().values()}
+    kinds.discard(chess.KING)
+    if chess.ROOK in kinds and kinds <= {chess.ROOK, chess.PAWN}:
+        return "rook"
+    if chess.BISHOP in kinds and kinds <= {chess.BISHOP, chess.PAWN}:
+        return "bishop"
+    return "other"
+
+
+def _is_light_square(square):
+    # a1 is dark. python-chess 1.9 has no square_color helper.
+    return (chess.square_file(square) + chess.square_rank(square)) % 2 == 1
+
+
+def bishop_motifs(board):
+    """Color complex of each bishop, plus same-color or opposite-color when each side has one."""
+    tokens = []
+    for color, light_name, dark_name in (
+            (chess.WHITE, "Blight", "Bdark"),
+            (chess.BLACK, "blight", "bdark"),
+    ):
+        for square in board.pieces(chess.BISHOP, color):
+            if _is_light_square(square):
+                tokens.append(light_name)
+            else:
+                tokens.append(dark_name)
+    white = list(board.pieces(chess.BISHOP, chess.WHITE))
+    black = list(board.pieces(chess.BISHOP, chess.BLACK))
+    if len(white) == 1 and len(black) == 1:
+        if _is_light_square(white[0]) == _is_light_square(black[0]):
+            tokens.append("sameB")
+        else:
+            tokens.append("oppB")
+    return tokens
 
 
 
 def get_attacked_pieces(squares, board, color, piece):
-    defenders = ['P', 'R', 'K']
+    defenders = ['P', 'R', 'B', 'K']
     if color:
-        defenders = ['p', 'r', 'k']
+        defenders = ['p', 'r', 'b', 'k']
     pawns = set(list(board.pieces(chess.PAWN, not color)))
     rooks = set(list(board.pieces(chess.ROOK, not color)))
+    bishops = set(list(board.pieces(chess.BISHOP, not color)))
     king = set(list(board.pieces(chess.KING, not color)))
 
     piece = str(piece)
@@ -87,8 +144,11 @@ def get_attacked_pieces(squares, board, color, piece):
     for rook in rooks:
         if rook in squares:
             result.append('!' + piece + '>' + defenders[1])
+    for bishop in bishops:
+        if bishop in squares:
+            result.append('!' + piece + '>' + defenders[2])
     if list(king)[0] in squares:
-        result.append('!' + piece + '>' + defenders[2])
+        result.append('!' + piece + '>' + defenders[3])
     return result
 
 
@@ -302,8 +362,9 @@ def get_more_features(fen):
     # [wc5,wd5,we5], white controls c5, d5, e5
     ksc = get_key_square_control(board)
     rps = get_rook_placement_score(board)  # 10 numbers, white, black
+    bishops = np.array(bishop_motifs(board))
 
-    result = np.array([ks, ppw, ppb, ip, dp, ksc, rps],
+    result = np.array([ks, ppw, ppb, ip, dp, ksc, rps, bishops],
                       dtype=object)  # removed mty
     return [item for sub_list in result for item in sub_list]
 
