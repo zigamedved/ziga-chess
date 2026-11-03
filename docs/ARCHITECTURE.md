@@ -1,6 +1,6 @@
 # Architecture: similar rook-endgame search
 
-This project finds **similar rook endgames** for a position (FEN). It extracts chess features, searches a Lucene index with BM25, and returns similar games plus principal variations.
+This project finds **similar rook and bishop endgames** for a position (FEN). It extracts chess features, searches a Lucene index with BM25, and returns similar games plus principal variations. A bishop endgame is kings, bishops, and pawns with at least one bishop, and that search is limited to documents tagged `bishop`. The shipped corpus is rook endgames, so a bishop query stays empty until bishop games are indexed. Other material is still searched, and the JSON response includes `warning`.
 
 This page describes the **current** data/query flow and how it differs from the **legacy** (pre–PR #15) design.
 
@@ -49,8 +49,8 @@ flowchart LR
 | Role | Fields |
 |------|--------|
 | Search (tokenized) | `static`, `other`, `dynamic` |
-| Stored metadata (for the API response) | `name`, `White`, `Black`, `Result`, `WhiteElo`, `BlackElo`, `PGN`, `PV1`, `PV2`, `endgameFEN` |
-| Filters | `Result` is a `StringField`. `elo` is an `IntPoint`: the average of the ratings present |
+| Stored metadata (for the API response) | `name`, `White`, `Black`, `Result`, `WhiteElo`, `BlackElo`, `PGN`, `PV1`, `PV2`, `endgameFEN`, `endgameFamily` |
+| Filters | `Result` and `endgameFamily` are `StringField`s. `elo` is an `IntPoint`: the average of the ratings present |
 
 `make index-update GAMES=docs.ndjson` adds those documents and replaces any document with the same `name`. The running process calls `maybeRefresh()` on each search, so that in-place commit is picked up. `make index` opens the index with `OpenMode.CREATE` (it wipes the directory), so restart Java after a full rebuild. A feature-schema change still needs the full rebuild.
 
@@ -75,7 +75,7 @@ sequenceDiagram
 
 Auth is checked once, on the JVM. The image contains the JRE, `chessapp`, and the Stockfish binary. `CHESSAPP_DIR` is the directory that holds the `chessapp` package. `POST /position` is still registered on the same port for a raw feature string; the client path is `POST /analyse`.
 
-`GET /quiz` lists five rook endgames seeded from `results/DvoretskyEndgameManual`. `POST /quiz` checks a SAN against the first move of that position's PV1, or reveals it. Similar games still come from `POST /analyse` on the returned FEN. The default `/analyse` body is JSON (`openapi.yaml`), including `similarPgn` for the current similar-game set and an `explanation` of the matched feature tokens on each hit. Optional `result`, `minElo`, and `maxElo` are Lucene filters on that same BM25 query. An empty filter leaves the query unchanged. A `PGN` body is resolved to the first rook endgame on the main line before that search. The rule lives in `chessapp.endgame`. `Accept: text/plain` returns the thesis text. Errors are JSON objects with `error` and `code`. `GET /` serves the board from the same process. `?fen=` on that page opens a shared position.
+`GET /quiz` lists five rook endgames seeded from `results/DvoretskyEndgameManual`. `POST /quiz` checks a SAN against the first move of that position's PV1, or reveals it. Similar games still come from `POST /analyse` on the returned FEN. The default `/analyse` body is JSON (`openapi.yaml`), including `similarPgn` for the current similar-game set and an `explanation` of the matched feature tokens on each hit. Optional `result`, `minElo`, `maxElo`, and `family` (`rook` or `bishop`) are Lucene filters on that same BM25 query. `endgameFamily` on the response is the material of the position just analysed. An empty filter leaves the query unchanged. A `PGN` body is resolved to the first rook endgame on the main line before that search. The rule lives in `chessapp.endgame`. `Accept: text/plain` returns the thesis text. Errors are JSON objects with `error` and `code`. `GET /` serves the board from the same process. `?fen=` on that page opens a shared position.
 
 Each `/analyse` starts a new CLI process, so the Flask LRU and the `engine_busy` lock do not apply to compose. They still apply if you run `main:app` yourself.
 

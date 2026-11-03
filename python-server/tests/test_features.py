@@ -75,6 +75,24 @@ def test_get_dynamic_features_quiet_move(app_module):
     assert dyn == ["!kh8"]
 
 
+def test_endgame_family_bishop_and_other(app_module):
+    assert app_module.endgame_family(
+        "4k3/8/8/8/2b5/8/3B4/4K3 w - - 0 1") == "bishop"
+    assert "oppB" in app_module.get_more_features(
+        "4k3/8/8/8/2b5/8/3B4/4K3 w - - 0 1")
+    assert app_module.endgame_family(README_FEN) == "rook"
+    assert app_module.endgame_family("6k1/8/8/8/8/8/8/4QK2 w - - 0 1") == "other"
+    assert app_module.endgame_family("4k3/8/8/8/8/8/4N3/4K3 w - - 0 1") == "other"
+    assert app_module.endgame_family("4k3/8/8/8/3b4/8/3R4/4K3 w - - 0 1") == "other"
+
+
+def test_get_dynamic_features_bishop_attacks_bishop(app_module):
+    fen = "4k3/8/4p3/4b3/8/8/3B4/4K3 w - - 0 1"
+    dyn = app_module.get_dynamic_features(fen, [chess.Move.from_uci("d2c3")])
+    assert "!Bc3" in dyn
+    assert "!B>b" in dyn
+
+
 def test_get_dynamic_features_rook_lift(app_module):
     move = chess.Move.from_uci("f8e8")
     dyn = app_module.get_dynamic_features(README_FEN, [move])

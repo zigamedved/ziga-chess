@@ -85,6 +85,18 @@ def test_golden_more_features(app_module):
     assert app_module.get_more_features(README_FEN) == GOLDEN_MORE
 
 
+# Opposite-colored bishops are not in this list: d2 and d4 are both dark.
+BISHOP_FEN = "4k3/8/8/8/3b4/8/3B4/4K3 w - - 0 1"
+GOLDEN_BISHOP_STATIC = ["Ke1", "ke8", "B<Ke1", "Bd2", "bd4", "K<Bd2"]
+GOLDEN_BISHOP_MORE = ["Bdark", "bdark", "sameB"]
+
+
+def test_golden_bishop_features(app_module):
+    assert app_module.endgame_family(BISHOP_FEN) == "bishop"
+    assert app_module.get_static_features(BISHOP_FEN) == GOLDEN_BISHOP_STATIC
+    assert app_module.get_more_features(BISHOP_FEN) == GOLDEN_BISHOP_MORE
+
+
 def test_golden_analyse_position_feature_string(app_module):
     # conftest sets LIMIT_DEPTH=1 and DummyStockfish legal ranking.
     feature_string, variants = app_module.analyse_position(README_FEN)

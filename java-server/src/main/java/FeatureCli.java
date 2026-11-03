@@ -26,18 +26,25 @@ public final class FeatureCli {
         public final String pv2;
         public final int engineDepth;
         public final int limitDepth;
+        /** {@code rook}, {@code bishop}, or {@code other}. Empty when the CLI omits it. */
+        public final String family;
 
         Result(String fen, String features, String pv1, String pv2) {
-            this(fen, features, pv1, pv2, 12, 8);
+            this(fen, features, pv1, pv2, 12, 8, "");
         }
 
         Result(String fen, String features, String pv1, String pv2, int engineDepth, int limitDepth) {
+            this(fen, features, pv1, pv2, engineDepth, limitDepth, "");
+        }
+
+        Result(String fen, String features, String pv1, String pv2, int engineDepth, int limitDepth, String family) {
             this.fen = fen;
             this.features = features;
             this.pv1 = pv1;
             this.pv2 = pv2;
             this.engineDepth = engineDepth;
             this.limitDepth = limitDepth;
+            this.family = family == null ? "" : family;
         }
     }
 
@@ -108,7 +115,8 @@ public final class FeatureCli {
                 stringField(obj, "pv1"),
                 stringField(obj, "pv2"),
                 intField(obj, "engineDepth", 12),
-                intField(obj, "limitDepth", 8));
+                intField(obj, "limitDepth", 8),
+                stringField(obj, "family"));
     }
 
     private static int intField(JsonObject obj, String name, int fallback) {

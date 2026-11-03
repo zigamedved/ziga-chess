@@ -159,6 +159,10 @@ public class IndexBuilder {
         doc.add(new StoredField("PV1", text(obj, "PV1")));
         doc.add(new StoredField("PV2", text(obj, "PV2")));
         doc.add(new StoredField("endgameFEN", text(obj, "endgameFEN")));
+        String family = text(obj, "endgameFamily");
+        if (!family.isEmpty()) {
+            doc.add(new StringField("endgameFamily", family, Field.Store.YES));
+        }
         return doc;
     }
 

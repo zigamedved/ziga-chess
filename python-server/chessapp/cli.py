@@ -16,6 +16,7 @@ import json
 import sys
 
 from chessapp import engine
+from chessapp.features import endgame_family
 from chessapp.response import format_pv
 
 
@@ -49,6 +50,7 @@ def main(argv=None) -> int:
             "pv2": format_pv(pgn2),
             "engineDepth": engine.ENGINE_DEPTH,
             "limitDepth": engine.LIMIT_DEPTH,
+            "family": endgame_family(fen),
         },
         sys.stdout,
     )

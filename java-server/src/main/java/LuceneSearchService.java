@@ -88,6 +88,18 @@ public class LuceneSearchService {
         return searchSimilar(input, SearchFilter.none());
     }
 
+    /** Documents tagged with this {@code endgameFamily}. Zero means the index has none. */
+    static int countFamily(String family) throws IOException {
+        ensureSearcher();
+        searcherManager.maybeRefresh();
+        IndexSearcher searcher = searcherManager.acquire();
+        try {
+            return searcher.count(new TermQuery(new Term("endgameFamily", family)));
+        } finally {
+            searcherManager.release(searcher);
+        }
+    }
+
     /**
      * BM25 search over static/other/dynamic. A non-empty {@code filter} is a Lucene
      * filter on the same query, so the top-K are the top matches that pass it.
@@ -119,6 +131,7 @@ public class LuceneSearchService {
                 row.put("PGN", nullToEmpty(d.get("PGN")));
                 row.put("PV1", nullToEmpty(d.get("PV1")));
                 row.put("PV2", nullToEmpty(d.get("PV2")));
+                row.put("endgameFamily", nullToEmpty(d.get("endgameFamily")));
                 row.put("score", sd.score);
                 row.put("explanation", MatchExplanation.forDoc(searcher, textQuery, sd.doc));
                 result.add(row);
@@ -139,6 +152,9 @@ public class LuceneSearchService {
             int min = filter.minElo == null ? 0 : filter.minElo;
             int max = filter.maxElo == null ? Integer.MAX_VALUE : filter.maxElo;
             builder.add(IntPoint.newRangeQuery("elo", min, max), BooleanClause.Occur.FILTER);
+        }
+        if (filter.family != null) {
+            builder.add(new TermQuery(new Term("endgameFamily", filter.family)), BooleanClause.Occur.FILTER);
         }
         return builder.build();
     }

@@ -85,8 +85,17 @@ public class AnalyseHandler implements HttpHandler {
         }
 
         final List<Map<String, Object>> hits;
+        final String warning = warningFor(extracted.family, request.filter);
         try {
-            hits = LuceneSearchService.searchSimilar(extracted.features, request.filter);
+            if (warning == AnalyseResponse.NO_BISHOP_INDEX_WARNING) {
+                hits = java.util.List.of();
+            } else {
+                SearchFilter filter = request.filter;
+                if ("bishop".equals(extracted.family) && filter.family == null) {
+                    filter = filter.withFamily("bishop");
+                }
+                hits = LuceneSearchService.searchSimilar(extracted.features, filter);
+            }
         } catch (Exception e) {
             e.printStackTrace();
             FenParser.sendJsonError(t, 500, "Lucene search failed");
@@ -97,10 +106,11 @@ public class AnalyseHandler implements HttpHandler {
         final String body;
         final String contentType;
         if (wantsPlainText(t)) {
-            body = AnalyseText.format(extracted.pv1, extracted.pv2, hits);
+            String text = AnalyseText.format(extracted.pv1, extracted.pv2, hits);
+            body = warning == null ? text : warning + "\n\n" + text;
             contentType = "text/plain; charset=utf-8";
         } else {
-            body = AnalyseResponse.toJson(fen, extracted, hits, tookMs, endgamePly);
+            body = AnalyseResponse.toJson(fen, extracted, hits, tookMs, endgamePly, warning);
             contentType = "application/json; charset=utf-8";
         }
         byte[] bytes = body.getBytes(StandardCharsets.UTF_8);
@@ -109,6 +119,23 @@ public class AnalyseHandler implements HttpHandler {
         OutputStream os = t.getResponseBody();
         os.write(bytes);
         os.close();
+    }
+
+    /**
+     * A bishop position is compared only with bishop games. The shipped corpus has
+     * none, so the list stays empty instead of ranking rook games on shared pawns.
+     * An explicit {@code family} other than bishop is left as the caller sent it.
+     */
+    private static String warningFor(String family, SearchFilter filter) throws IOException {
+        if ("other".equals(family)) {
+            return AnalyseResponse.OTHER_FAMILY_WARNING;
+        }
+        boolean askingForBishops = "bishop".equals(family)
+                && (filter.family == null || "bishop".equals(filter.family));
+        if (askingForBishops && LuceneSearchService.countFamily("bishop") == 0) {
+            return AnalyseResponse.NO_BISHOP_INDEX_WARNING;
+        }
+        return null;
     }
 
     static final class RequestedAnalyse {

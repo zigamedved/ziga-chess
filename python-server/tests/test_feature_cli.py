@@ -12,6 +12,7 @@ def test_cli_prints_features_and_pvs(app_module, capsys):
     assert main([README_FEN]) == 0
     payload = json.loads(capsys.readouterr().out)
     assert payload["fen"] == README_FEN
+    assert payload["family"] == "rook"
     assert payload["features"] == GOLDEN_ANALYSE_FEATURE_STRING
     assert "Kh8" in payload["pv1"]
     assert "Rfe8" in payload["pv2"]
