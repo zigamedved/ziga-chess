@@ -25,6 +25,11 @@ final class SearchFilter {
         return new SearchFilter(null, null, null, null);
     }
 
+    /** Same bounds, with a family limit added. */
+    SearchFilter withFamily(String family) {
+        return new SearchFilter(result, minElo, maxElo, family);
+    }
+
     boolean isEmpty() {
         return result == null && minElo == null && maxElo == null && family == null;
     }

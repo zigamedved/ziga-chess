@@ -735,6 +735,7 @@ public class ChessServerTest {
                 .parse(bishop.responseBody.toString("UTF-8")).getAsJsonObject();
         assertEquals("bishop", bishopJson.get("endgameFamily").getAsString());
         assertFalse(bishopJson.has("warning"));
+        assertEquals(1, bishopJson.getAsJsonArray("similarGames").size());
         com.google.gson.JsonObject top = bishopJson.getAsJsonArray("similarGames").get(0).getAsJsonObject();
         assertEquals("Game#bishop.txt", top.get("name").getAsString());
         assertEquals("bishop", top.get("endgameFamily").getAsString());
@@ -753,6 +754,17 @@ public class ChessServerTest {
         handler.handle(plain);
         assertEquals(200, plain.statusCode);
         assertFalse(plain.responseBody.toString("UTF-8").contains("endgameFamily"));
+
+        Path rookOnly = tempDir.resolve("rook-only");
+        buildFixtureIndex(rookOnly);
+        System.setProperty("chess.indexDir", rookOnly.toString());
+        FakeExchange missingBishops = authorised("{\"FEN\":\"" + bishopFen + "\"}");
+        handler.handle(missingBishops);
+        assertEquals(200, missingBishops.statusCode);
+        com.google.gson.JsonObject missingJson = new com.google.gson.JsonParser()
+                .parse(missingBishops.responseBody.toString("UTF-8")).getAsJsonObject();
+        assertEquals(AnalyseResponse.NO_BISHOP_INDEX_WARNING, missingJson.get("warning").getAsString());
+        assertEquals(0, missingJson.getAsJsonArray("similarGames").size());
 
         FakeExchange badFamily = authorised("{\"FEN\":\"" + bishopFen + "\",\"family\":\"queen\"}");
         handler.handle(badFamily);

@@ -19,6 +19,13 @@ Date is the day the mistake was found, not the day the code was first written.
 
 ## CI and runtime
 
+### 2026-11-03 — bishop features still match the rook corpus
+
+- **Assumed:** tagging a bishop position and extracting bishop tokens is enough for similar bishop games.
+- **Actually:** `games/games.json.zip` is rook endgames. Shared king and pawn tokens rank those games under a bishop query. `make index` retags the same corpus; it does not add bishop games.
+- **Broke:** a bishop analyse looked successful and listed rook games.
+- **Do this:** search a bishop position only among `endgameFamily=bishop` documents. When that count is zero, return an empty list and `warning`. Add bishop games with `make index-update`.
+
 ### 2026-11-02 — python-chess 1.9 has no square_color
 
 - **Assumed:** `chess.square_color` is available in the venv that CI and the feature CLI use.

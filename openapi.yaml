@@ -225,7 +225,10 @@ components:
             least one bishop. Anything else is other.
         warning:
           type: string
-          description: Present when endgameFamily is other. The search still runs.
+          description: >
+            Present when endgameFamily is other, and when a bishop position is
+            searched against an index that has no bishop games. In that second
+            case similarGames is empty.
         principalVariations:
           type: array
           items:

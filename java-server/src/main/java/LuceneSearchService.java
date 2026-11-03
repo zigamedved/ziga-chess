@@ -88,6 +88,18 @@ public class LuceneSearchService {
         return searchSimilar(input, SearchFilter.none());
     }
 
+    /** Documents tagged with this {@code endgameFamily}. Zero means the index has none. */
+    static int countFamily(String family) throws IOException {
+        ensureSearcher();
+        searcherManager.maybeRefresh();
+        IndexSearcher searcher = searcherManager.acquire();
+        try {
+            return searcher.count(new TermQuery(new Term("endgameFamily", family)));
+        } finally {
+            searcherManager.release(searcher);
+        }
+    }
+
     /**
      * BM25 search over static/other/dynamic. A non-empty {@code filter} is a Lucene
      * filter on the same query, so the top-K are the top matches that pass it.

@@ -13,13 +13,16 @@ public final class AnalyseResponse {
     static final String OTHER_FAMILY_WARNING =
             "Only rook and bishop endgames are supported. Similar games are a best effort from king, rook, bishop, and pawn features.";
 
+    static final String NO_BISHOP_INDEX_WARNING =
+            "This index has no bishop endgames. Similar games stay empty until bishop games are indexed.";
+
     private static final Gson GSON = new Gson();
 
     private AnalyseResponse() {
     }
 
     public static String toJson(String fen, FeatureCli.Result extracted, List<Map<String, Object>> hits, long tookMs) {
-        return toJson(fen, extracted, hits, tookMs, null);
+        return toJson(fen, extracted, hits, tookMs, null, null);
     }
 
     public static String toJson(
@@ -28,6 +31,16 @@ public final class AnalyseResponse {
             List<Map<String, Object>> hits,
             long tookMs,
             Integer endgamePly) {
+        return toJson(fen, extracted, hits, tookMs, endgamePly, null);
+    }
+
+    public static String toJson(
+            String fen,
+            FeatureCli.Result extracted,
+            List<Map<String, Object>> hits,
+            long tookMs,
+            Integer endgamePly,
+            String warning) {
         Map<String, Object> root = new LinkedHashMap<>();
         root.put("fen", fen);
         if (endgamePly != null) {
@@ -35,9 +48,9 @@ public final class AnalyseResponse {
         }
         if (extracted.family != null && !extracted.family.isEmpty()) {
             root.put("endgameFamily", extracted.family);
-            if (!"rook".equals(extracted.family) && !"bishop".equals(extracted.family)) {
-                root.put("warning", OTHER_FAMILY_WARNING);
-            }
+        }
+        if (warning != null && !warning.isEmpty()) {
+            root.put("warning", warning);
         }
 
         List<Map<String, Object>> variations = new ArrayList<>();
