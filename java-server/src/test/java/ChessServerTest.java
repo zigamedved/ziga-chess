@@ -449,6 +449,33 @@ public class ChessServerTest {
         assertEquals("W", LuceneSearchService.searchSimilar("Ke1").get(0).get("White"));
     }
 
+    @Test
+    void indexBuilder_bishopCorpusLoadsBesideARookGame(@TempDir Path tempDir) throws Exception {
+        Path docs = Path.of("..", "fixtures", "bishop-docs.ndjson");
+        if (!Files.isRegularFile(docs)) {
+            docs = Path.of("fixtures", "bishop-docs.ndjson");
+        }
+        assertTrue(Files.isRegularFile(docs), docs.toAbsolutePath().toString());
+
+        Path rookDocs = tempDir.resolve("rook.ndjson");
+        Files.writeString(rookDocs, docLine("Game#rook.txt", "Rook", "onlyrooktoken"));
+        Path index = tempDir.resolve("index");
+        assertEquals(1, IndexBuilder.buildIndex(rookDocs, index));
+        long bishops = IndexBuilder.updateIndex(docs, index);
+        assertTrue(bishops >= 20);
+
+        System.setProperty("chess.indexDir", index.toString());
+        assertEquals(bishops, LuceneSearchService.countFamily("bishop"));
+        List<Map<String, Object>> rook = LuceneSearchService.searchSimilar("onlyrooktoken");
+        assertEquals(1, rook.size());
+        assertEquals("Game#rook.txt", rook.get(0).get("name"));
+
+        List<Map<String, Object>> opposite = LuceneSearchService.searchSimilar("oppB");
+        assertFalse(opposite.isEmpty());
+        assertTrue(opposite.stream().allMatch(hit -> "bishop".equals(hit.get("endgameFamily"))));
+        assertTrue(opposite.stream().anyMatch(hit -> "Bishop#opposite.txt".equals(hit.get("name"))));
+    }
+
     private static String docLine(String name, String white, String features) {
         return "{\"name\":\"" + name + "\",\"White\":\"" + white + "\",\"Black\":\"B\",\"Result\":\"1-0\","
                 + "\"PGN\":\"1. e4\",\"PV1\":\"\",\"PV2\":\"\","

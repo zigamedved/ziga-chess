@@ -1,6 +1,6 @@
 # Architecture: similar rook-endgame search
 
-This project finds **similar rook and bishop endgames** for a position (FEN). It extracts chess features, searches a Lucene index with BM25, and returns similar games plus principal variations. A bishop endgame is kings, bishops, and pawns with at least one bishop, and that search is limited to documents tagged `bishop`. The shipped corpus is rook endgames, so a bishop query stays empty until bishop games are indexed. Other material is still searched, and the JSON response includes `warning`.
+This project finds **similar rook and bishop endgames** for a position (FEN). It extracts chess features, searches a Lucene index with BM25, and returns similar games plus principal variations. A bishop endgame is kings, bishops, and pawns with at least one bishop, and that search is limited to documents tagged `bishop`. The shipped zip is rook endgames. `fixtures/bishop-docs.ndjson` holds 24 bishop studies; `make index-bishops` adds them with `IndexBuilder --update`. A full `make index` wipes them, so the bishop load has to run again afterwards. Until then a bishop query stays empty. Other material is still searched, and the JSON response includes `warning`.
 
 This page describes the **current** data/query flow and how it differs from the **legacy** (pre–PR #15) design.
 

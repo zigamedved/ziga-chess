@@ -52,6 +52,7 @@ make index-sample          # ~100 games, quick local smoke
 make index                 # full corpus (~900k games; tens of minutes)
 # or: make index INDEX_LIMIT=1000 INDEX_DIR=java-server/indexedFiles
 make index-update GAMES=/tmp/new-docs.ndjson
+make index-bishops          # add fixtures/bishop-docs.ndjson; run again after make index
 ```
 
 `make index` wipes the index and writes it again. Restart the Java server after that. `make index-update` reads only `GAMES`, which is NDJSON in the same shape as `scripts/prepare_lucene_docs.py` output. A line whose `name` is already indexed replaces that game. A new `name` is added. The rest of the index stays, so the work follows the size of `GAMES`. The running server picks the commit up on the next search. A feature-schema change (new indexed fields) still needs `make index`.
@@ -138,7 +139,7 @@ A PGN is sent as `{"PGN":"..."}` when the box is not a FEN. The server walks the
 
 The same JSON body can filter the similar games. `result` is `1-0`, `0-1`, or `1/2-1/2`. `minElo` and `maxElo` bound the game's Elo: the average of `WhiteElo` and `BlackElo` when both are present, otherwise the one rating that is present. A game with no rating is left out when either bound is set. `family` is `rook` or `bishop`. Omitting the fields leaves the BM25 ranking unchanged. Example: `{"FEN":"...","result":"1-0","minElo":2200,"family":"bishop"}`. The board sends the result and Elo fields from the inputs. An index built before these fields were indexed needs `make index` again; until then a result, Elo, or family filter matches nothing.
 
-A position of kings, bishops, and pawns, with at least one bishop, is a bishop endgame. Its features add the bishop squares, who attacks them, and `sameB` or `oppB` when each side has one bishop. The response `endgameFamily` is `bishop`. That search uses only documents tagged `bishop`. `games/games.json.zip` has no bishop endgame, so `make index` does not create bishop results. Until bishop games are indexed, the similar-game list is empty and `warning` says so. Prepare those games in the same NDJSON shape, with `endgameFamily`, and load them with `make index-update`. A queen, a knight, or rooks mixed with bishops is `other`. That response includes `warning` and still returns a best-effort list.
+A position of kings, bishops, and pawns, with at least one bishop, is a bishop endgame. Its features add the bishop squares, who attacks them, and `sameB` or `oppB` when each side has one bishop. The response `endgameFamily` is `bishop`. That search uses only documents tagged `bishop`. `games/games.json.zip` has no bishop endgame, so `make index` does not create bishop results. `make index-bishops` loads the 24 studies in `fixtures/bishop-docs.ndjson` with `make index-update`, leaving the rook games in place. `make index` wipes the directory, so run `make index-bishops` again after a full rebuild. Until those studies are loaded, a bishop query returns an empty list and `warning`. A queen, a knight, or rooks mixed with bishops is `other`. That response includes `warning` and still returns a best-effort list.
 
 ![Board with the sample FEN](docs/ui/board.png)
 
