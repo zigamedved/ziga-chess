@@ -19,6 +19,13 @@ Date is the day the mistake was found, not the day the code was first written.
 
 ## CI and runtime
 
+### 2026-11-19 — a bare bishop ending is a draw
+
+- **Assumed:** any legal bishop-family position is worth indexing as a similar game.
+- **Actually:** king and bishop versus king, and one bishop each with no pawns, is a draw. There is no plan for the search to retrieve.
+- **Broke:** the review of `Bishop#opposite` (`4k3/8/8/8/2b5/8/3B4/4K3`).
+- **Do this:** a bishop study needs a pawn, or a bishop pair that can force mate. `scripts/prepare_bishop_docs.py` rejects the rest.
+
 ### 2026-11-03 — bishop features still match the rook corpus
 
 - **Assumed:** tagging a bishop position and extracting bishop tokens is enough for similar bishop games.

@@ -473,7 +473,7 @@ public class ChessServerTest {
         List<Map<String, Object>> opposite = LuceneSearchService.searchSimilar("oppB");
         assertFalse(opposite.isEmpty());
         assertTrue(opposite.stream().allMatch(hit -> "bishop".equals(hit.get("endgameFamily"))));
-        assertTrue(opposite.stream().anyMatch(hit -> "Bishop#opposite.txt".equals(hit.get("name"))));
+        assertTrue(opposite.stream().anyMatch(hit -> "Bishop#opposite-pawn.txt".equals(hit.get("name"))));
     }
 
     private static String docLine(String name, String white, String features) {

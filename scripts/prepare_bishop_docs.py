@@ -16,6 +16,8 @@ import json
 import sys
 from pathlib import Path
 
+import chess
+
 ROOT = Path(__file__).resolve().parents[1]
 PYTHON_SERVER = ROOT / "python-server"
 DEFAULT_SOURCES = ROOT / "fixtures" / "bishop-sources.json"
@@ -29,6 +31,19 @@ def load_features():
     return endgame_family, get_static_features, get_more_features
 
 
+def worth_indexing(fen: str) -> bool:
+    """A bare bishop ending is a draw. Keep a pawn, or a pair that can mate."""
+    board = chess.Board(fen)
+    if not board.is_valid():
+        return False
+    if board.pawns:
+        return True
+    return (
+        len(board.pieces(chess.BISHOP, chess.WHITE)) >= 2
+        or len(board.pieces(chess.BISHOP, chess.BLACK)) >= 2
+    )
+
+
 def documents(sources: Path):
     endgame_family, get_static_features, get_more_features = load_features()
     rows = json.loads(sources.read_text(encoding="utf-8"))
@@ -38,6 +53,10 @@ def documents(sources: Path):
         family = endgame_family(fen)
         if family != "bishop":
             raise SystemExit(f"{row['name']} is {family}, not a bishop endgame: {fen}")
+        if not worth_indexing(fen):
+            raise SystemExit(
+                f"{row['name']} is a draw with no pawn and no bishop pair: {fen}"
+            )
         docs.append(
             {
                 "name": row["name"],
