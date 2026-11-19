@@ -1,4 +1,4 @@
-.PHONY: test test-python test-java index index-sample index-update package-java compose-up compose-down download-stockfish
+.PHONY: test test-python test-java index index-sample index-update index-bishops package-java compose-up compose-down download-stockfish
 
 DOCS_NDJSON ?= /tmp/ziga-chess-lucene-docs.ndjson
 INDEX_DIR ?= java-server/indexedFiles
@@ -63,3 +63,8 @@ index-update: package-java
 	java -cp java-server/target/my-maven-docker-project.jar IndexBuilder \
 		--update --docs $(GAMES) --out $(INDEX_DIR)
 	@echo "Updated $(INDEX_DIR) from $(GAMES)"
+
+# Bishop studies. The rook zip has none, and `make index` wipes the directory,
+# so run this again after a full rebuild.
+index-bishops: package-java
+	$(MAKE) index-update GAMES=fixtures/bishop-docs.ndjson
