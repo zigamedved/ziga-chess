@@ -1,5 +1,6 @@
 """Flask routes: /analyse, /hello, /ping."""
 
+import hmac
 import json
 import os
 
@@ -30,9 +31,17 @@ AUTH_USERNAME = _load_required_secret("AUTH_USERNAME")
 AUTH_PASSWORD = _load_required_secret("AUTH_PASSWORD")
 
 
+def _same_secret(provided, expected: str) -> bool:
+    if not isinstance(provided, str):
+        provided = ""
+    return hmac.compare_digest(provided.encode("utf-8"), expected.encode("utf-8"))
+
+
 @auth.verify_password
 def verify_password(username, password):
-    return username == AUTH_USERNAME and password == AUTH_PASSWORD
+    user_ok = _same_secret(username, AUTH_USERNAME)
+    pass_ok = _same_secret(password, AUTH_PASSWORD)
+    return user_ok and pass_ok
 
 
 @app.route(prefix + '/hello', methods=['GET'])

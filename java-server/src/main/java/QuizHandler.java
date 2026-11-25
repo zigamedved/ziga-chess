@@ -24,6 +24,7 @@ public class QuizHandler implements HttpHandler {
 
     @Override
     public void handle(HttpExchange exchange) throws IOException {
+        SecurityHeaders.apply(exchange);
         if (!AuthFilter.authorize(exchange)) {
             return;
         }

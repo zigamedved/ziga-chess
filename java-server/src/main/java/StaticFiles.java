@@ -10,6 +10,7 @@ import java.nio.charset.StandardCharsets;
 public final class StaticFiles implements HttpHandler {
     @Override
     public void handle(HttpExchange exchange) throws IOException {
+        SecurityHeaders.apply(exchange);
         String method = exchange.getRequestMethod();
         if (!"GET".equals(method) && !"HEAD".equals(method)) {
             exchange.sendResponseHeaders(405, -1);
@@ -85,8 +86,19 @@ public final class StaticFiles implements HttpHandler {
             case "/app.css" -> "/web/app.css";
             case "/app.js" -> "/web/app.js";
             case "/vendor/chess.js" -> "/web/vendor/chess.js";
-            default -> null;
+            default -> staticAsset(path);
         };
+    }
+
+    /** Piece SVGs and self-hosted fonts. The pattern rejects anything that is not a single file name. */
+    private static String staticAsset(String path) {
+        if (path.matches("/pieces/[wb][KQRBNP]\\.svg")) {
+            return "/web" + path;
+        }
+        if (path.matches("/fonts/[A-Za-z0-9._-]+\\.woff2")) {
+            return "/web" + path;
+        }
+        return null;
     }
 
     private static String contentType(String resource) {
@@ -95,6 +107,12 @@ public final class StaticFiles implements HttpHandler {
         }
         if (resource.endsWith(".js")) {
             return "text/javascript; charset=utf-8";
+        }
+        if (resource.endsWith(".svg")) {
+            return "image/svg+xml";
+        }
+        if (resource.endsWith(".woff2")) {
+            return "font/woff2";
         }
         return "text/html; charset=utf-8";
     }

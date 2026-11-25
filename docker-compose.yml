@@ -9,7 +9,7 @@
 #     -d '{"FEN":"r4rk1/4Rppp/p1p5/P1p5/8/3P2P1/1PP2P1P/R5K1 b - - 0 25"}' \
 #     http://127.0.0.1:8081/analyse
 #
-# Optional APP_PREFIX (e.g. /v1/chess) is applied to /analyse and /position.
+# Optional APP_PREFIX (e.g. /v1/chess) is applied to /analyse, /position, and /quiz.
 # Healthchecks stay on unprefixed /ping. Leave APP_PREFIX empty for local defaults.
 
 services:

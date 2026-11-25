@@ -2,6 +2,7 @@ import com.sun.net.httpserver.HttpExchange;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
+import java.security.MessageDigest;
 import java.util.Base64;
 
 /**
@@ -54,14 +55,25 @@ public class AuthFilter {
         }
         String username = credentials.substring(0, colon);
         String password = credentials.substring(colon + 1);
-        if (!authUsername.equals(username) || !authPassword.equals(password)) {
+        // Compare both sides before branching so a wrong username still spends the password check.
+        boolean userOk = constantTimeEquals(username, authUsername);
+        boolean passOk = constantTimeEquals(password, authPassword);
+        if (!userOk || !passOk) {
             sendUnauthorized(t);
             return false;
         }
         return true;
     }
 
+    /** {@link MessageDigest#isEqual} compares the password bytes without an early content mismatch. */
+    static boolean constantTimeEquals(String provided, String expected) {
+        byte[] left = provided.getBytes(StandardCharsets.UTF_8);
+        byte[] right = expected.getBytes(StandardCharsets.UTF_8);
+        return MessageDigest.isEqual(left, right);
+    }
+
     static void sendUnauthorized(HttpExchange t) throws IOException {
+        SecurityHeaders.apply(t);
         t.getResponseHeaders().set("WWW-Authenticate", "Basic realm=\"ziga-chess\"");
         FenParser.sendJsonError(t, 401, "Unauthorized", "unauthorized");
     }

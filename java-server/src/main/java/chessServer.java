@@ -7,6 +7,8 @@ import java.io.OutputStream;
 import java.net.InetSocketAddress;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Paths;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 /**
  * Process entry. Wires {@link AuthFilter}, {@link FenParser}, {@link AnalyseHandler},
@@ -18,13 +20,6 @@ public class chessServer {
         AuthFilter.requireAuthConfigured();
         LuceneSearchService.requireIndexPresent();
         LuceneSearchService.ensureSearcher();
-        Runtime.getRuntime().addShutdownHook(new Thread(() -> {
-            try {
-                LuceneSearchService.closeSearchResources();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }));
 
         String envValue = System.getenv("APP_PREFIX");
         envValue = envValue != null ? envValue : "";
@@ -43,10 +38,30 @@ public class chessServer {
             server.createContext(envValue + "/ping", new PingHandler());
         }
 
-        server.setExecutor(null);
+        ExecutorService pool = newHttpExecutor();
+        server.setExecutor(pool);
+        Runtime.getRuntime().addShutdownHook(new Thread(() -> {
+            server.stop(0);
+            pool.shutdown();
+            try {
+                LuceneSearchService.closeSearchResources();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }));
         server.start();
 
         System.out.println("Server started on 0.0.0.0:" + port);
+    }
+
+    /** Fixed pool so /analyse and the board are not stuck behind one request thread. */
+    static ExecutorService newHttpExecutor() {
+        int threads = Math.max(4, Runtime.getRuntime().availableProcessors());
+        return Executors.newFixedThreadPool(threads, runnable -> {
+            Thread thread = new Thread(runnable, "chess-http");
+            thread.setDaemon(false);
+            return thread;
+        });
     }
 
     /** {@code chess.port} property, then {@code PORT}, then 8081. */
@@ -77,6 +92,7 @@ public class chessServer {
     static class PingHandler implements HttpHandler {
         @Override
         public void handle(HttpExchange exchange) throws IOException {
+            SecurityHeaders.apply(exchange);
             String response = "pong";
             exchange.sendResponseHeaders(200, response.length());
             OutputStream os = exchange.getResponseBody();
