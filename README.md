@@ -1,108 +1,21 @@
-# ziga-chess
+# Endgame Studio
 
-Bachelor thesis system for **similar rook-endgame retrieval**: given a FEN, extract chess features, search a Lucene index, and return similar games plus engine lines.
+ziga-chess finds **similar rook and bishop endgames**. Set up a position, or paste a FEN or a PGN. The studio extracts features, searches a Lucene index, and returns engine lines plus games that share that endgame shape.
 
-**How the system works (current vs legacy):** see **[docs/ARCHITECTURE.md](docs/ARCHITECTURE.md)** — diagrams for index build, query path, and what changed when Mongo was removed. Service shape: [ADR 0001](docs/adr/0001-single-service.md).
+The public server is one process on port **8081**: a Java 17 HTTP server (Lucene) with a Python feature CLI and Stockfish beside it, and the board served from the same process. Service shape: [ADR 0001](docs/adr/0001-single-service.md). Data flow: [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md). Mistakes that already broke a run: [docs/PITFALLS.md](docs/PITFALLS.md).
 
-**Wrong assumptions that already broke CI or a local run:** see **[docs/PITFALLS.md](docs/PITFALLS.md)**. Add an entry when you hit a new one.
+## Quick start
 
-**Clone and LFS:** [CONTRIBUTING.md](CONTRIBUTING.md). `games/games.json.zip` is Git LFS (`git lfs install && git lfs pull`). Stockfish and the Lucene index are not in the tree.
-
-## Architecture overview
-
-```mermaid
-flowchart LR
-  ZIP["games/games.json.zip"] -->|make index| IDX["Lucene indexedFiles/<br/>features + game metadata"]
-  Client -->|POST /analyse| Svc["JVM :8081<br/>feature CLI + BM25"]
-  Svc --> IDX
-  IDX -->|similar games + scores| Svc --> Client
-```
-
-| Step | What happens |
-|------|----------------|
-| **Index** | Zip → feature tokens + stored metadata → Lucene (no Mongo) |
-| **Query** | FEN → JVM runs `python -m chessapp.cli` → Lucene BM25 → plain-text similar games |
-| **Add games** | Append to the zip → `make index` → restart the server |
-
-Legacy design used Lucene only for ranking, then **MongoDB** for PGN/players/PVs. That path is gone; details in the [architecture doc](docs/ARCHITECTURE.md).
-
----
-
-# Project handling
-
-# Tests (pin current behaviour before refactors)
-
-From the repo root:
+`games/games.json.zip` is Git LFS. Stockfish and the Lucene index are not in the tree. See [CONTRIBUTING.md](CONTRIBUTING.md).
 
 ```bash
-make test          # Python + Java
-make test-python   # pytest (Stockfish + Java HTTP mocked)
-make test-java     # mvn test (temp Lucene fixture; no Mongo)
-```
-
-Python coverage includes unit tests for feature extractors, golden snapshots for the README sample FEN, and Flask route integration tests. The feature code is split into `chessapp/features`, `chessapp/engine`, `chessapp/api`, and `chessapp/search_client` (`main.py` is the Flask app the tests import). Java is `chessServer` plus `AuthFilter`, `AnalyseHandler`, `FeatureCli`, `FenParser`, and `LuceneSearchService`, with auth/body helpers, Lucene search against a fixture index, and `IndexBuilder` round-trips.
-
-# Build Lucene index (required for java-server)
-
-The search index is **not** committed (see `java-server/indexedFiles/` in `.gitignore`). Rebuild from `games/games.json.zip` (Git LFS):
-
-```bash
-git lfs pull
-make index-sample          # ~100 games, quick local smoke
-make index                 # full corpus (~900k games; tens of minutes)
-# or: make index INDEX_LIMIT=1000 INDEX_DIR=java-server/indexedFiles
-make index-update GAMES=/tmp/new-docs.ndjson
-make index-bishops          # add fixtures/bishop-docs.ndjson; run again after make index
-```
-
-`make index` wipes the index and writes it again. Restart the Java server after that. `make index-update` reads only `GAMES`, which is NDJSON in the same shape as `scripts/prepare_lucene_docs.py` output. A line whose `name` is already indexed replaces that game. A new `name` is added. The rest of the index stays, so the work follows the size of `GAMES`. The running server picks the commit up on the next search. A feature-schema change (new indexed fields) still needs `make index`.
-
-Pipeline: `scripts/prepare_lucene_docs.py` (static/other/dynamic features + metadata) → `IndexBuilder` (Lucene 8.11). Game metadata (`White`, `Black`, `PGN`, …) is stored **in Lucene** — MongoDB is no longer used.
-
-# Configuration / secrets
-
-Copy `.env.example` → `.env` and set:
-
-- `AUTH_USERNAME` / `AUTH_PASSWORD` (required)
-- `LUCENE_INDEX_DIR` / `LUCENE_TOP_K` (optional; default top 20)
-- `CHESSAPP_DIR` (directory that contains the `chessapp` package; the image sets `/app/python-server`)
-- `STOCKFISH_PATH` (optional; otherwise platform detection under `engine/` relative to the CLI working directory)
-- `PORT` (optional; default 8081)
-- `CACHE_MAX_ENTRIES` / `CACHE_TTL_SECONDS` / `STOCKFISH_LOCK_TIMEOUT_SECONDS` apply to Flask `main:app` only, not to each CLI process the JVM starts
-
-See [SECURITY.md](SECURITY.md). Hardcoded credentials have been removed.
-
-# Performance
-
-- **Lucene:** one `SearcherManager` per Java process (opened at startup, closed on shutdown). Search acquires and releases a searcher; it does not open a new `DirectoryReader` per request. `maybeRefresh()` sees an in-place commit. A full `make index` still needs a process restart (`OpenMode.CREATE` wipes the directory).
-- **Top-N:** Lucene returns at most `LUCENE_TOP_K` hits (default 20), already ranked by BM25. The plain-text body prints that page in score order.
-- **Compose `/analyse`:** each request starts `python -m chessapp.cli`, which starts its own Stockfish. The Flask LRU does not survive that process.
-- **Flask `main:app`:** plain-text bodies live in an in-process LRU with TTL (default 256 entries, 1 hour). One Stockfish process. A second overlapping `/analyse` that needs the engine gets **503** `engine_busy` (default wait is 0). A cached FEN does not take the lock. Keep a single worker if you run gunicorn yourself.
-
-Rough latency for the README sample FEN `r4rk1/4Rppp/p1p5/P1p5/8/3P2P1/1PP2P1P/R5K1 b - - 0 25`:
-
-| Path | Before | After |
-|------|--------|-------|
-| Lucene, 40 queries on a 1-doc fixture (this machine) | **~20 ms** opening a `DirectoryReader` every query | **~6 ms** acquire/release on one searcher (about 3×; `LUCENE_BENCH` in `make test-java`) |
-| First `/analyse` of the sample FEN | Stockfish depth 12 and a depth-8 PV tree dominate | unchanged; the Lucene hop is the small part |
-| Repeat `/analyse` of the same FEN on Flask `main:app` | unbounded dict hit | LRU+TTL hit; skips Stockfish and the search hop |
-| Second Flask `/analyse` while the engine is busy | threads share one Stockfish process | **503** `engine_busy` |
-
-The Lucene numbers are a local microbench (same `MatchAllDocsQuery`, tiny fixture), not a full `/analyse`. They show the reader is no longer reopened; the test also checks that 40 searches keep the same `IndexReader` and do not grow open file descriptors. A full `indexedFiles` tree costs more to open, so the gap widens there.
-
-# How to run (Docker Compose — recommended)
-
-```bash
-cp .env.example .env          # set AUTH_USERNAME / AUTH_PASSWORD
-git lfs pull
+cp .env.example .env          # AUTH_USERNAME and AUTH_PASSWORD
+git lfs install && git lfs pull
 make index-sample             # or: make index
 docker compose up --build
 ```
 
-- Board: `http://127.0.0.1:8081/`
-- Analyse API: `http://127.0.0.1:8081/analyse`
-- Health: `GET /ping` on that same port (always unprefixed, even if `APP_PREFIX` is set)
-- Optional `APP_PREFIX` (e.g. `/v1/chess`) is applied to `/analyse`, `/position`, and `/quiz`. The board stays at `/` and calls those prefixed URLs. Leave `APP_PREFIX` empty for local defaults.
+Open [http://127.0.0.1:8081/](http://127.0.0.1:8081/). Health is `GET /ping` on that same port. `APP_PREFIX` (for example `/v1/chess`) is applied to `/analyse`, `/position`, and `/quiz` only. The board stays at `/` and calls the prefixed URLs. Health checks stay on unprefixed `/ping`.
 
 ```bash
 source .env
@@ -111,11 +24,70 @@ curl -u "$AUTH_USERNAME:$AUTH_PASSWORD" -H 'Content-Type: application/json' \
   http://127.0.0.1:8081/analyse
 ```
 
-Stockfish is **downloaded in the image** (not committed). For local non-Docker runs: `./scripts/download_stockfish.sh`.
+## The studio
 
-## Manual (without Compose)
+The board is the position. Click a piece in the palette and then a square, or drag a piece. Clear, the starting position, side to move, and flip sit under the board. Ranks and files follow the flip. The FEN field stays in step with the board and says when the text is not a valid FEN. A PGN in that field is analysed from the first rook endgame on the main line.
 
-Build the index, package the jar, and run one process. `CHESSAPP_DIR` is `python-server/` so `python -m chessapp.cli` can import the package. The CLI inherits `STOCKFISH_PATH`.
+Filters are result and Elo. The Elo boxes are empty until you type a number. The bar above the board is **Outcomes in similar games**, with white wins, draws, and black wins. It is not an engine evaluation.
+
+Engine lines are PV1 and PV2. A shared position is `/?fen=` plus the FEN. Download PGN saves `similarPgn`. The quiz is five rook endgames from the Dvoretsky set. The username stays in this browser. The password stays in this tab only.
+
+![Endgame Studio, desktop, before analyse](docs/ui/board.png)
+
+![Endgame Studio, desktop, after analyse](docs/ui/analyse.png)
+
+![Endgame Studio, phone, board first](docs/ui/board-mobile.png)
+
+![Endgame Studio, phone, after analyse](docs/ui/analyse-mobile.png)
+
+A position of kings, bishops, and pawns, with at least one bishop, is a bishop endgame. `games/games.json.zip` has no bishop games. `make index-bishops` loads the studies in `fixtures/bishop-docs.ndjson`. Run it again after `make index`, which wipes the directory. Until those studies are loaded, a bishop query returns an empty list and `warning`. A queen, a knight, or rooks mixed with bishops is `other`.
+
+## API
+
+`POST /analyse` with `Authorization: Basic` and `Content-Type: application/json`. The schema is [openapi.yaml](openapi.yaml).
+
+```json
+{
+  "FEN": "r4rk1/4Rppp/p1p5/P1p5/8/3P2P1/1PP2P1P/R5K1 b - - 0 25",
+  "result": "1-0",
+  "minElo": 2200,
+  "family": "rook"
+}
+```
+
+`result` is `1-0`, `0-1`, or `1/2-1/2`. `minElo` and `maxElo` bound the game's Elo: the average of the two ratings when both are present, otherwise the one that is present. A game with no rating is left out when either bound is set. `family` is `rook` or `bishop`. Omitting the fields leaves the BM25 ranking unchanged.
+
+A PGN is `{"PGN":"..."}`. The response `fen` is the first rook endgame on the main line, and `endgamePly` is its half-move index. A game that never reaches one returns `no_endgame`.
+
+`Accept: text/plain` returns the thesis layout (`PV1` / `PV2`, then `Game #N`) and leaves `explanation` out. The default body is JSON: `principalVariations`, `similarGames` (with `explanation` tokens), `similarPgn`, and `meta`. `GET /quiz` lists the five positions. `POST /quiz` checks a SAN against the first move of that position's PV1, or reveals it.
+
+## Architecture
+
+```mermaid
+flowchart LR
+  ZIP["games/games.json.zip"] -->|make index| IDX["Lucene index"]
+  Client -->|POST /analyse| JVM["JVM :8081"]
+  JVM --> CLI["python -m chessapp.cli"]
+  CLI --> SF["Stockfish"]
+  JVM --> IDX
+```
+
+The index stores features and the game metadata. There is no Mongo round-trip. `make index` rebuilds the directory (`OpenMode.CREATE`); restart the server after that. `make index-update` commits into the same directory, and the next search sees it.
+
+One image: JRE, `python3`, the `chessapp` package, and Stockfish. `CHESSAPP_DIR` is the directory that contains that package. The image listens on 8081. Do not add a second compose service.
+
+## Develop
+
+```bash
+make test          # pytest and JUnit
+make index-sample  # about 100 games
+make index         # full corpus, then restart the server
+make index-bishops # bishop studies; run again after make index
+```
+
+Python pins, including `numpy>=1.26,<2`, live in `python-server/requirements.txt`. `make test-python` installs that file.
+
+Without Compose, after the index exists:
 
 ```bash
 export AUTH_USERNAME=... AUTH_PASSWORD=...
@@ -125,85 +97,14 @@ export LUCENE_INDEX_DIR="$PWD/java-server/indexedFiles"
 java -jar java-server/target/my-maven-docker-project.jar
 ```
 
-Listens on port 8081 (`PORT` overrides). The same process serves the board at `/`.
+`./scripts/download_stockfish.sh` fetches the binary for a local run. The image downloads it during the build.
 
-Open `http://127.0.0.1:8081/`. The page is two columns. The left column shows the saved username, a box for a FEN or a PGN, and Analyze Game. Enter the Basic auth user and password in that card. The quiz under that card loads five rook endgames from the Dvoretsky set. Check move compares your SAN with the first move of that position's PV1. A correct move, or Show solution, then runs Analyze Game. Solved ids stay in this browser. The sample FEN is filled in. The right column is the board. The current move is a blue arrow. Engine lines under the board are `PV1` and `PV2`. Suggested games sit in Analyzed Games History & Review: a thumbnail, the players, the result, and a match percent against the strongest hit in that response (a BM25 score, not a win probability or a date). Recent positions from this browser are listed there too. The bar beside the board counts `1-0`, draws, and `0-1` in the suggested games. It is not an engine evaluation. Credentials and the recent-position list stay in the browser's local storage.
+Credentials come from the environment. See [SECURITY.md](SECURITY.md). The thesis questionnaire answers are in [docs/thesis.md](docs/thesis.md).
 
-A shared position is `/?fen=` plus the FEN, URL-encoded (`/` as `%2F`, spaces as `%20`). Copy link writes that URL. An invalid `fen` parameter leaves the sample position and shows an error.
+## Sources
 
-Download PGN saves the `similarPgn` field: one game per similar hit, separated by a blank line. Movetext-only games gain `[Event]`, `[White]`, `[Black]`, `[Result]`, `[FEN]`, and `[SetUp "1"]`. A stored PGN that already starts with `[` is copied through.
-
-Each similar game includes `explanation`: a BM25 score for `static`, `other`, and `dynamic`, plus up to five matched tokens. The board lists those tokens under the game. `Accept: text/plain` leaves the explanation out so the thesis body stays the stored fields.
-
-A PGN is sent as `{"PGN":"..."}` when the box is not a FEN. The server walks the main line and analyses the first rook endgame: a legal position of kings, rooks, and pawns with at least one rook. The response `fen` is that position, and `endgamePly` is its half-move index (`0` is the start). A game that never reaches one returns `no_endgame`. A FEN request is unchanged and omits `endgamePly`.
-
-The same JSON body can filter the similar games. `result` is `1-0`, `0-1`, or `1/2-1/2`. `minElo` and `maxElo` bound the game's Elo: the average of `WhiteElo` and `BlackElo` when both are present, otherwise the one rating that is present. A game with no rating is left out when either bound is set. `family` is `rook` or `bishop`. Omitting the fields leaves the BM25 ranking unchanged. Example: `{"FEN":"...","result":"1-0","minElo":2200,"family":"bishop"}`. The board sends the result and Elo fields from the inputs. An index built before these fields were indexed needs `make index` again; until then a result, Elo, or family filter matches nothing.
-
-A position of kings, bishops, and pawns, with at least one bishop, is a bishop endgame. Its features add the bishop squares, who attacks them, and `sameB` or `oppB` when each side has one bishop. The response `endgameFamily` is `bishop`. That search uses only documents tagged `bishop`. `games/games.json.zip` has no bishop endgame, so `make index` does not create bishop results. `make index-bishops` loads the 24 studies in `fixtures/bishop-docs.ndjson` with `make index-update`, leaving the rook games in place. `make index` wipes the directory, so run `make index-bishops` again after a full rebuild. Until those studies are loaded, a bishop query returns an empty list and `warning`. A queen, a knight, or rooks mixed with bishops is `other`. That response includes `warning` and still returns a best-effort list.
-
-![Board with the sample FEN](docs/ui/board.png)
-
-![Analyse result with a similar game](docs/ui/analyse.png)
-
-# R&D
-- improve game attributes in feature extraction, then `make index` to refresh `indexedFiles`
-
-# Request example
-- url: http://127.0.0.1:8081/analyse
-- method `POST`
-- body:
-
-`{
-	"FEN": "r4rk1/4Rppp/p1p5/P1p5/8/3P2P1/1PP2P1P/R5K1 b - - 0 25"
-}`
-- headers: `Authorization: Basic ...`. Optional `Accept: text/plain` selects the legacy body.
-- example response (`application/json`; schema in [openapi.yaml](openapi.yaml)):
-
-```json
-{
-  "fen": "r4rk1/4Rppp/p1p5/P1p5/8/3P2P1/1PP2P1P/R5K1 b - - 0 25",
-  "principalVariations": [
-    { "id": 1, "pgn": "25... Rfe8 ..." },
-    { "id": 2, "pgn": "25... f6 ..." }
-  ],
-  "similarGames": [
-    {
-      "rank": 0,
-      "name": "Game#894776.txt",
-      "white": "Christiansen,Johan-Sebastian",
-      "black": "Guliev,L",
-      "result": "1-0",
-      "endgameFen": "r4rk1/4Rppp/p1p5/P1p5/8/3P2P1/1PP2P1P/R5K1 b - - 0 25",
-      "pgn": "1. e4 c5 ...",
-      "pv1": "25... Rfe8 ...",
-      "pv2": "25... f6 ...",
-      "score": 86.85
-    }
-  ],
-  "meta": { "engineDepth": 12, "limitDepth": 8, "tookMs": 1234 }
-}
-```
-
-`Accept: text/plain` returns the previous thesis layout (`PV1` / `PV2`, then `Game #N`). Flask `main:app` still returns that text. Compose serves the JVM.
-
-# Sources
 - https://stockfishchess.org
 - https://repozitorij.uni-lj.si/IzpisGradiva.php?id=153478&lang=slv
 - [SIGIR '14: Proceedings of the 37th international ACM SIGIR conference on Research & development in information retrieval](https://dl.acm.org/doi/10.1145/2600428.2609605)
 
-# Chess results questionnaire (system answers)
-1 A C B
-2 C A B
-3 C B A
-4 B A C
-5 A C B
-6 C A B
-7 B C A
-8 B A C
-9 C A B
-10 C B A
-11 C A B
-12 C A B
-13 B C A
-14 A C B
-15 A C B
+Piece drawings are Colin M.L. Burnett's cburnett set (GPL-2.0-or-later and CC-BY-SA-3.0), kept unmodified under `java-server/src/main/resources/web/pieces/`. Instrument Serif, DM Sans, and IBM Plex Mono are under the SIL Open Font License in `java-server/src/main/resources/web/fonts/OFL.txt`.

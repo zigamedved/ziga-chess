@@ -19,6 +19,13 @@ Date is the day the mistake was found, not the day the code was first written.
 
 ## CI and runtime
 
+### 2026-11-25 — a FEN textarea's min-content widens the phone
+
+- **Assumed:** `width: 100%` on the position textarea keeps the panel inside a 390px column.
+- **Actually:** Chrome sizes that textarea's minimum from the FEN line. The panel then lays out wider than the viewport, and `scrollWidth` grows.
+- **Broke:** the analysed page at 390px.
+- **Do this:** set `min-width: 0` and `max-width: 100%` on the textarea, the cards, and `.dashboard > *`. Keep the history FEN on one line with an ellipsis.
+
 ### 2026-11-19 — a bare bishop ending is a draw
 
 - **Assumed:** any legal bishop-family position is worth indexing as a similar game.

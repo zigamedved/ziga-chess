@@ -19,9 +19,7 @@ test-python:
 	cd python-server && \
 		(test -d .venv || python3 -m venv .venv) && \
 		.venv/bin/pip install -q -U pip setuptools wheel && \
-		.venv/bin/pip install -q "numpy>=1.26,<2" "chess==1.9.4" "Flask==2.3.2" \
-			"Werkzeug==2.3.6" "flask_httpauth==4.8.0" "stockfish==3.28.0" \
-			"urllib3~=2.0.4" -r requirements-dev.txt && \
+		.venv/bin/pip install -q -r requirements.txt -r requirements-dev.txt && \
 		.venv/bin/pytest -q
 
 test-java:
@@ -41,9 +39,7 @@ index: package-java
 	cd python-server && \
 		(test -d .venv || python3 -m venv .venv) && \
 		.venv/bin/pip install -q -U pip setuptools wheel && \
-		.venv/bin/pip install -q "numpy>=1.26,<2" "chess==1.9.4" "Flask==2.3.2" \
-			"Werkzeug==2.3.6" "flask_httpauth==4.8.0" "stockfish==3.28.0" \
-			"urllib3~=2.0.4"
+		.venv/bin/pip install -q -r requirements.txt
 	@if [ "$(INDEX_LIMIT)" -gt 0 ] 2>/dev/null; then \
 		python-server/.venv/bin/python scripts/prepare_lucene_docs.py \
 			--limit $(INDEX_LIMIT) -o $(DOCS_NDJSON); \

@@ -20,6 +20,7 @@ public class FenParser implements HttpHandler {
 
     @Override
     public void handle(HttpExchange t) throws IOException {
+        SecurityHeaders.apply(t);
         if (!AuthFilter.authorize(t)) {
             return;
         }
@@ -112,6 +113,7 @@ public class FenParser implements HttpHandler {
     }
 
     static void sendJsonError(HttpExchange t, int status, String message, String code) throws IOException {
+        SecurityHeaders.apply(t);
         Map<String, String> payload = new HashMap<>();
         payload.put("error", message);
         payload.put("code", code);

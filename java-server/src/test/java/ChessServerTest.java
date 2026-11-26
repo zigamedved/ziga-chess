@@ -37,6 +37,8 @@ import java.util.ArrayList;
 import java.util.Base64;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.ThreadPoolExecutor;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -77,7 +79,18 @@ public class ChessServerTest {
         assertEquals(200, page.statusCode);
         assertTrue(page.responseHeaders.getFirst("Content-Type").startsWith("text/html"));
         assertTrue(page.responseBody.toString("UTF-8").contains("Analyze Game"));
+        assertTrue(page.responseBody.toString("UTF-8").contains("Endgame Studio"));
         assertTrue(page.responseBody.toString("UTF-8").contains("content=\"\""));
+        assertSecurityHeaders(page);
+
+        FakeExchange piece = new FakeExchange();
+        piece.setRequestMethod("GET");
+        piece.setRequestUri("/pieces/wK.svg");
+        handler.handle(piece);
+        assertEquals(200, piece.statusCode);
+        assertEquals("image/svg+xml", piece.responseHeaders.getFirst("Content-Type"));
+        assertTrue(piece.responseBody.toString("UTF-8").contains("<svg"));
+        assertSecurityHeaders(piece);
 
         System.setProperty("chess.appPrefix", "/v1/chess");
         FakeExchange prefixed = new FakeExchange();
@@ -98,6 +111,37 @@ public class ChessServerTest {
         escaped.setRequestUri("/vendor/../app.js");
         handler.handle(escaped);
         assertEquals(404, escaped.statusCode);
+        assertSecurityHeaders(escaped);
+    }
+
+    @Test
+    void httpExecutor_isAFixedThreadPool() {
+        ExecutorService executor = chessServer.newHttpExecutor();
+        try {
+            assertTrue(executor instanceof ThreadPoolExecutor);
+            assertTrue(((ThreadPoolExecutor) executor).getCorePoolSize() >= 4);
+        } finally {
+            executor.shutdownNow();
+        }
+    }
+
+    @Test
+    void ping_setsSecurityHeaders() throws IOException {
+        chessServer.PingHandler handler = new chessServer.PingHandler();
+        FakeExchange exchange = new FakeExchange();
+        handler.handle(exchange);
+        assertEquals(200, exchange.statusCode);
+        assertEquals("pong", exchange.responseBody.toString("UTF-8"));
+        assertSecurityHeaders(exchange);
+    }
+
+    private static void assertSecurityHeaders(FakeExchange exchange) {
+        assertEquals("nosniff", exchange.responseHeaders.getFirst("X-Content-Type-Options"));
+        assertEquals("no-referrer", exchange.responseHeaders.getFirst("Referrer-Policy"));
+        String policy = exchange.responseHeaders.getFirst("Content-Security-Policy");
+        assertTrue(policy.contains("default-src 'self'"));
+        assertTrue(policy.contains("frame-ancestors 'none'"));
+        assertFalse(policy.contains("unsafe-inline"));
     }
 
     @Test
@@ -142,6 +186,8 @@ public class ChessServerTest {
         FakeExchange ex = new FakeExchange();
         assertFalse(AuthFilter.authorize(ex));
         assertEquals(401, ex.statusCode);
+        assertEquals("nosniff", ex.responseHeaders.getFirst("X-Content-Type-Options"));
+        assertTrue(ex.responseHeaders.getFirst("Content-Security-Policy").contains("frame-ancestors 'none'"));
     }
 
     @Test

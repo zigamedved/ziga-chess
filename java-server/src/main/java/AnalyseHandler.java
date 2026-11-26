@@ -37,6 +37,7 @@ public class AnalyseHandler implements HttpHandler {
 
     @Override
     public void handle(HttpExchange t) throws IOException {
+        SecurityHeaders.apply(t);
         if (!AuthFilter.authorize(t)) {
             return;
         }
